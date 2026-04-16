@@ -42,11 +42,9 @@ export class PolicyEngine {
   }
 
   async evaluate(task: CanonicalTaskModel, transition: StateTransition): Promise<void> {
-    const matchingRules = this.rules.filter(rule => {
-      if (rule.action === 'enter' && rule.toStatus !== undefined && rule.toStatus !== transition.to) return false;
-      if (rule.action === 'exit' && rule.fromStatus !== undefined && rule.fromStatus !== transition.from) return false;
-      return true;
-    });
+    const exitRules = this.matchRules('exit', transition);
+    const enterRules = this.matchRules('enter', transition);
+    const matchingRules = [...exitRules, ...enterRules];
 
     for (const rule of matchingRules) {
       try {

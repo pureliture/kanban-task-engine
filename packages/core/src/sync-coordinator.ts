@@ -45,11 +45,11 @@ export class SyncCoordinator {
     this.transports.set(name, transport);
   }
 
-  async syncFromProvider(providerName: string): Promise<number> {
+  async syncFromProvider(providerName: string, since?: string): Promise<number> {
     const provider = this.providers.get(providerName);
     if (!provider) throw new Error(`Unknown provider: ${providerName}`);
 
-    const remoteTasks = await provider.fetchTasks();
+    const remoteTasks = await provider.fetchTasks(since);
     let syncCount = 0;
 
     for (const remoteTask of remoteTasks) {

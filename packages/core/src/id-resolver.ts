@@ -13,7 +13,7 @@ export class IdResolver {
       throw new Error(`Invalid task reference format: ${refString}`);
     }
     const provider = parts[0];
-    const validProviders = ['local', 'github', 'jira'];
+    const validProviders = ['local', 'github', 'firebase', 'jira'];
     if (!validProviders.includes(provider)) {
       throw new Error(`Invalid provider '${provider}' in reference: ${refString}. Valid: ${validProviders.join(', ')}`);
     }

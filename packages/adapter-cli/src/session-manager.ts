@@ -71,15 +71,21 @@ export class SessionManager {
 
   async cancelSession(sessionId: string): Promise<void> {
     const session = this.sessions.get(sessionId);
-    if (session?.process) {
+    if (session?.process && session.process.pid && !session.process.killed) {
       session.process.kill('SIGTERM');
+      // SIGKILL after 5 second grace period
+      setTimeout(() => {
+        if (session.process?.pid && !session.process.killed) {
+          session.process.kill('SIGKILL');
+        }
+      }, 5000);
       session.status = 'cancelled';
     }
     this.cleanupCompletedSessions();
   }
 
   private executeCommand(config: SessionConfig, sessionId: string): Promise<ExecutionResult> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const startedAt = new Date().toISOString();
       const timeout = config.timeout ?? 300000;
 
@@ -101,6 +107,7 @@ export class SessionManager {
       });
 
       childProcess.on('close', (code) => {
+        clearTimeout(timeoutTimer);
         const s = this.sessions.get(sessionId);
         if (s) {
           s.process = null;
@@ -116,6 +123,7 @@ export class SessionManager {
       });
 
       childProcess.on('error', (error) => {
+        clearTimeout(timeoutTimer);
         const s = this.sessions.get(sessionId);
         if (s) {
           s.process = null;
@@ -130,11 +138,12 @@ export class SessionManager {
         });
       });
 
-      // Set timeout
-      setTimeout(() => {
-        if (childProcess.pid) {
-          childProcess.kill('SIGTERM');
+      // Set timeout with SIGKILL fallback
+      const timeoutTimer = setTimeout(() => {
+        if (childProcess.pid && !childProcess.killed) {
+          childProcess.kill('SIGKILL');
         }
+        reject(new Error(`Process timed out after ${timeout}ms`));
       }, timeout);
     });
   }

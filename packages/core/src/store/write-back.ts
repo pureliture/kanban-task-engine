@@ -4,6 +4,12 @@ import { canonicalToYaml, normalizedToRawStatus } from './mapper';
 import { parseFrontmatter, extractBody, serializeWithFrontmatter } from './frontmatter-utils';
 import { atomicWriteFile } from './fs-utils';
 
+const VALID_FIELDS = new Set([
+  'id', 'status', 'priority', 'issueType', 'summary', 'assignee', 'reporter',
+  'labels', 'project', 'components', 'sprint', 'storyPoints', 'due_date',
+  'automation', 'created', 'updated', 'completed',
+]);
+
 export class WriteBack {
   async updateStatus(filePath: string, newStatus: NormalizedStatus, task: CanonicalTaskModel): Promise<void> {
     const content = await fs.readFile(filePath, 'utf-8');
@@ -16,6 +22,9 @@ export class WriteBack {
   }
 
   async updateField(filePath: string, fieldName: string, value: unknown): Promise<void> {
+    if (!VALID_FIELDS.has(fieldName)) {
+      throw new Error(`Invalid field name: ${fieldName}`);
+    }
     const content = await fs.readFile(filePath, 'utf-8');
     const frontmatter = parseFrontmatter(content);
     if (!frontmatter) throw new Error(`Cannot parse frontmatter: ${filePath}`);
