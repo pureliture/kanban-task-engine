@@ -64,6 +64,27 @@ describe('StateMachine', () => {
       const result = sm.transition(activeTask, 'DONE');
       expect(result.completed).toBeDefined();
     });
+
+    it('sets completed date on CANCELLED', () => {
+      const activeTask = { ...baseTask, workflow: { ...baseTask.workflow, normalized_status: 'ACTIVE' as NormalizedStatus } };
+      const result = sm.transition(activeTask, 'CANCELLED');
+      expect(result.completed).toBeDefined();
+    });
+
+    it('does not mutate the original task object', () => {
+      sm.transition(baseTask, 'ACTIVE');
+      expect(baseTask.workflow.normalized_status).toBe('BACKLOG');
+    });
+  });
+
+  describe('getValidTransitions', () => {
+    it('returns valid transitions for ACTIVE', () => {
+      const transitions = sm.getValidTransitions('ACTIVE');
+      expect(transitions).toContain('BLOCKED');
+      expect(transitions).toContain('REVIEW');
+      expect(transitions).toContain('DONE');
+      expect(transitions).toContain('CANCELLED');
+    });
   });
 
   describe('terminal status', () => {
