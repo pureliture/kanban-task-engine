@@ -1,5 +1,5 @@
 import { ExecutionResult, ExecutionStatus } from '@kanban-task-engine/core';
-import { exec, ChildProcess } from 'child_process';
+import { spawn, ChildProcess } from 'child_process';
 
 export interface SessionConfig {
   command: string;
@@ -20,9 +20,11 @@ interface ActiveSession {
 export class SessionManager {
   private sessions: Map<string, ActiveSession> = new Map();
   private defaultConfig: Partial<SessionConfig>;
+  private maxSessions: number;
 
-  constructor(defaultConfig?: Partial<SessionConfig>) {
+  constructor(defaultConfig?: Partial<SessionConfig>, maxSessions: number = 100) {
     this.defaultConfig = defaultConfig ?? {};
+    this.maxSessions = maxSessions;
   }
 
   async startSession(sessionId: string, config: SessionConfig): Promise<ExecutionResult> {
@@ -45,6 +47,8 @@ export class SessionManager {
         completedSession.status = result.success ? 'completed' : 'failed';
         completedSession.result = result;
       }
+
+      this.cleanupCompletedSessions();
 
       return result;
     } catch (error) {
@@ -71,40 +75,60 @@ export class SessionManager {
       session.process.kill('SIGTERM');
       session.status = 'cancelled';
     }
+    this.cleanupCompletedSessions();
   }
 
   private executeCommand(config: SessionConfig, sessionId: string): Promise<ExecutionResult> {
     return new Promise((resolve) => {
       const startedAt = new Date().toISOString();
-      const timeout = config.timeout ?? 300000; // 5 min default
+      const timeout = config.timeout ?? 300000;
 
-      const childProcess = exec(
-        `${config.command} ${config.args?.join(' ') ?? ''}`,
-        {
-          cwd: config.cwd,
-          env: { ...process.env, ...config.env },
-          maxBuffer: 1024 * 1024,
-        },
-        (error, stdout, stderr) => {
-          const session = this.sessions.get(sessionId);
-          if (session) {
-            session.process = null;
-          }
-
-          resolve({
-            success: !error,
-            sessionId,
-            error: error?.message ?? (stderr ? stderr.slice(0, 500) : undefined),
-            startedAt,
-            completedAt: new Date().toISOString(),
-          });
-        }
-      );
+      const childProcess = spawn(config.command, config.args ?? [], {
+        cwd: config.cwd,
+        env: { ...process.env, ...config.env },
+        stdio: 'pipe',
+      });
 
       const session = this.sessions.get(sessionId);
       if (session) {
         session.process = childProcess;
       }
+
+      let stderr = '';
+
+      childProcess.stderr?.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      childProcess.on('close', (code) => {
+        const s = this.sessions.get(sessionId);
+        if (s) {
+          s.process = null;
+        }
+
+        resolve({
+          success: code === 0,
+          sessionId,
+          error: code !== 0 ? (stderr.slice(0, 500) || `Process exited with code ${code}`) : undefined,
+          startedAt,
+          completedAt: new Date().toISOString(),
+        });
+      });
+
+      childProcess.on('error', (error) => {
+        const s = this.sessions.get(sessionId);
+        if (s) {
+          s.process = null;
+        }
+
+        resolve({
+          success: false,
+          sessionId,
+          error: error.message,
+          startedAt,
+          completedAt: new Date().toISOString(),
+        });
+      });
 
       // Set timeout
       setTimeout(() => {
@@ -113,5 +137,17 @@ export class SessionManager {
         }
       }, timeout);
     });
+  }
+
+  private cleanupCompletedSessions(): void {
+    if (this.sessions.size <= this.maxSessions) return;
+
+    // Remove oldest completed/failed/cancelled sessions
+    for (const [id, session] of this.sessions) {
+      if (session.status !== 'running' && session.status !== 'pending') {
+        this.sessions.delete(id);
+        if (this.sessions.size <= this.maxSessions * 0.8) break; // Clean up to 80% of max
+      }
+    }
   }
 }
