@@ -1,10 +1,20 @@
 import { createHash } from 'crypto';
 import { CanonicalTaskModel } from './types';
-import { canonicalToYaml } from './store/mapper';
+
+function stableStringify(obj: unknown): string {
+  if (obj === null || obj === undefined) return 'null';
+  if (typeof obj !== 'object') return JSON.stringify(obj);
+  if (Array.isArray(obj)) return '[' + obj.map(stableStringify).join(',') + ']';
+  const sorted = Object.keys(obj as Record<string, unknown>).sort();
+  return '{' + sorted.map(k => JSON.stringify(k) + ':' + stableStringify((obj as Record<string, unknown>)[k])).join(',') + '}';
+}
 
 export function computeChecksum(task: CanonicalTaskModel): string {
-  const data = canonicalToYaml(task);
-  const content = JSON.stringify(data, Object.keys(data).sort());
+  // Exclude sync.checksum from the hash to avoid circular dependency
+  const { sync, ...rest } = task;
+  const { checksum: _cs, ...syncWithoutChecksum } = sync;
+  const data = { ...rest, sync: syncWithoutChecksum };
+  const content = stableStringify(data);
   return createHash('sha256').update(content).digest('hex').slice(0, 12);
 }
 

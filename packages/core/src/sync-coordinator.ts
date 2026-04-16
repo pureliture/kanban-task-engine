@@ -144,7 +144,21 @@ export class SyncCoordinator {
           },
         };
       case 'newest-wins': {
-        const localNewer = (localTask.updated ?? localTask.created ?? '') > (remoteTask.updated ?? remoteTask.created ?? '');
+        const localTs = localTask.updated ?? localTask.created;
+        const remoteTs = remoteTask.updated ?? remoteTask.created;
+        if (!localTs || !remoteTs) {
+          // Cannot compare - fall back to local-wins
+          return {
+            ...localTask,
+            sync: {
+              ...localTask.sync,
+              last_synced_at: new Date().toISOString(),
+              last_source: providerName as Sync['last_source'],
+              checksum: computeChecksum(localTask),
+            },
+          };
+        }
+        const localNewer = localTs > remoteTs;
         const winner = localNewer ? localTask : remoteTask;
         return {
           ...winner,
