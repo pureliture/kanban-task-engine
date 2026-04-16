@@ -12,7 +12,8 @@ export interface GitHubAdapterConfig {
   token: string;
   owner: string;
   repo: string;
-  projectId?: string;
+  projectId: string;
+  statusFieldId: string;  // Required - the global field ID for the Status field
 }
 
 export class GitHubAdapter implements WorkStateProvider {
@@ -128,23 +129,38 @@ export class GitHubAdapter implements WorkStateProvider {
   }
 
   async pushStatus(externalKey: string, status: NormalizedStatus): Promise<void> {
-    if (!this.config.projectId) {
-      throw new Error('GitHub project ID is required for pushStatus');
-    }
-
     const issueNumber = parseInt(externalKey.replace('#', ''), 10);
+    if (isNaN(issueNumber)) throw new Error(`Invalid issue key: ${externalKey}`);
+
     const githubStatus = normalizedToGithubStatus(status);
 
-    // This would use the GitHub Projects API to update the status field
-    // The actual mutation depends on the project's custom field configuration
+    // Step 1: Resolve issue number to node ID
+    const nodeIdQuery = `
+      query($owner: String!, $repo: String!, $number: Int!) {
+        repository(owner: $owner, name: $repo) {
+          issue(number: $number) { id }
+        }
+      }
+    `;
+
+    const nodeResult: any = await this.graphqlWithAuth(nodeIdQuery, {
+      owner: this.config.owner,
+      repo: this.config.repo,
+      number: issueNumber,
+    });
+
+    const contentId = nodeResult.repository.issue?.id;
+    if (!contentId) throw new Error(`Could not resolve node ID for issue ${externalKey}`);
+
+    // Step 2: Update the project item status
     const mutation = `
-      mutation($projectId: ID!, $contentId: ID!, $statusFieldId: ID!, $statusOptionId: String!) {
+      mutation($projectId: ID!, $contentId: ID!, $fieldId: ID!, $optionId: String!) {
         updateProjectV2ItemFieldValue(
           input: {
             projectId: $projectId
             contentId: $contentId
-            fieldId: $statusFieldId
-            value: { singleSelectOptionId: $statusOptionId }
+            fieldId: $fieldId
+            value: { singleSelectOptionId: $optionId }
           }
         ) {
           projectV2Item { id }
@@ -155,9 +171,9 @@ export class GitHubAdapter implements WorkStateProvider {
     try {
       await this.graphqlWithAuth(mutation, {
         projectId: this.config.projectId,
-        contentId: issueNumber,
-        statusFieldId: 'Status',
-        statusOptionId: githubStatus,
+        contentId,
+        fieldId: this.config.statusFieldId,
+        optionId: githubStatus,
       });
     } catch (error) {
       throw new Error(`GitHub pushStatus failed: ${error}`);

@@ -112,10 +112,12 @@ function mapLabelsToPriority(labels: string[]): string {
 
 function mapPriority(raw: string): CanonicalTaskModel['classification']['priority'] {
   const map: Record<string, CanonicalTaskModel['classification']['priority']> = {
+    'Blocker': 'Blocker',
     'Critical': 'Critical',
     'High': 'High',
     'Medium': 'Medium',
     'Low': 'Low',
+    'Trivial': 'Trivial',
   };
   return map[raw] ?? 'Medium';
 }
