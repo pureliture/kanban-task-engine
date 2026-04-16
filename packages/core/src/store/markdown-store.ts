@@ -1,10 +1,10 @@
-import { CanonicalTaskModel, TaskFilter } from '../types';
+import { CanonicalTaskModel, TaskFilter, TaskStore } from '../types';
 import { yamlToCanonical, canonicalToYaml } from './mapper';
 import YAML from 'yaml';
 import fs from 'fs/promises';
 import path from 'path';
 
-export class MarkdownStore {
+export class MarkdownStore implements TaskStore {
   private workspacePaths: string[];
 
   constructor(workspacePaths: string[]) {
@@ -25,7 +25,16 @@ export class MarkdownStore {
   async saveTask(task: CanonicalTaskModel): Promise<void> {
     const filePath = this.getIssueFilePath(task);
     const yamlData = canonicalToYaml(task);
-    const content = this.serializeWithFrontmatter(yamlData, task.description_ref);
+
+    let body: string;
+    try {
+      const existing = await fs.readFile(filePath, 'utf-8');
+      body = this.extractBody(existing);
+    } catch {
+      body = `# ${yamlData.summary ?? ''}`;
+    }
+
+    const content = this.serializeWithFrontmatter(yamlData, body);
     await fs.mkdir(path.dirname(filePath), { recursive: true });
     await fs.writeFile(filePath, content, 'utf-8');
   }
@@ -77,10 +86,14 @@ export class MarkdownStore {
     }
   }
 
-  private serializeWithFrontmatter(yamlData: Record<string, unknown>, descriptionRef?: string): string {
+  private extractBody(content: string): string {
+    const match = content.match(/^---\s*\n[\s\S]*?\n---\s*\n/);
+    return match ? content.slice(match[0].length).trim() : content.trim();
+  }
+
+  private serializeWithFrontmatter(yamlData: Record<string, unknown>, body: string): string {
     const frontmatter = YAML.stringify(yamlData, { lineWidth: 0 });
-    const body = descriptionRef ? `\n# ${yamlData.summary ?? ''}\n` : '';
-    return `---\n${frontmatter}---\n${body}`;
+    return `---\n${frontmatter}---\n\n${body}\n`;
   }
 
   private async findIssueFile(issueId: string): Promise<string | null> {

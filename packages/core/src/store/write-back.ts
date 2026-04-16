@@ -1,14 +1,14 @@
 import fs from 'fs/promises';
 import YAML from 'yaml';
 import { CanonicalTaskModel, NormalizedStatus } from '../types';
-import { canonicalToYaml } from './mapper';
+import { canonicalToYaml, normalizedToRawStatus } from './mapper';
 
 export class WriteBack {
   async updateStatus(filePath: string, newStatus: NormalizedStatus, task: CanonicalTaskModel): Promise<void> {
     const content = await fs.readFile(filePath, 'utf-8');
     const body = this.extractBody(content);
     const yamlData = canonicalToYaml(task);
-    yamlData.status = this.normalizedToRawStatus(newStatus);
+    yamlData.status = normalizedToRawStatus(newStatus);
 
     const newContent = this.serializeWithFrontmatter(yamlData, body);
 
@@ -51,16 +51,4 @@ export class WriteBack {
     return `---\n${frontmatter}---\n\n${body}\n`;
   }
 
-  private normalizedToRawStatus(normalized: NormalizedStatus): string {
-    const map: Record<string, string> = {
-      'BACKLOG': 'Backlog',
-      'SELECTED': 'Todo',
-      'ACTIVE': 'In Progress',
-      'BLOCKED': 'Blocked',
-      'REVIEW': 'In Review',
-      'DONE': 'Done',
-      'CANCELLED': 'Cancelled',
-    };
-    return map[normalized] ?? 'Backlog';
-  }
 }
