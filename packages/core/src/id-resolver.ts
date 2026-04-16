@@ -1,0 +1,34 @@
+import { TaskRef, CanonicalTaskModel } from './types';
+
+export class IdResolver {
+  private cache: Map<string, TaskRef> = new Map();
+
+  resolveRef(ref: TaskRef): string {
+    return `${ref.provider}:${ref.external_key}:${ref.external_id}`;
+  }
+
+  parseRef(refString: string): TaskRef {
+    const parts = refString.split(':');
+    if (parts.length < 3) {
+      throw new Error(`Invalid task reference format: ${refString}`);
+    }
+    return {
+      provider: parts[0] as TaskRef['provider'],
+      external_key: parts[1],
+      external_id: parts.slice(2).join(':'),
+    };
+  }
+
+  register(task: CanonicalTaskModel): void {
+    const key = this.resolveRef(task.task_ref);
+    this.cache.set(key, task.task_ref);
+  }
+
+  lookup(provider: string, externalKey: string, externalId: string): TaskRef | undefined {
+    return this.cache.get(`${provider}:${externalKey}:${externalId}`);
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+}
