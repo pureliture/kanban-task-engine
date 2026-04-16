@@ -1,0 +1,22 @@
+{
+  "name": "@kanban-task-engine/adapter-github",
+  "version": "0.1.0",
+  "description": "GitHub adapter for task synchronization",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@kanban-task-engine/core": "workspace:*",
+    "@octokit/graphql": "^8.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.0.0"
+  }
+}
