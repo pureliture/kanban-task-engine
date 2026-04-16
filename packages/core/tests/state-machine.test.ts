@@ -75,6 +75,26 @@ describe('StateMachine', () => {
       sm.transition(baseTask, 'ACTIVE');
       expect(baseTask.workflow.normalized_status).toBe('BACKLOG');
     });
+
+    it('updates raw_status and raw_status_category on transition', () => {
+      const result = sm.transition(baseTask, 'ACTIVE');
+      expect(result.workflow.raw_status).toBe('In Progress');
+      expect(result.workflow.raw_status_category).toBe('IN_PROGRESS');
+    });
+
+    it('updates raw_status and raw_status_category for SELECTED', () => {
+      const selectedTask = { ...baseTask, workflow: { ...baseTask.workflow, normalized_status: 'BACKLOG' as NormalizedStatus } };
+      const result = sm.transition(selectedTask, 'SELECTED');
+      expect(result.workflow.raw_status).toBe('Todo');
+      expect(result.workflow.raw_status_category).toBe('BACKLOG');
+    });
+
+    it('updates raw_status and raw_status_category for REVIEW', () => {
+      const activeTask = { ...baseTask, workflow: { ...baseTask.workflow, normalized_status: 'ACTIVE' as NormalizedStatus } };
+      const result = sm.transition(activeTask, 'REVIEW');
+      expect(result.workflow.raw_status).toBe('In Review');
+      expect(result.workflow.raw_status_category).toBe('IN_REVIEW');
+    });
   });
 
   describe('getValidTransitions', () => {

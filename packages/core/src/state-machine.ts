@@ -1,9 +1,30 @@
 import {
   NormalizedStatus,
+  RawStatusCategory,
   StateTransition,
   VALID_TRANSITIONS,
   CanonicalTaskModel,
 } from './types';
+
+const STATUS_TO_RAW: Record<NormalizedStatus, string> = {
+  'BACKLOG': 'Backlog',
+  'SELECTED': 'Todo',
+  'ACTIVE': 'In Progress',
+  'BLOCKED': 'Blocked',
+  'REVIEW': 'In Review',
+  'DONE': 'Done',
+  'CANCELLED': 'Cancelled',
+};
+
+const STATUS_TO_CATEGORY: Record<NormalizedStatus, RawStatusCategory> = {
+  'BACKLOG': 'BACKLOG',
+  'SELECTED': 'BACKLOG',
+  'ACTIVE': 'IN_PROGRESS',
+  'BLOCKED': 'BLOCKED',
+  'REVIEW': 'IN_REVIEW',
+  'DONE': 'DONE',
+  'CANCELLED': 'CANCELLED',
+};
 
 export class StateMachine {
   private transitions: Map<string, Set<NormalizedStatus>>;
@@ -30,12 +51,13 @@ export class StateMachine {
       );
     }
 
-    const prevStatus = task.workflow.normalized_status;
     return {
       ...task,
       workflow: {
         ...task.workflow,
         normalized_status: newStatus,
+        raw_status: STATUS_TO_RAW[newStatus],
+        raw_status_category: STATUS_TO_CATEGORY[newStatus],
       },
       sync: {
         ...task.sync,
