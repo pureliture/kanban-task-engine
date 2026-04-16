@@ -1,6 +1,7 @@
 import { CanonicalTaskModel, TaskFilter, TaskStore } from '../types';
 import { yamlToCanonical, canonicalToYaml } from './mapper';
-import YAML from 'yaml';
+import { parseFrontmatter, extractBody, serializeWithFrontmatter } from './frontmatter-utils';
+import { atomicWriteFile } from './fs-utils';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -16,7 +17,7 @@ export class MarkdownStore implements TaskStore {
     if (!filePath) return null;
 
     const content = await fs.readFile(filePath, 'utf-8');
-    const frontmatter = this.parseFrontmatter(content);
+    const frontmatter = parseFrontmatter(content);
     if (!frontmatter) return null;
 
     return yamlToCanonical(frontmatter, filePath);
@@ -29,14 +30,14 @@ export class MarkdownStore implements TaskStore {
     let body: string;
     try {
       const existing = await fs.readFile(filePath, 'utf-8');
-      body = this.extractBody(existing);
+      body = extractBody(existing);
     } catch {
       body = `# ${yamlData.summary ?? ''}`;
     }
 
-    const content = this.serializeWithFrontmatter(yamlData, body);
+    const content = serializeWithFrontmatter(yamlData, body);
     await fs.mkdir(path.dirname(filePath), { recursive: true });
-    await fs.writeFile(filePath, content, 'utf-8');
+    await atomicWriteFile(filePath, content);
   }
 
   async updateTask(task: CanonicalTaskModel): Promise<void> {
@@ -57,7 +58,7 @@ export class MarkdownStore implements TaskStore {
 
     for (const filePath of allFiles) {
       const content = await fs.readFile(filePath, 'utf-8');
-      const frontmatter = this.parseFrontmatter(content);
+      const frontmatter = parseFrontmatter(content);
       if (!frontmatter) continue;
 
       const task = yamlToCanonical(frontmatter, filePath);
@@ -74,26 +75,6 @@ export class MarkdownStore implements TaskStore {
     if (filePath) {
       await fs.unlink(filePath);
     }
-  }
-
-  private parseFrontmatter(content: string): Record<string, unknown> | null {
-    const match = content.match(/^---\s*\n([\s\S]*?)\n---\s*\n/);
-    if (!match) return null;
-    try {
-      return YAML.parse(match[1]) as Record<string, unknown>;
-    } catch {
-      return null;
-    }
-  }
-
-  private extractBody(content: string): string {
-    const match = content.match(/^---\s*\n[\s\S]*?\n---\s*\n/);
-    return match ? content.slice(match[0].length).trim() : content.trim();
-  }
-
-  private serializeWithFrontmatter(yamlData: Record<string, unknown>, body: string): string {
-    const frontmatter = YAML.stringify(yamlData, { lineWidth: 0 });
-    return `---\n${frontmatter}---\n\n${body}\n`;
   }
 
   private async findIssueFile(issueId: string): Promise<string | null> {

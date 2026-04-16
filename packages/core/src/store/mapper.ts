@@ -29,17 +29,18 @@ export function rawStatusToNormalized(raw: string): NormalizedStatus {
   return STATUS_MAP[raw.toLowerCase()] ?? 'BACKLOG';
 }
 
+const REVERSE_STATUS_MAP: Record<string, string> = {
+  'BACKLOG': 'Backlog',
+  'SELECTED': 'Todo',
+  'ACTIVE': 'In Progress',
+  'BLOCKED': 'Blocked',
+  'REVIEW': 'In Review',
+  'DONE': 'Done',
+  'CANCELLED': 'Cancelled',
+};
+
 export function normalizedToRawStatus(normalized: NormalizedStatus): string {
-  const reverse: Record<string, string> = {
-    'BACKLOG': 'Backlog',
-    'SELECTED': 'Todo',
-    'ACTIVE': 'In Progress',
-    'BLOCKED': 'Blocked',
-    'REVIEW': 'In Review',
-    'DONE': 'Done',
-    'CANCELLED': 'Cancelled',
-  };
-  return reverse[normalized] ?? 'Backlog';
+  return REVERSE_STATUS_MAP[normalized] ?? 'Backlog';
 }
 
 export function yamlToCanonical(yaml: Record<string, unknown>, filePath: string): CanonicalTaskModel {

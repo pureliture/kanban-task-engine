@@ -35,6 +35,9 @@ export class FileWatcher {
     this.watcher.on('add', (filePath) => this.handleEvent('add', filePath));
     this.watcher.on('change', (filePath) => this.handleEvent('change', filePath));
     this.watcher.on('unlink', (filePath) => this.handleEvent('unlink', filePath));
+    this.watcher.on('error', (err) => {
+      console.error(`FileWatcher error: ${err}`);
+    });
   }
 
   stop(): void {
