@@ -1,6 +1,6 @@
 // === 식별 ===
 export interface TaskRef {
-  provider: 'local' | 'github' | 'jira';
+  provider: 'local' | 'github' | 'jira' | 'firebase';
   external_key: string;
   external_id: string;
 }
