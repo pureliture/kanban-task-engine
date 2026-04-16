@@ -125,8 +125,7 @@ export class SyncCoordinator {
     switch (this.conflictResolution) {
       case 'local-wins':
         return {
-          ...remoteTask,
-          workflow: localTask.workflow,
+          ...localTask,
           sync: {
             ...localTask.sync,
             last_synced_at: new Date().toISOString(),

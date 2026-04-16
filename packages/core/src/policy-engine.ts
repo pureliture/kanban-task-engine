@@ -57,7 +57,11 @@ export class PolicyEngine {
     };
 
     // Evaluate exit policies for current status
-    const exitRules = this.rules.filter(r => r.action === 'exit' && r.fromStatus === transition.from);
+    const exitRules = this.rules.filter(r => {
+      if (r.action !== 'exit') return false;
+      if (r.fromStatus !== undefined && r.fromStatus !== transition.from) return false;
+      return true;
+    });
     for (const rule of exitRules) {
       try {
         await rule.handler(task, transition);
@@ -70,7 +74,11 @@ export class PolicyEngine {
     const updatedTask = this.stateMachine.transition(task, newStatus);
 
     // Evaluate enter policies for new status
-    const enterRules = this.rules.filter(r => r.action === 'enter' && r.toStatus === transition.to);
+    const enterRules = this.rules.filter(r => {
+      if (r.action !== 'enter') return false;
+      if (r.toStatus !== undefined && r.toStatus !== transition.to) return false;
+      return true;
+    });
     for (const rule of enterRules) {
       try {
         await rule.handler(updatedTask, transition);
