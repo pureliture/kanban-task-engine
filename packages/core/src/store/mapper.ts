@@ -1,6 +1,11 @@
 import { CanonicalTaskModel, NormalizedStatus, RawStatusCategory } from '../types';
 
-// 기존 Obsidian 상태 → Canonical 상태 매핑
+// Status mapping: This is the canonical local mapping.
+// Adapters (GitHub, Firebase) maintain their own provider-specific mappings.
+// When adding new status aliases here, ensure consistency with:
+// - packages/adapter-github/src/status-mapping.ts
+// - packages/adapter-firebase/src/firebase-mapper.ts
+// - packages/core/src/state-machine.ts (STATUS_TO_RAW, STATUS_TO_CATEGORY)
 const STATUS_MAP: Record<string, NormalizedStatus> = {
   'backlog': 'BACKLOG',
   'in progress': 'ACTIVE',

@@ -5,6 +5,27 @@ import { atomicWriteFile } from './fs-utils';
 import fs from 'fs/promises';
 import path from 'path';
 
+function deepMerge<T>(target: T, patch: Partial<T>): T {
+  const result = { ...target };
+  for (const key of Object.keys(patch as object)) {
+    const patchVal = (patch as any)[key];
+    const targetVal = (target as any)[key];
+    if (
+      patchVal !== null &&
+      typeof patchVal === 'object' &&
+      !Array.isArray(patchVal) &&
+      targetVal !== null &&
+      typeof targetVal === 'object' &&
+      !Array.isArray(targetVal)
+    ) {
+      (result as any)[key] = deepMerge(targetVal, patchVal);
+    } else {
+      (result as any)[key] = patchVal;
+    }
+  }
+  return result;
+}
+
 export class MarkdownStore implements TaskStore {
   private workspacePaths: string[];
 
@@ -48,7 +69,7 @@ export class MarkdownStore implements TaskStore {
     const existing = await this.findByExternalKey(task.task_ref.provider, task.task_ref.external_key);
     if (!existing) throw new Error(`Task not found: ${task.task_ref.external_id}`);
 
-    const merged = { ...existing, ...patch, ...patch.workflow ? { workflow: { ...existing.workflow, ...patch.workflow } } : {} };
+    const merged = deepMerge(existing, patch);
     await this.saveTask(merged);
   }
 

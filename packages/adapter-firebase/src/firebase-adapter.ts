@@ -36,23 +36,25 @@ export class FirebaseAdapter implements SyncTransport {
   subscribe(handler: (event: SyncEvent) => void): void {
     this.handlers.push(handler);
 
-    // Start listener on first subscription
-    if (!this.listener) {
-      this.listener = new FirebaseListener(this.app, {
-        collectionPath: this.config.collectionPath,
-        workspace: this.config.workspace,
-      });
-
-      this.listener.start((event) => {
-        for (const h of this.handlers) {
-          try {
-            h(event);
-          } catch (err) {
-            console.error('FirebaseAdapter: handler error:', err);
-          }
-        }
-      });
+    // Stop existing listener before creating a new one
+    if (this.listener) {
+      this.listener.stop();
     }
+
+    this.listener = new FirebaseListener(this.app, {
+      collectionPath: this.config.collectionPath,
+      workspace: this.config.workspace,
+    });
+
+    this.listener.start((event) => {
+      for (const h of this.handlers) {
+        try {
+          h(event);
+        } catch (err) {
+          console.error('FirebaseAdapter: handler error:', err);
+        }
+      }
+    });
   }
 
   async publish(event: SyncEvent): Promise<void> {
