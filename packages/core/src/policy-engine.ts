@@ -5,6 +5,7 @@ import {
 } from './types';
 import { StateMachine } from './state-machine';
 import { EventBus } from './event-bus';
+import { POLICY_EVENTS } from './events';
 
 export interface PolicyRule {
   id: string;
@@ -50,11 +51,11 @@ export class PolicyEngine {
       try {
         await rule.handler(task, transition);
       } catch (err) {
-        this.eventBus.emit('policy:error', { ruleId: rule.id, error: err });
+        this.eventBus.emit(POLICY_EVENTS.ERROR, { ruleId: rule.id, error: err });
       }
     }
 
-    this.eventBus.emit('policy:evaluated', { taskRef: task.task_ref, transition, ruleCount: matchingRules.length });
+    this.eventBus.emit(POLICY_EVENTS.EVALUATED, { taskRef: task.task_ref, transition, ruleCount: matchingRules.length });
   }
 
   async onTransition(task: CanonicalTaskModel, newStatus: NormalizedStatus): Promise<CanonicalTaskModel> {
@@ -69,7 +70,7 @@ export class PolicyEngine {
       try {
         await rule.handler(task, transition);
       } catch (err) {
-        this.eventBus.emit('policy:error', { ruleId: rule.id, error: err });
+        this.eventBus.emit(POLICY_EVENTS.ERROR, { ruleId: rule.id, error: err });
       }
     }
 
@@ -82,11 +83,11 @@ export class PolicyEngine {
       try {
         await rule.handler(updatedTask, transition);
       } catch (err) {
-        this.eventBus.emit('policy:error', { ruleId: rule.id, error: err });
+        this.eventBus.emit(POLICY_EVENTS.ERROR, { ruleId: rule.id, error: err });
       }
     }
 
-    this.eventBus.emit('policy:transition', { taskRef: task.task_ref, transition });
+    this.eventBus.emit(POLICY_EVENTS.TRANSITION, { taskRef: task.task_ref, transition });
 
     return updatedTask;
   }

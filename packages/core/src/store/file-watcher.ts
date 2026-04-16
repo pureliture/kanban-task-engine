@@ -45,6 +45,11 @@ export class FileWatcher {
       this.watcher.close();
       this.watcher = null;
     }
+    // Clear all pending debounce timers
+    for (const timer of this.debounceTimers.values()) {
+      clearTimeout(timer);
+    }
+    this.debounceTimers.clear();
   }
 
   onChange(handler: (event: FileChangeEvent) => void): void {

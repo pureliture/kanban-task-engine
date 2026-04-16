@@ -11,6 +11,7 @@ import { EventBus } from './event-bus';
 import { StateMachine } from './state-machine';
 import { PolicyEngine } from './policy-engine';
 import { computeChecksum, hasChanged } from './checksum';
+import { SYNC_EVENTS } from './events';
 
 export type ConflictResolution = 'local-wins' | 'provider-wins' | 'newest-wins';
 
@@ -59,7 +60,6 @@ export class SyncCoordinator {
       );
 
       if (!localTask) {
-        // New task from remote - save locally
         await this.taskStore.saveTask({
           ...remoteTask,
           sync: {
@@ -69,23 +69,23 @@ export class SyncCoordinator {
           },
         });
         syncCount++;
-        this.eventBus.emit('sync:task-added', { providerName, taskRef: remoteTask.task_ref });
+        this.eventBus.emit(SYNC_EVENTS.TASK_ADDED, { providerName, taskRef: remoteTask.task_ref });
         continue;
       }
 
       // Check for changes
-      if (!hasChanged(localTask) && !hasChanged(remoteTask)) continue;
-      if (localTask.sync.checksum === computeChecksum(remoteTask)) continue;
+      const remoteChecksum = computeChecksum(remoteTask);
+      if (!hasChanged(localTask) && localTask.sync.checksum === remoteChecksum) continue;
 
       // Conflict resolution
-      const resolved = this.resolveConflict(localTask, remoteTask, providerName);
+      const resolved = this.resolveConflict(localTask, remoteTask, providerName, remoteChecksum);
       await this.taskStore.updateTask(resolved);
       syncCount++;
 
-      this.eventBus.emit('sync:task-updated', { providerName, taskRef: resolved.task_ref });
+      this.eventBus.emit(SYNC_EVENTS.TASK_UPDATED, { providerName, taskRef: resolved.task_ref });
     }
 
-    this.eventBus.emit('sync:completed', { providerName, count: syncCount });
+    this.eventBus.emit(SYNC_EVENTS.COMPLETED, { providerName, count: syncCount });
     return syncCount;
   }
 
@@ -106,21 +106,22 @@ export class SyncCoordinator {
       },
     });
 
-    this.eventBus.emit('sync:pushed', { providerName, taskRef: task.task_ref });
+    this.eventBus.emit(SYNC_EVENTS.PUSHED, { providerName, taskRef: task.task_ref });
   }
 
   handleRemoteEvent(event: SyncEvent): void {
-    this.eventBus.emit('sync:remote-event', event);
+    this.eventBus.emit(SYNC_EVENTS.REMOTE_EVENT, event);
     // Process the event through the policy engine if it involves a status change
     if (event.prev_status !== event.new_status) {
-      this.eventBus.emit('sync:status-change', event);
+      this.eventBus.emit(SYNC_EVENTS.STATUS_CHANGE, event);
     }
   }
 
   private resolveConflict(
     localTask: CanonicalTaskModel,
     remoteTask: CanonicalTaskModel,
-    providerName: string
+    providerName: string,
+    remoteChecksum?: string
   ): CanonicalTaskModel {
     switch (this.conflictResolution) {
       case 'local-wins':
@@ -140,7 +141,7 @@ export class SyncCoordinator {
             ...remoteTask.sync,
             last_synced_at: new Date().toISOString(),
             last_source: providerName as Sync['last_source'],
-            checksum: computeChecksum(remoteTask),
+            checksum: remoteChecksum ?? computeChecksum(remoteTask),
           },
         };
       case 'newest-wins': {
@@ -166,7 +167,7 @@ export class SyncCoordinator {
             ...winner.sync,
             last_synced_at: new Date().toISOString(),
             last_source: providerName as Sync['last_source'],
-            checksum: computeChecksum(winner),
+            checksum: localNewer ? computeChecksum(localTask) : (remoteChecksum ?? computeChecksum(remoteTask)),
           },
         };
       }

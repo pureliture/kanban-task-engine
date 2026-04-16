@@ -2,6 +2,11 @@ import { TaskRef, CanonicalTaskModel } from './types';
 
 export class IdResolver {
   private cache: Map<string, TaskRef> = new Map();
+  private maxSize: number;
+
+  constructor(maxSize: number = 10000) {
+    this.maxSize = maxSize;
+  }
 
   resolveRef(ref: TaskRef): string {
     return `${ref.provider}:${ref.external_key}:${ref.external_id}`;
@@ -26,6 +31,11 @@ export class IdResolver {
 
   register(task: CanonicalTaskModel): void {
     const key = this.resolveRef(task.task_ref);
+    // Evict oldest entry if at capacity
+    if (this.cache.size >= this.maxSize && !this.cache.has(key)) {
+      const firstKey = this.cache.keys().next().value;
+      if (firstKey) this.cache.delete(firstKey);
+    }
     this.cache.set(key, task.task_ref);
   }
 

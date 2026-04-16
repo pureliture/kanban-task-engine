@@ -6,3 +6,4 @@ export { PolicyEngine, PolicyRule } from './policy-engine';
 export { SyncCoordinator, ConflictResolution } from './sync-coordinator';
 export { IdResolver } from './id-resolver';
 export { computeChecksum, hasChanged } from './checksum';
+export { SYNC_EVENTS, POLICY_EVENTS } from './events';
