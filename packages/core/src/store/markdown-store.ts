@@ -1,9 +1,10 @@
-import { CanonicalTaskModel, TaskFilter, TaskStore } from '../types';
-import { yamlToCanonical, canonicalToYaml } from './mapper';
+import { CanonicalTaskModel, NormalizedStatus, StateTransition, TaskFilter, TaskStore } from '../types';
+import { yamlToCanonical, canonicalToYaml, rawStatusToNormalized } from './mapper';
 import { parseFrontmatter, extractBody, serializeWithFrontmatter } from './frontmatter-utils';
 import { atomicWriteFile } from './fs-utils';
 import fs from 'fs/promises';
 import path from 'path';
+import { createHash } from 'crypto';
 
 function deepMerge<T>(target: T, patch: Partial<T>): T {
   const result = { ...target };
@@ -26,11 +27,23 @@ function deepMerge<T>(target: T, patch: Partial<T>): T {
   return result;
 }
 
+export interface MarkdownStoreOptions {
+  basePath: string | string[];
+  policyEngine?: {
+    onTransition(task: CanonicalTaskModel, transition: StateTransition): Promise<void>;
+    onParseError?(error: Error, filePath: string): void;
+  };
+}
+
 export class MarkdownStore implements TaskStore {
   private workspacePaths: string[];
+  private policyEngine?: MarkdownStoreOptions['policyEngine'];
+  private stateCache: Map<string, CanonicalTaskModel> = new Map();
+  private checksumCache: Map<string, string> = new Map();
 
-  constructor(workspacePaths: string[]) {
-    this.workspacePaths = workspacePaths;
+  constructor(basePath: string | string[], options?: MarkdownStoreOptions) {
+    this.workspacePaths = Array.isArray(basePath) ? basePath : [basePath];
+    this.policyEngine = options?.policyEngine;
   }
 
   async findByExternalKey(provider: string, externalKey: string): Promise<CanonicalTaskModel | null> {
@@ -144,5 +157,49 @@ export class MarkdownStore implements TaskStore {
     if (filter.assignee && !filter.assignee.includes(task.ownership.assignee)) return false;
     if (filter.workspace && !filter.workspace.includes(task.automation.workspace ?? '')) return false;
     return true;
+  }
+
+  async computeChecksum(filePath: string): Promise<string> {
+    const content = await fs.readFile(filePath, 'utf-8');
+    return createHash('sha256').update(content).digest('hex').slice(0, 12);
+  }
+
+  async loadFromFile(filePath: string): Promise<CanonicalTaskModel | null> {
+    try {
+      const content = await fs.readFile(filePath, 'utf-8');
+      const frontmatter = parseFrontmatter(content);
+      if (!frontmatter) return null;
+      return yamlToCanonical(frontmatter, filePath);
+    } catch (err) {
+      this.policyEngine?.onParseError?.(err as Error, filePath);
+      return null;
+    }
+  }
+
+  async onFileChange(filePath: string): Promise<void> {
+    const checksum = await this.computeChecksum(filePath);
+
+    // Skip if checksum hasn't changed (duplicate event)
+    const cachedChecksum = this.checksumCache.get(filePath);
+    if (cachedChecksum === checksum) {
+      return;
+    }
+    this.checksumCache.set(filePath, checksum);
+
+    const newTask = await this.loadFromFile(filePath);
+    if (!newTask) return;
+
+    const oldTask = this.stateCache.get(filePath);
+
+    // Detect status change and notify policy engine
+    if (oldTask && oldTask.workflow.normalized_status !== newTask.workflow.normalized_status) {
+      const transition: StateTransition = {
+        from: rawStatusToNormalized(oldTask.workflow.raw_status),
+        to: rawStatusToNormalized(newTask.workflow.raw_status),
+      };
+      await this.policyEngine?.onTransition(newTask, transition);
+    }
+
+    this.stateCache.set(filePath, newTask);
   }
 }
