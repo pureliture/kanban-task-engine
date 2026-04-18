@@ -1,4 +1,5 @@
 import { CanonicalTaskModel, NormalizedStatus, RawStatusCategory } from '../types';
+import grayMatter from 'gray-matter';
 
 // Status mapping: This is the canonical local mapping.
 // Adapters (GitHub, Firebase) maintain their own provider-specific mappings.
@@ -48,6 +49,25 @@ export function normalizedToRawStatus(normalized: NormalizedStatus): string {
   return REVERSE_STATUS_MAP[normalized] ?? 'Backlog';
 }
 
+export function parseMarkdownFile(content: string): { data: Record<string, any>; body: string } {
+  const { data, content: body } = grayMatter(content);
+
+  // Normalize workspace field: top-level takes precedence
+  if (data.automation?.workspace && !data.workspace) {
+    data.workspace = data.automation.workspace;
+  }
+
+  // Remove duplicate if same value
+  if (data.automation?.workspace === data.workspace) {
+    delete data.automation.workspace;
+  }
+
+  return { data, body };
+}
+
+/**
+ * Convert frontmatter to CanonicalTaskModel.
+ */
 export function yamlToCanonical(yaml: Record<string, unknown>, filePath: string): CanonicalTaskModel {
   const workspace = extractWorkspace(filePath);
   const rawStatus = String(yaml.status ?? 'Backlog');
@@ -85,7 +105,7 @@ export function yamlToCanonical(yaml: Record<string, unknown>, filePath: string)
       on_enter: ((yaml.automation as Record<string, unknown>)?.triggerOnStatus as string[])?.map(rawStatusToNormalized) ?? ['ACTIVE'],
       on_exit: [],
       execution_profile: 'standard',
-      workspace: (yaml.automation as Record<string, unknown>)?.workspace ? String((yaml.automation as Record<string, unknown>).workspace) : workspace,
+      workspace: String(yaml.workspace ?? workspace),
       useAcp: Boolean((yaml.automation as Record<string, unknown>)?.useAcp ?? false),
     },
     sync: {
