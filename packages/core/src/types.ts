@@ -165,6 +165,7 @@ export interface TaskFilter {
 }
 
 export interface ExecutionAdapter {
+  name: string;
   execute(task: CanonicalTaskModel, transition: StateTransition): Promise<ExecutionResult>;
   getSessionStatus(sessionId: string): Promise<ExecutionStatus>;
   cancel(sessionId: string): Promise<void>;

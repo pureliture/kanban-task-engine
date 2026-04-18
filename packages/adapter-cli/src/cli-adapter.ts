@@ -18,6 +18,7 @@ export interface CliAdapterConfig {
 }
 
 export class CliAdapter implements ExecutionAdapter {
+  readonly name = 'cli';
   private sessionManager: SessionManager;
   private config: CliAdapterConfig;
 

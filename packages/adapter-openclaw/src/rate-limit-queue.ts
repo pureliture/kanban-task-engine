@@ -8,7 +8,7 @@ export interface RateLimitQueueOptions {
 }
 
 export interface TaskLike {
-  id: string;
+  id?: string;
   [key: string]: unknown;
 }
 
@@ -60,14 +60,15 @@ export class PersistentRateLimitQueue {
     const entry = this.queue.shift();
     if (!entry) return null;
 
-    this.processing.add(entry.task.id as string);
+    const taskId = (entry.task as unknown as TaskLike).id ?? entry.task.task_ref.external_key;
+    this.processing.add(taskId);
     await this.persist();
 
-    return entry.task as TaskLike;
+    return entry.task as unknown as TaskLike;
   }
 
   peek(): TaskLike | null {
-    return this.queue[0]?.task as TaskLike ?? null;
+    return (this.queue[0]?.task as unknown as TaskLike) ?? null;
   }
 
   size(): number {
@@ -82,7 +83,13 @@ export class PersistentRateLimitQueue {
   }
 
   setPriority(taskId: string, priority: number): void {
-    const entry = this.queue.find(e => e.task.id === taskId);
+    const entry = this.queue.find(e => {
+      const taskLike = e.task as unknown as TaskLike;
+      if (taskLike.id === taskId) return true;
+      // Check for task_ref.external_key if it's a CanonicalTaskModel
+      const externalKey = (e.task as any).task_ref?.external_key;
+      return externalKey === taskId;
+    });
     if (entry) {
       entry.priority = priority;
       this.queue.sort((a, b) => b.priority - a.priority);
