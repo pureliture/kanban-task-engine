@@ -1,0 +1,26 @@
+{
+  "issuesBasePath": "~/Projects/kanban-task-engine/issues",
+  "workspaces": {
+    "openclaw": {
+      "type": "single",
+      "path": "~/Projects/kanban-task-engine/issues/openclaw"
+    },
+    "vibe-coding": {
+      "type": "container",
+      "path": "~/Projects/kanban-task-engine/issues/vibe-coding",
+      "projects": []
+    },
+    "stocks": {
+      "type": "single",
+      "path": "~/Projects/kanban-task-engine/issues/stocks"
+    },
+    "web": {
+      "type": "single",
+      "path": "~/Projects/kanban-task-engine/issues/web"
+    },
+    "personal": {
+      "type": "single",
+      "path": "~/Projects/kanban-task-engine/issues/personal"
+    }
+  }
+}
