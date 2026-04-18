@@ -2,6 +2,7 @@ import {
   CanonicalTaskModel,
   NormalizedStatus,
   StateTransition,
+  ExecutionAdapter,
 } from './types';
 import { StateMachine } from './state-machine';
 import { EventBus } from './event-bus';
@@ -17,12 +18,20 @@ export interface PolicyRule {
 
 export class PolicyEngine {
   private rules: PolicyRule[] = [];
+  private adapters: Map<string, ExecutionAdapter> = new Map();
   private stateMachine: StateMachine;
   private eventBus: EventBus;
 
   constructor(stateMachine: StateMachine, eventBus: EventBus) {
     this.stateMachine = stateMachine;
     this.eventBus = eventBus;
+  }
+
+  /**
+   * Register an execution adapter.
+   */
+  registerAdapter(adapter: ExecutionAdapter): void {
+    this.adapters.set(adapter.name, adapter);
   }
 
   private matchRules(action: 'enter' | 'exit', transition: StateTransition): PolicyRule[] {
@@ -94,5 +103,16 @@ export class PolicyEngine {
 
   getRules(): PolicyRule[] {
     return [...this.rules];
+  }
+
+  /**
+   * Handle a parse error.
+   * Logs the error and emits a policy:error event.
+   */
+  async onParseError(filePath: string, error: Error): Promise<void> {
+    this.eventBus.emit(POLICY_EVENTS.ERROR, {
+      ruleId: 'parse-error',
+      error: `Parse error for ${filePath}: ${error.message}`,
+    });
   }
 }
