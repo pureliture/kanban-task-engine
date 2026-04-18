@@ -5,3 +5,4 @@ export { yamlToCanonical, canonicalToYaml, rawStatusToNormalized, normalizedToRa
 export { parseFrontmatter, extractBody, serializeWithFrontmatter } from './frontmatter-utils';
 export { atomicWriteFile } from './fs-utils';
 export { validatePath, isPathWithinAllowed, ALLOWED_BASE_PATHS } from './path-validator';
+export { WorkspaceResolver, WorkspaceConfig, WorkspaceType, ParsedTicketPath } from './workspace-resolver';
