@@ -13,6 +13,7 @@ export class DeadLetterQueue {
   private entries: DeadLetterEntry[] = [];
   private readonly filePath: string;
   private loaded: boolean = false;
+  private persistPromise: Promise<void> = Promise.resolve();
 
   constructor(filePath: string) {
     this.filePath = filePath;
@@ -39,21 +40,27 @@ export class DeadLetterQueue {
     this.loaded = true;
   }
 
-  private async persist(): Promise<void> {
+  private async persistInternal(): Promise<void> {
     await fs.mkdir(path.dirname(this.filePath), { recursive: true });
     await fs.writeFile(this.filePath, JSON.stringify(this.entries, null, 2));
   }
 
   async add(entry: DeadLetterEntry): Promise<void> {
-    await this.ensureLoaded();
-    this.entries.push(entry);
-    await this.persist();
+    this.persistPromise = this.persistPromise.then(async () => {
+      await this.ensureLoaded();
+      this.entries.push(entry);
+      await this.persistInternal();
+    });
+    return this.persistPromise;
   }
 
   async remove(filePath: string): Promise<void> {
-    await this.ensureLoaded();
-    this.entries = this.entries.filter(e => e.filePath !== filePath);
-    await this.persist();
+    this.persistPromise = this.persistPromise.then(async () => {
+      await this.ensureLoaded();
+      this.entries = this.entries.filter(e => e.filePath !== filePath);
+      await this.persistInternal();
+    });
+    return this.persistPromise;
   }
 
   async getAll(): Promise<DeadLetterEntry[]> {
@@ -69,9 +76,12 @@ export class DeadLetterQueue {
   }
 
   async clear(): Promise<void> {
-    this.entries = [];
-    this.loaded = true;
-    await this.persist();
+    this.persistPromise = this.persistPromise.then(async () => {
+      this.entries = [];
+      this.loaded = true;
+      await this.persistInternal();
+    });
+    return this.persistPromise;
   }
 
   async size(): Promise<number> {
