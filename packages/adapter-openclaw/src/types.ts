@@ -19,6 +19,7 @@ export interface GatewayCompletionResponse {
 }
 
 export interface QueuedTask {
+  taskId: string;  // Use taskId directly for queue operations
   task: CanonicalTaskModel;
   priority: number;
   enqueuedAt: number;

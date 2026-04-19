@@ -36,7 +36,7 @@ export class PersistentRateLimitQueue {
     this.loaded = true;
   }
 
-  async enqueue(task: TaskLike, priority: number = 0): Promise<void> {
+  async enqueue(task: CanonicalTaskModel, priority: number = 0): Promise<void> {
     await this.ensureLoaded();
 
     if (this.queue.length >= this.maxSize) {
@@ -44,7 +44,8 @@ export class PersistentRateLimitQueue {
     }
 
     this.queue.push({
-      task: task as unknown as CanonicalTaskModel,
+      taskId: task.task_ref.external_key,
+      task,
       priority,
       enqueuedAt: Date.now(),
       attempts: 0
@@ -54,21 +55,21 @@ export class PersistentRateLimitQueue {
     await this.persist();
   }
 
-  async dequeue(): Promise<TaskLike | null> {
+  async dequeue(): Promise<CanonicalTaskModel | null> {
     await this.ensureLoaded();
 
     const entry = this.queue.shift();
     if (!entry) return null;
 
-    const taskId = (entry.task as unknown as TaskLike).id ?? entry.task.task_ref.external_key;
+    const taskId = entry.taskId;
     this.processing.add(taskId);
     await this.persist();
 
-    return entry.task as unknown as TaskLike;
+    return entry.task;
   }
 
-  peek(): TaskLike | null {
-    return (this.queue[0]?.task as unknown as TaskLike) ?? null;
+  peek(): CanonicalTaskModel | null {
+    return this.queue[0]?.task ?? null;
   }
 
   size(): number {
@@ -83,13 +84,7 @@ export class PersistentRateLimitQueue {
   }
 
   setPriority(taskId: string, priority: number): void {
-    const entry = this.queue.find(e => {
-      const taskLike = e.task as unknown as TaskLike;
-      if (taskLike.id === taskId) return true;
-      // Check for task_ref.external_key if it's a CanonicalTaskModel
-      const externalKey = (e.task as any).task_ref?.external_key;
-      return externalKey === taskId;
-    });
+    const entry = this.queue.find(e => e.taskId === taskId);
     if (entry) {
       entry.priority = priority;
       this.queue.sort((a, b) => b.priority - a.priority);
