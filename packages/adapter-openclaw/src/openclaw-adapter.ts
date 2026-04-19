@@ -12,6 +12,7 @@ export interface ExecutionAdapter {
 export interface OpenClawAdapterOptions {
   timeout?: number;
   retries?: number;
+  model?: string;  // Add model option
 }
 
 export class OpenClawAdapter implements ExecutionAdapter {
@@ -22,7 +23,11 @@ export class OpenClawAdapter implements ExecutionAdapter {
     private queue: PersistentRateLimitQueue,
     private gatewayUrl: string,
     private options: OpenClawAdapterOptions = {}
-  ) {}
+  ) {
+    this.model = options.model ?? 'claude-opus-4-7';
+  }
+
+  private readonly model: string;
 
   async execute(task: CanonicalTaskModel): Promise<GatewayCompletionResponse> {
     const credentials = await this.config.getCredentials('gateway');
@@ -70,7 +75,7 @@ export class OpenClawAdapter implements ExecutionAdapter {
         'Authorization': `Bearer ${credentials.token}`
       },
       body: JSON.stringify({
-        model: 'claude-opus-4-7',
+        model: this.model,
         messages: [
           {
             role: 'user',
