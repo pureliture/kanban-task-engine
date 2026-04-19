@@ -72,10 +72,31 @@ export class MarkdownStore implements TaskStore {
     const content = serializeWithFrontmatter(yamlData, body);
     await fs.mkdir(path.dirname(filePath), { recursive: true });
     await atomicWriteFile(filePath, content);
+
+    const checksum = await this.computeChecksum(filePath);
+    this.syncCache(filePath, task, checksum);
   }
 
   async updateTask(task: CanonicalTaskModel): Promise<void> {
     await this.saveTask(task);
+  }
+
+  /**
+   * Sync caches after programmatic task updates.
+   * Call this after saveTask/updateTask to prevent false transitions.
+   */
+  syncCache(filePath: string, task: CanonicalTaskModel, checksum: string): void {
+    this.stateCache.set(filePath, task);
+    this.checksumCache.set(filePath, checksum);
+  }
+
+  /**
+   * Invalidate cache for a task.
+   * Call this before programmatic updates to force re-evaluation.
+   */
+  invalidateCache(filePath: string): void {
+    this.stateCache.delete(filePath);
+    this.checksumCache.delete(filePath);
   }
 
   async writeBack(task: CanonicalTaskModel, patch: Partial<CanonicalTaskModel>): Promise<void> {
@@ -169,7 +190,14 @@ export class MarkdownStore implements TaskStore {
       const content = await fs.readFile(filePath, 'utf-8');
       const frontmatter = parseFrontmatter(content);
       if (!frontmatter) return null;
-      return yamlToCanonical(frontmatter, filePath);
+      const task = yamlToCanonical(frontmatter, filePath);
+
+      // Update caches when loading
+      const checksum = await this.computeChecksum(filePath);
+      this.checksumCache.set(filePath, checksum);
+      this.stateCache.set(filePath, task);
+
+      return task;
     } catch (err) {
       this.policyEngine?.onParseError?.(err as Error, filePath);
       return null;
