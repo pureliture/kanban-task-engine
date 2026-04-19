@@ -1,9 +1,9 @@
 ---
 type: kanban
-workspace: openclaw
+workspace: web
 ---
 
-# 📋 OpenClaw Kanban
+# 📋 Web Kanban
 
 ## 📊 현황
 
@@ -12,7 +12,7 @@ workspace: openclaw
  :query [:find (count ?t) ?s
          :where
          [?t :block/properties ?p]
-         [(get ?p :workspace) "openclaw"]
+         [(get ?p :workspace) "web"]
          [(get ?p :status) ?s]]
  :result-transform (fn [rows] (map (fn [[c s]] [s c]) rows))}
 #+END_QUERY
@@ -26,7 +26,7 @@ workspace: openclaw
  :query [:find ?t ?id ?summary ?prio
          :where
          [?t :block/properties ?p]
-         [(get ?p :workspace) "openclaw"]
+         [(get ?p :workspace) "web"]
          [(get ?p :status) "Backlog"]
          [(get ?p :id) ?id]
          [(get ?p :summary) ?summary]
@@ -48,7 +48,7 @@ workspace: openclaw
  :query [:find ?t ?id ?summary ?prio
          :where
          [?t :block/properties ?p]
-         [(get ?p :workspace) "openclaw"]
+         [(get ?p :workspace) "web"]
          [(get ?p :status) "In Progress"]
          [(get ?p :id) ?id]
          [(get ?p :summary) ?summary]
@@ -64,7 +64,7 @@ workspace: openclaw
  :query [:find ?t ?id ?summary
          :where
          [?t :block/properties ?p]
-         [(get ?p :workspace) "openclaw"]
+         [(get ?p :workspace) "web"]
          [(get ?p :status) "In Review"]
          [(get ?p :id) ?id]
          [(get ?p :summary) ?summary]]}
@@ -79,7 +79,7 @@ workspace: openclaw
  :query [:find ?t ?id ?summary
          :where
          [?t :block/properties ?p]
-         [(get ?p :workspace) "openclaw"]
+         [(get ?p :workspace) "web"]
          [(get ?p :status) "Done"]
          [(get ?p :id) ?id]
          [(get ?p :summary) ?summary]]}
@@ -94,7 +94,7 @@ workspace: openclaw
  :query [:find ?t ?id ?summary
          :where
          [?t :block/properties ?p]
-         [(get ?p :workspace) "openclaw"]
+         [(get ?p :workspace) "web"]
          [(get ?p :status) "Blocked"]
          [(get ?p :id) ?id]
          [(get ?p :summary) ?summary]]}
@@ -109,7 +109,7 @@ workspace: openclaw
  :query [:find ?t ?id ?summary
          :where
          [?t :block/properties ?p]
-         [(get ?p :workspace) "openclaw"]
+         [(get ?p :workspace) "web"]
          [(get ?p :status) "Cancelled"]
          [(get ?p :id) ?id]
          [(get ?p :summary) ?summary]]}

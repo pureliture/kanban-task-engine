@@ -9,11 +9,11 @@ title: Mission Control
 
 ## Workspace 선택
 
-- [[boards/openclaw/SPACE-KANBAN|openclaw]]
-- [[boards/vibe-coding/SPACE-KANBAN|vibe-coding]]
-- [[boards/stocks/SPACE-KANBAN|stocks]]
-- [[boards/web/SPACE-KANBAN|web]]
-- [[boards/personal/SPACE-KANBAN|personal]]
+- [[openclaw/SPACE-KANBAN|openclaw]]
+- [[vibe-coding/SPACE-KANBAN|vibe-coding]]
+- [[stocks/SPACE-KANBAN|stocks]]
+- [[web/SPACE-KANBAN|web]]
+- [[personal/SPACE-KANBAN|personal]]
 
 ---
 
