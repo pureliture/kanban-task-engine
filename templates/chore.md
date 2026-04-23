@@ -1,11 +1,11 @@
 ---
 id: XX-001
-title: 새 이슈 제목
-type: task
+title: 정비 작업 제목
+type: chore
 status: READY
 executor: claude-code
 project: example-project
-priority: P2
+priority: P3
 labels: []
 depends_on: []
 working_dir: ~/Projects/example-project
@@ -16,11 +16,11 @@ updated: 2026-04-24
 
 ## 목적
 
-이슈의 목표를 한 문단으로 작성합니다.
+이 정비 작업의 필요성과 목표를 작성합니다.
 
 ## 컨텍스트
 
-배경 정보와 관련 링크를 작성합니다.
+기술 부채나 유지보수 배경을 설명합니다.
 
 ## Acceptance Criteria
 
@@ -28,6 +28,6 @@ updated: 2026-04-24
 
 ## 실행 힌트
 
-- 구현 시 참고할 힌트나 접근 방향을 작성합니다.
+- 작업 접근 방향을 작성합니다.
 
 ## 로그

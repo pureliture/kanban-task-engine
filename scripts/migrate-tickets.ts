@@ -12,6 +12,61 @@ function kanbanHome(): string {
   return path.resolve(expandHome(process.env.KANBAN_HOME || '~/.openclaw/workspace-kanban/kanban'));
 }
 
+const PRIORITY_TO_P: Record<string, string> = {
+  blocker:  'P0',
+  critical: 'P0',
+  high:     'P1',
+  medium:   'P2',
+  low:      'P3',
+  trivial:  'P3',
+};
+
+function migrateFields(data: Record<string, unknown>): void {
+  // issueType → type
+  if ('issueType' in data && !('type' in data)) {
+    data.type = data.issueType;
+    delete data.issueType;
+  }
+
+  // createdAt → created
+  if ('createdAt' in data && !('created' in data)) {
+    data.created = data.createdAt;
+    delete data.createdAt;
+  }
+
+  // updatedAt → updated
+  if ('updatedAt' in data && !('updated' in data)) {
+    data.updated = data.updatedAt;
+    delete data.updatedAt;
+  }
+
+  // priority: Jira names → P-style
+  if (typeof data.priority === 'string') {
+    const mapped = PRIORITY_TO_P[data.priority.toLowerCase()];
+    if (mapped) data.priority = mapped;
+  }
+
+  // Remove deprecated fields
+  delete data.syncTarget;
+  delete data.jiraProject;
+  delete data.jiraKey;
+
+  // Remove automation.trigger/allowedActions block (keep policy_id/useAcp/onEnter if present)
+  if (data.automation && typeof data.automation === 'object') {
+    const auto = data.automation as Record<string, unknown>;
+    delete auto.trigger;
+    delete auto.allowedActions;
+    if (Object.keys(auto).length === 0) delete data.automation;
+  }
+}
+
+function migrateSections(body: string): string {
+  return body
+    .replace(/^## Goal\b/gm, '## 목적')
+    .replace(/^## Notes\b/gm, '## 컨텍스트')
+    .replace(/^## Implementation Tasks\b/gm, '## 실행 힌트');
+}
+
 const MIGRATIONS: Array<{
   from: string;
   to: string;
@@ -19,7 +74,7 @@ const MIGRATIONS: Array<{
   type: 'single' | 'container';
 }> = [
   {
-    from: path.join(process.env.HOME!, '.openclaw/workspace-claude/issues'),
+    from: path.join(process.env.HOME!, '.openclaw/workspace-vibe-coding/issues'),
     to: path.join(kanbanHome(), 'issues', 'vibe-coding'),
     workspace: 'vibe-coding',
     type: 'container'
@@ -48,18 +103,17 @@ async function migrateFile(srcPath: string, destPath: string, workspace: string)
   const content = await fs.readFile(srcPath, 'utf-8');
   const { data, content: body } = grayMatter(content);
 
-  // Update frontmatter
   data.workspace = workspace;
 
-  // Move automation.workspace to top level if exists
-  if (data.automation?.workspace) {
-    if (data.automation.workspace === workspace) {
-      delete data.automation.workspace;
-    }
+  if (data.automation && typeof data.automation === 'object') {
+    const auto = data.automation as Record<string, unknown>;
+    if (auto.workspace === workspace) delete auto.workspace;
   }
 
-  // Reconstruct file
-  const newContent = grayMatter.stringify(body, data);
+  migrateFields(data);
+
+  const migratedBody = migrateSections(body);
+  const newContent = grayMatter.stringify(migratedBody, data);
   await fs.mkdir(path.dirname(destPath), { recursive: true });
   await fs.writeFile(destPath, newContent);
 
