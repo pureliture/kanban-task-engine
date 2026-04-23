@@ -1,6 +1,6 @@
 # Kanban Foundation and Vault Migration Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Create the Home kanban operator workspace and move the Home Markdown issue vault into `<OPENCLAW_HOME>/workspace-kanban/kanban` as a standalone git repository without breaking existing references.
 
@@ -38,7 +38,7 @@
 **Files:**
 - Create: `docs/superpowers/plans/artifacts/kanban-foundation-baseline.md`
 
-- [ ] **Step 1: Create the artifact directory**
+- [x] **Step 1: Create the artifact directory**
 
 Run:
 
@@ -48,7 +48,7 @@ mkdir -p docs/superpowers/plans/artifacts
 
 Expected: command exits with code 0.
 
-- [ ] **Step 2: Capture git and path state**
+- [x] **Step 2: Capture git and path state**
 
 Run:
 
@@ -86,7 +86,7 @@ Run:
 
 Expected: `docs/superpowers/plans/artifacts/kanban-foundation-baseline.md` exists and contains the three path checks.
 
-- [ ] **Step 3: Review baseline**
+- [x] **Step 3: Review baseline**
 
 Run:
 
@@ -96,7 +96,7 @@ sed -n '1,220p' docs/superpowers/plans/artifacts/kanban-foundation-baseline.md
 
 Expected: output shows whether `<OPENCLAW_HOME>/kanban` and `<OPENCLAW_HOME>/workspace-kanban` exist.
 
-- [ ] **Step 4: Confirm parent currently tracks or ignores kanban**
+- [x] **Step 4: Confirm parent currently tracks or ignores kanban**
 
 Run:
 
@@ -106,7 +106,7 @@ git -C "<OPENCLAW_HOME>" ls-files kanban
 
 Expected: output may include existing tracked files such as `kanban/KANBAN.md`, `kanban/registry.yaml`, and `kanban/spaces/*.md`. Record this output in the baseline artifact. Slice 2 removes these entries from the parent index.
 
-- [ ] **Step 5: Commit the baseline artifact**
+- [x] **Step 5: Commit the baseline artifact**
 
 Run:
 
@@ -128,7 +128,7 @@ Expected: commit succeeds and includes only the baseline artifact.
 - Create: `<OPENCLAW_HOME>/workspace-kanban/.gitignore`
 - Create: `<OPENCLAW_HOME>/workspace-kanban/memory/.gitkeep`
 
-- [ ] **Step 1: Create workspace directories**
+- [x] **Step 1: Create workspace directories**
 
 Run:
 
@@ -138,7 +138,7 @@ mkdir -p "<OPENCLAW_HOME>/workspace-kanban/memory" "<OPENCLAW_HOME>/workspace-ka
 
 Expected: command exits with code 0.
 
-- [ ] **Step 2: Write AGENTS.md**
+- [x] **Step 2: Write AGENTS.md**
 
 Create `<OPENCLAW_HOME>/workspace-kanban/AGENTS.md` with:
 
@@ -169,7 +169,7 @@ Before doing anything else:
 - Prefer explicit Run commands for execution.
 ```
 
-- [ ] **Step 3: Write identity files**
+- [x] **Step 3: Write identity files**
 
 Create `<OPENCLAW_HOME>/workspace-kanban/SOUL.md` with:
 
@@ -219,7 +219,7 @@ Create `<OPENCLAW_HOME>/workspace-kanban/HEARTBEAT.md` with:
 - If nothing needs attention, reply `HEARTBEAT_OK`.
 ```
 
-- [ ] **Step 4: Write .gitignore**
+- [x] **Step 4: Write .gitignore**
 
 Create `<OPENCLAW_HOME>/workspace-kanban/.gitignore` with:
 
@@ -234,7 +234,7 @@ runtime/
 secrets.json
 ```
 
-- [ ] **Step 5: Keep the empty memory directory tracked**
+- [x] **Step 5: Keep the empty memory directory tracked**
 
 Run:
 
@@ -244,7 +244,7 @@ touch "<OPENCLAW_HOME>/workspace-kanban/memory/.gitkeep"
 
 Expected: command exits with code 0.
 
-- [ ] **Step 6: Initialize workspace git repo if needed**
+- [x] **Step 6: Initialize workspace git repo if needed**
 
 Run:
 
@@ -256,7 +256,7 @@ fi
 
 Expected: `git -C "<OPENCLAW_HOME>/workspace-kanban" rev-parse --show-toplevel` prints `<OPENCLAW_HOME>/workspace-kanban`.
 
-- [ ] **Step 7: Commit workspace shell**
+- [x] **Step 7: Commit workspace shell**
 
 Run:
 
@@ -267,7 +267,7 @@ git -C "<OPENCLAW_HOME>/workspace-kanban" commit --no-gpg-sign -m "config: initi
 
 Expected: commit succeeds.
 
-- [ ] **Step 8: If the parent `.openclaw` repo uses workspace submodules, register the new workspace pointer**
+- [x] **Step 8: If the parent `.openclaw` repo uses workspace submodules, register the new workspace pointer**
 
 Run:
 
@@ -284,7 +284,7 @@ Expected: if this prints a missing-path error, defer parent registration until t
 - Create: `<OPENCLAW_HOME>/workspace-kanban/config/module-overrides.yaml`
 - Create: `<OPENCLAW_HOME>/workspace-kanban/config/kanban-home.yaml`
 
-- [ ] **Step 1: Write active recipe config**
+- [x] **Step 1: Write active recipe config**
 
 Create `<OPENCLAW_HOME>/workspace-kanban/config/active-recipe.yaml` with:
 
@@ -294,7 +294,7 @@ vaultPath: <OPENCLAW_HOME>/workspace-kanban/kanban
 enginePath: ~/Projects/kanban-task-engine
 ```
 
-- [ ] **Step 2: Write module overrides**
+- [x] **Step 2: Write module overrides**
 
 Create `<OPENCLAW_HOME>/workspace-kanban/config/module-overrides.yaml` with:
 
@@ -312,7 +312,7 @@ modules:
     enabled: true
 ```
 
-- [ ] **Step 3: Write kanban home config**
+- [x] **Step 3: Write kanban home config**
 
 Create `<OPENCLAW_HOME>/workspace-kanban/config/kanban-home.yaml` with:
 
@@ -323,7 +323,7 @@ boardsPath: <OPENCLAW_HOME>/workspace-kanban/kanban/boards
 legacySpacesPath: <OPENCLAW_HOME>/workspace-kanban/kanban/spaces
 ```
 
-- [ ] **Step 4: Commit operator config**
+- [x] **Step 4: Commit operator config**
 
 Run:
 
@@ -341,7 +341,7 @@ Expected: commit succeeds.
 - Create: `<OPENCLAW_HOME>/kanban` symlink
 - Create: `<OPENCLAW_HOME>/workspace-kanban/kanban/.gitignore`
 
-- [ ] **Step 1: Verify move is safe**
+- [x] **Step 1: Verify move is safe**
 
 Run:
 
@@ -352,7 +352,7 @@ test ! -e "<OPENCLAW_HOME>/workspace-kanban/kanban"
 
 Expected: both commands exit with code 0. If the second command fails, stop and inspect the existing target path.
 
-- [ ] **Step 2: Move the vault**
+- [x] **Step 2: Move the vault**
 
 Run:
 
@@ -362,7 +362,7 @@ mv "<OPENCLAW_HOME>/kanban" "<OPENCLAW_HOME>/workspace-kanban/kanban"
 
 Expected: `test -d "<OPENCLAW_HOME>/workspace-kanban/kanban"` exits with code 0.
 
-- [ ] **Step 3: Create compatibility symlink**
+- [x] **Step 3: Create compatibility symlink**
 
 Run:
 
@@ -372,7 +372,7 @@ ln -s "<OPENCLAW_HOME>/workspace-kanban/kanban" "<OPENCLAW_HOME>/kanban"
 
 Expected: `readlink "<OPENCLAW_HOME>/kanban"` prints `<OPENCLAW_HOME>/workspace-kanban/kanban`.
 
-- [ ] **Step 4: Create vault directories**
+- [x] **Step 4: Create vault directories**
 
 Run:
 
@@ -398,7 +398,7 @@ mkdir -p \
 
 Expected: command exits with code 0.
 
-- [ ] **Step 5: Write vault .gitignore**
+- [x] **Step 5: Write vault .gitignore**
 
 Create `<OPENCLAW_HOME>/workspace-kanban/kanban/.gitignore` with:
 
@@ -411,7 +411,7 @@ exports/tmp/
 *.tmp
 ```
 
-- [ ] **Step 6: Initialize vault git repo**
+- [x] **Step 6: Initialize vault git repo**
 
 Run:
 
@@ -423,7 +423,7 @@ fi
 
 Expected: `git -C "<OPENCLAW_HOME>/workspace-kanban/kanban" rev-parse --show-toplevel` prints `<OPENCLAW_HOME>/workspace-kanban/kanban`.
 
-- [ ] **Step 7: Commit vault baseline**
+- [x] **Step 7: Commit vault baseline**
 
 Run:
 
@@ -440,7 +440,7 @@ Expected: commit succeeds or prints that there is nothing to commit if the vault
 - Modify index only: `<OPENCLAW_HOME>` tracked `kanban/*` entries
 - Add to parent index: `<OPENCLAW_HOME>/kanban` symlink
 
-- [ ] **Step 1: Inspect parent tracked kanban paths**
+- [x] **Step 1: Inspect parent tracked kanban paths**
 
 Run:
 
@@ -450,7 +450,7 @@ git -C "<OPENCLAW_HOME>" ls-files kanban
 
 Expected: output lists tracked old vault files, or prints nothing if the parent has already stopped tracking them.
 
-- [ ] **Step 2: Remove old tracked vault files from parent index**
+- [x] **Step 2: Remove old tracked vault files from parent index**
 
 Run:
 
@@ -460,7 +460,7 @@ git -C "<OPENCLAW_HOME>" rm --cached -r kanban
 
 Expected: removes tracked `kanban/*` entries from the parent index without deleting the symlink target. If git reports no pathspec match, continue.
 
-- [ ] **Step 3: Add only the compatibility symlink to the parent index**
+- [x] **Step 3: Add only the compatibility symlink to the parent index**
 
 Run:
 
@@ -471,7 +471,7 @@ git -C "<OPENCLAW_HOME>" diff --cached --name-status -- kanban
 
 Expected: diff shows deletion of old tracked files and an added `kanban` symlink entry. It must not show files under `workspace-kanban/kanban/`.
 
-- [ ] **Step 4: Commit parent compatibility boundary**
+- [x] **Step 4: Commit parent compatibility boundary**
 
 Run:
 
@@ -487,7 +487,7 @@ Expected: commit succeeds and parent `.openclaw` no longer tracks live vault fil
 - Read: `<OPENCLAW_HOME>/workspace-kanban/.gitignore`
 - Read: `<OPENCLAW_HOME>/workspace-kanban/kanban/.git`
 
-- [ ] **Step 1: Verify symlink and repo roots**
+- [x] **Step 1: Verify symlink and repo roots**
 
 Run:
 
@@ -505,7 +505,7 @@ Expected:
 <OPENCLAW_HOME>/workspace-kanban/kanban
 ```
 
-- [ ] **Step 2: Verify parent ignores nested vault**
+- [x] **Step 2: Verify parent ignores nested vault**
 
 Run:
 
@@ -515,7 +515,7 @@ git -C "<OPENCLAW_HOME>/workspace-kanban" status --short --untracked-files=norma
 
 Expected: output does not include `kanban/`.
 
-- [ ] **Step 3: Verify parent tracks no live vault files**
+- [x] **Step 3: Verify parent tracks no live vault files**
 
 Run:
 
@@ -525,7 +525,7 @@ git -C "<OPENCLAW_HOME>" ls-files kanban
 
 Expected: output is either exactly `kanban` for the compatibility symlink, or empty if the parent deliberately ignores the symlink. It must not list `kanban/KANBAN.md`, `kanban/registry.yaml`, or `kanban/spaces/*.md`.
 
-- [ ] **Step 4: Verify legacy path still resolves**
+- [x] **Step 4: Verify legacy path still resolves**
 
 Run:
 
@@ -535,7 +535,7 @@ find "<OPENCLAW_HOME>/kanban" -maxdepth 2 -print | sort | sed -n '1,80p'
 
 Expected: output lists files from `<OPENCLAW_HOME>/kanban`, backed by the symlink target.
 
-- [ ] **Step 5: Commit operator workspace final state**
+- [x] **Step 5: Commit operator workspace final state**
 
 Run:
 

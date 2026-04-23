@@ -1,6 +1,6 @@
 # Kanban Schema and Core Engine Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add the shared Jira-compatible issue schema, configurable vault paths, Markdown issue parsing, and registry resolution needed by Home and Work modes.
 
@@ -38,7 +38,7 @@
 - Create: `packages/schema/tsconfig.json`
 - Create: `packages/schema/src/index.ts`
 
-- [ ] **Step 1: Write package manifest**
+- [x] **Step 1: Write package manifest**
 
 Create `packages/schema/package.json`:
 
@@ -65,7 +65,7 @@ Create `packages/schema/package.json`:
 }
 ```
 
-- [ ] **Step 2: Write tsconfig**
+- [x] **Step 2: Write tsconfig**
 
 Create `packages/schema/tsconfig.json`:
 
@@ -80,7 +80,7 @@ Create `packages/schema/tsconfig.json`:
 }
 ```
 
-- [ ] **Step 3: Write package index**
+- [x] **Step 3: Write package index**
 
 Create `packages/schema/src/index.ts`:
 
@@ -90,7 +90,7 @@ export * from './issue-schema';
 export * from './fixtures';
 ```
 
-- [ ] **Step 4: Run package build to verify expected failure**
+- [x] **Step 4: Run package build to verify expected failure**
 
 Run:
 
@@ -100,7 +100,7 @@ pnpm --filter @kanban-task-engine/schema build
 
 Expected: FAIL because `status`, `issue-schema`, and `fixtures` are not defined yet.
 
-- [ ] **Step 5: Commit skeleton**
+- [x] **Step 5: Commit skeleton**
 
 Run:
 
@@ -117,7 +117,7 @@ Expected: commit succeeds.
 - Create: `packages/schema/src/status.ts`
 - Test: `packages/schema/tests/status.test.ts`
 
-- [ ] **Step 1: Write failing status tests**
+- [x] **Step 1: Write failing status tests**
 
 Create `packages/schema/tests/status.test.ts`:
 
@@ -148,7 +148,7 @@ describe('issue status schema', () => {
 });
 ```
 
-- [ ] **Step 2: Run failing test**
+- [x] **Step 2: Run failing test**
 
 Run:
 
@@ -158,7 +158,7 @@ pnpm --filter @kanban-task-engine/schema test -- tests/status.test.ts
 
 Expected: FAIL with module not found for `../src/status`.
 
-- [ ] **Step 3: Implement status model**
+- [x] **Step 3: Implement status model**
 
 Create `packages/schema/src/status.ts`:
 
@@ -203,7 +203,7 @@ export function toJiraStatusHint(status: IssueStatus): string {
 }
 ```
 
-- [ ] **Step 4: Run status tests**
+- [x] **Step 4: Run status tests**
 
 Run:
 
@@ -213,7 +213,7 @@ pnpm --filter @kanban-task-engine/schema test -- tests/status.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit status model**
+- [x] **Step 5: Commit status model**
 
 Run:
 
@@ -231,7 +231,7 @@ Expected: commit succeeds.
 - Create: `packages/schema/src/fixtures.ts`
 - Test: `packages/schema/tests/issue-schema.test.ts`
 
-- [ ] **Step 1: Write failing schema tests**
+- [x] **Step 1: Write failing schema tests**
 
 Create `packages/schema/tests/issue-schema.test.ts`:
 
@@ -274,7 +274,7 @@ describe('issue schema', () => {
 });
 ```
 
-- [ ] **Step 2: Run failing schema tests**
+- [x] **Step 2: Run failing schema tests**
 
 Run:
 
@@ -284,7 +284,7 @@ pnpm --filter @kanban-task-engine/schema test -- tests/issue-schema.test.ts
 
 Expected: FAIL with module not found for `../src/issue-schema`.
 
-- [ ] **Step 3: Add fixtures**
+- [x] **Step 3: Add fixtures**
 
 Create `packages/schema/src/fixtures.ts`:
 
@@ -310,7 +310,7 @@ updatedAt: 2026-04-20
 
 ## Implementation Tasks
 
-- [ ] refresh token 검증 로직 추가
+- [x] refresh token 검증 로직 추가
 
 ## Notes
 
@@ -334,7 +334,7 @@ updatedAt: 2026-04-20
 
 ## Implementation Tasks
 
-- [ ] refresh token 검증 로직 추가
+- [x] refresh token 검증 로직 추가
 
 ## Notes
 
@@ -342,7 +342,7 @@ updatedAt: 2026-04-20
 `;
 ```
 
-- [ ] **Step 4: Implement schema validation**
+- [x] **Step 4: Implement schema validation**
 
 Create `packages/schema/src/issue-schema.ts`:
 
@@ -424,7 +424,7 @@ function extractSections(body: string): Record<string, string> {
 }
 ```
 
-- [ ] **Step 5: Run schema tests**
+- [x] **Step 5: Run schema tests**
 
 Run:
 
@@ -434,7 +434,7 @@ pnpm --filter @kanban-task-engine/schema test -- tests/issue-schema.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 6: Build schema package**
+- [x] **Step 6: Build schema package**
 
 Run:
 
@@ -444,7 +444,7 @@ pnpm --filter @kanban-task-engine/schema build
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit schema validation**
+- [x] **Step 7: Commit schema validation**
 
 Run:
 
@@ -463,7 +463,7 @@ Expected: commit succeeds.
 - Modify: `packages/core/src/state-machine.ts`
 - Modify: `packages/core/tests/state-machine.test.ts`
 
-- [ ] **Step 1: Add schema dependency**
+- [x] **Step 1: Add schema dependency**
 
 Modify `packages/core/package.json` dependencies:
 
@@ -475,7 +475,7 @@ Modify `packages/core/package.json` dependencies:
 }
 ```
 
-- [ ] **Step 2: Update failing state-machine test**
+- [x] **Step 2: Update failing state-machine test**
 
 In `packages/core/tests/state-machine.test.ts`, replace old status assertions with:
 
@@ -501,7 +501,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/state-machine.test.ts
 
 Expected: FAIL because core still defines old status names.
 
-- [ ] **Step 3: Update core types**
+- [x] **Step 3: Update core types**
 
 In `packages/core/src/types.ts`, replace `NormalizedStatus` and `VALID_TRANSITIONS` with:
 
@@ -520,7 +520,7 @@ export type RawStatusCategory =
 
 Keep the rest of the file, and update any `Sync.last_source` union in later adapter tasks only if tests require it.
 
-- [ ] **Step 4: Update state machine mapping**
+- [x] **Step 4: Update state machine mapping**
 
 In `packages/core/src/state-machine.ts`, replace maps with:
 
@@ -552,7 +552,7 @@ isTerminalStatus(status: NormalizedStatus): boolean {
 }
 ```
 
-- [ ] **Step 5: Run state machine tests**
+- [x] **Step 5: Run state machine tests**
 
 Run:
 
@@ -562,7 +562,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/state-machine.test.ts
 
 Expected: PASS after updating remaining old fixture values in the test file to new statuses.
 
-- [ ] **Step 6: Commit status alignment**
+- [x] **Step 6: Commit status alignment**
 
 Run:
 
@@ -581,7 +581,7 @@ Expected: commit succeeds.
 - Create: `packages/core/tests/kanban-home.test.ts`
 - Modify: `packages/core/src/index.ts`
 
-- [ ] **Step 1: Write failing path tests**
+- [x] **Step 1: Write failing path tests**
 
 Create `packages/core/tests/kanban-home.test.ts`:
 
@@ -615,7 +615,7 @@ describe('kanban home config', () => {
 });
 ```
 
-- [ ] **Step 2: Run failing path tests**
+- [x] **Step 2: Run failing path tests**
 
 Run:
 
@@ -625,7 +625,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/kanban-home.test.ts
 
 Expected: FAIL with module not found for `../src/config/kanban-home`.
 
-- [ ] **Step 3: Implement config helper**
+- [x] **Step 3: Implement config helper**
 
 Create `packages/core/src/config/kanban-home.ts`:
 
@@ -651,7 +651,7 @@ export function getAllowedIssueBasePath(env: NodeJS.ProcessEnv = process.env): s
 }
 ```
 
-- [ ] **Step 4: Update path validator**
+- [x] **Step 4: Update path validator**
 
 Replace `packages/core/src/store/path-validator.ts` with:
 
@@ -687,7 +687,7 @@ export function isPathWithinAllowed(requestedPath: string): boolean {
 }
 ```
 
-- [ ] **Step 5: Export config helper**
+- [x] **Step 5: Export config helper**
 
 Add to `packages/core/src/index.ts`:
 
@@ -695,7 +695,7 @@ Add to `packages/core/src/index.ts`:
 export { resolveKanbanHome, getAllowedIssueBasePath, expandHome } from './config/kanban-home';
 ```
 
-- [ ] **Step 6: Run path tests**
+- [x] **Step 6: Run path tests**
 
 Run:
 
@@ -705,7 +705,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/kanban-home.test.ts tests/p
 
 Expected: PASS after updating `path-validator.test.ts` expectations to use `KANBAN_HOME`.
 
-- [ ] **Step 7: Commit path configuration**
+- [x] **Step 7: Commit path configuration**
 
 Run:
 
@@ -722,7 +722,7 @@ Expected: commit succeeds.
 - Modify: `packages/core/src/store/mapper.ts`
 - Create: `packages/core/tests/issue-markdown-parser.test.ts`
 
-- [ ] **Step 1: Write failing parser tests**
+- [x] **Step 1: Write failing parser tests**
 
 Create `packages/core/tests/issue-markdown-parser.test.ts`:
 
@@ -746,7 +746,7 @@ describe('markdownIssueToCanonical', () => {
 });
 ```
 
-- [ ] **Step 2: Run failing parser test**
+- [x] **Step 2: Run failing parser test**
 
 Run:
 
@@ -756,7 +756,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/issue-markdown-parser.test.
 
 Expected: FAIL because `markdownIssueToCanonical` is not exported.
 
-- [ ] **Step 3: Implement canonical mapping function**
+- [x] **Step 3: Implement canonical mapping function**
 
 Add to `packages/core/src/store/mapper.ts`:
 
@@ -824,7 +824,7 @@ function normalizePriority(input: string): CanonicalTaskModel['classification'][
 }
 ```
 
-- [ ] **Step 4: Run parser test**
+- [x] **Step 4: Run parser test**
 
 Run:
 
@@ -834,7 +834,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/issue-markdown-parser.test.
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit parser**
+- [x] **Step 5: Commit parser**
 
 Run:
 
@@ -851,7 +851,7 @@ Expected: commit succeeds.
 - Modify: `packages/core/src/store/workspace-resolver.ts`
 - Modify: `packages/core/tests/workspace-resolver.test.ts`
 
-- [ ] **Step 1: Write failing registry test**
+- [x] **Step 1: Write failing registry test**
 
 Append to `packages/core/tests/workspace-resolver.test.ts`:
 
@@ -878,7 +878,7 @@ describe('fromRegistry', () => {
 });
 ```
 
-- [ ] **Step 2: Run failing registry test**
+- [x] **Step 2: Run failing registry test**
 
 Run:
 
@@ -888,7 +888,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/workspace-resolver.test.ts
 
 Expected: FAIL because `WorkspaceResolver.fromRegistry` is not defined.
 
-- [ ] **Step 3: Implement registry factory**
+- [x] **Step 3: Implement registry factory**
 
 Add to `WorkspaceResolver` in `packages/core/src/store/workspace-resolver.ts`:
 
@@ -915,7 +915,7 @@ static fromRegistry(registry: VaultRegistry, vaultRoot: string): WorkspaceResolv
 }
 ```
 
-- [ ] **Step 4: Run workspace resolver tests**
+- [x] **Step 4: Run workspace resolver tests**
 
 Run:
 
@@ -925,7 +925,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/workspace-resolver.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit registry support**
+- [x] **Step 5: Commit registry support**
 
 Run:
 
@@ -941,7 +941,7 @@ Expected: commit succeeds.
 **Files:**
 - Read: all changed files in `packages/schema` and `packages/core`
 
-- [ ] **Step 1: Run schema tests**
+- [x] **Step 1: Run schema tests**
 
 Run:
 
@@ -951,7 +951,7 @@ pnpm --filter @kanban-task-engine/schema test
 
 Expected: PASS.
 
-- [ ] **Step 2: Run core tests**
+- [x] **Step 2: Run core tests**
 
 Run:
 
@@ -961,7 +961,7 @@ pnpm --filter @kanban-task-engine/core test
 
 Expected: PASS. If adapter tests fail because they use old status names, update only the fixtures in the failing test file and rerun the same command.
 
-- [ ] **Step 3: Run build**
+- [x] **Step 3: Run build**
 
 Run:
 
@@ -972,7 +972,7 @@ pnpm --filter @kanban-task-engine/core build
 
 Expected: both commands PASS.
 
-- [ ] **Step 4: Commit verification-only fixture updates if any**
+- [x] **Step 4: Commit verification-only fixture updates if any**
 
 Run:
 
