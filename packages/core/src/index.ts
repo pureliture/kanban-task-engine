@@ -19,3 +19,6 @@ export { parseRecipeYaml } from './recipes/recipe-loader';
 
 export { createManualCommandTrigger } from './modules/manual-command-trigger';
 export { createStateTransitionModule } from './modules/state-transition-module';
+
+export { createAuditLogModule } from './modules/audit-log-module';
+export { createGitCheckpointModule } from './modules/git-checkpoint-module';
