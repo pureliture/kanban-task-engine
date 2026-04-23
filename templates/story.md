@@ -1,34 +1,37 @@
 ---
-id: TICKET-ID
-status: Backlog
-priority: High
-issueType: Story
-workspace: {{workspace}}
-summary: "사용자 스토리 제목"
-assignee: 
+id: issue-example-001
+title: 새 이슈 제목
+issueType: story
+project: example-project
+status: READY
+priority: high
 labels: []
-storyPoints: 3
+executor:
+syncTarget:
+jiraProject:
+jiraKey:
+createdAt: 2026-04-23
+updatedAt: 2026-04-23
 automation:
-  workspace: {{workspace}}
-  useAcp: true
-  triggerOnStatus: [In Progress]
-created: {{created}}
-updated: {{updated}}
+  trigger: manual
+  allowedActions:
+    - transitionIssue
+    - startExecution
+    - writeExecutionLog
 ---
 
-# {{summary}}
+## Goal
 
-## 사용자 스토리
+사용자 가치와 목표를 설명합니다.
 
-**As a** [사용자 역할]
-**I want** [목표]
-**So that** [이유/가치]
+## Acceptance Criteria
 
-## 수락 조건
+- 완료 여부를 확인할 수 있는 조건을 작성합니다.
 
-- [ ] 조건 1
-- [ ] 조건 2
+## Implementation Tasks
 
-## 기술 노트
+- [ ] 첫 번째 실행 단위를 작성합니다.
 
-기술적 구현 노트를 작성하세요.
+## Notes
+
+추가 맥락을 작성합니다.
