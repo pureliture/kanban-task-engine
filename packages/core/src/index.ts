@@ -13,3 +13,6 @@ export { DeadLetterQueue, DeadLetterEntry } from './dead-letter-queue';export { 
 export { ModuleRunner } from './runtime/module-runner';
 export type { AutomationModule, ModuleContext } from './runtime/module';
 export type { RuntimePolicy, ModuleSideEffect } from './runtime/policy';
+
+export type { AutomationRecipe } from './recipes/recipe-loader';
+export { parseRecipeYaml } from './recipes/recipe-loader';

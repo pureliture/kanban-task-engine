@@ -1,0 +1,7 @@
+mode: validate-only
+modules:
+  - parser
+  - validator
+policy:
+  allowedSideEffects:
+    - readIssue
