@@ -1,6 +1,6 @@
 # Kanban Boards, Work Adapter, and Cleanup Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Generate Obsidian-friendly board views from issue Markdown, add the Work/Jira export adapter, and remove old engine-repo live-state assumptions from docs and scripts.
 
@@ -33,7 +33,7 @@
 - Create: `packages/core/tests/board-generator.test.ts`
 - Modify: `packages/core/src/index.ts`
 
-- [ ] **Step 1: Write failing board generator test**
+- [x] **Step 1: Write failing board generator test**
 
 Create `packages/core/tests/board-generator.test.ts`:
 
@@ -60,7 +60,7 @@ describe('board generator', () => {
 });
 ```
 
-- [ ] **Step 2: Run failing test**
+- [x] **Step 2: Run failing test**
 
 Run:
 
@@ -70,7 +70,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/board-generator.test.ts
 
 Expected: FAIL because `board-generator` is missing.
 
-- [ ] **Step 3: Implement board generator**
+- [x] **Step 3: Implement board generator**
 
 Create `packages/core/src/boards/board-generator.ts`:
 
@@ -122,7 +122,7 @@ export function renderBoardMarkdown(options: RenderBoardOptions): string {
 }
 ```
 
-- [ ] **Step 4: Export board generator**
+- [x] **Step 4: Export board generator**
 
 Add to `packages/core/src/index.ts`:
 
@@ -131,7 +131,7 @@ export { renderBoardMarkdown } from './boards/board-generator';
 export type { BoardIssue, RenderBoardOptions } from './boards/board-generator';
 ```
 
-- [ ] **Step 5: Run board tests**
+- [x] **Step 5: Run board tests**
 
 Run:
 
@@ -141,7 +141,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/board-generator.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit board generator**
+- [x] **Step 6: Commit board generator**
 
 Run:
 
@@ -160,7 +160,7 @@ Expected: commit succeeds.
 - Modify: `templates/story.md`
 - Modify: `templates/bug.md`
 
-- [ ] **Step 1: Replace base template**
+- [x] **Step 1: Replace base template**
 
 Replace `templates/base.md` with:
 
@@ -197,14 +197,14 @@ automation:
 
 ## Implementation Tasks
 
-- [ ] 첫 번째 실행 단위를 작성합니다.
+- [x] 첫 번째 실행 단위를 작성합니다.
 
 ## Notes
 
 추가 맥락을 작성합니다.
 ```
 
-- [ ] **Step 2: Replace task template**
+- [x] **Step 2: Replace task template**
 
 Replace `templates/task.md` with the same structure as `base.md`, changing:
 
@@ -215,7 +215,7 @@ priority: medium
 
 and keep all required sections.
 
-- [ ] **Step 3: Replace story template**
+- [x] **Step 3: Replace story template**
 
 Replace `templates/story.md` with the same structure as `base.md`, changing:
 
@@ -230,7 +230,7 @@ and set `## Goal` body to:
 사용자 가치와 목표를 설명합니다.
 ```
 
-- [ ] **Step 4: Replace bug template**
+- [x] **Step 4: Replace bug template**
 
 Replace `templates/bug.md` with the same structure as `base.md`, changing:
 
@@ -243,7 +243,7 @@ labels:
 
 and add reproduction notes under `## Notes`.
 
-- [ ] **Step 5: Validate templates manually**
+- [x] **Step 5: Validate templates manually**
 
 Run:
 
@@ -254,7 +254,7 @@ rg -n '^## Goal|^## Acceptance Criteria|^## Implementation Tasks|^## Notes' temp
 
 Expected: first command prints no stale fields; second command prints the four required sections for each template.
 
-- [ ] **Step 6: Commit templates**
+- [x] **Step 6: Commit templates**
 
 Run:
 
@@ -274,7 +274,7 @@ Expected: commit succeeds.
 - Create: `packages/adapter-jira/src/jira-mapper.ts`
 - Create: `packages/adapter-jira/tests/jira-mapper.test.ts`
 
-- [ ] **Step 1: Write package files**
+- [x] **Step 1: Write package files**
 
 Create `packages/adapter-jira/package.json`:
 
@@ -322,7 +322,7 @@ export * from './jira-mapper';
 export * from './jira-adapter';
 ```
 
-- [ ] **Step 2: Write failing mapper test**
+- [x] **Step 2: Write failing mapper test**
 
 Create `packages/adapter-jira/tests/jira-mapper.test.ts`:
 
@@ -355,7 +355,7 @@ describe('canonicalToJiraPayload', () => {
 });
 ```
 
-- [ ] **Step 3: Run failing mapper test**
+- [x] **Step 3: Run failing mapper test**
 
 Run:
 
@@ -365,7 +365,7 @@ pnpm --filter @kanban-task-engine/adapter-jira test -- tests/jira-mapper.test.ts
 
 Expected: FAIL because `jira-mapper` is missing.
 
-- [ ] **Step 4: Implement Jira mapper**
+- [x] **Step 4: Implement Jira mapper**
 
 Create `packages/adapter-jira/src/jira-mapper.ts`:
 
@@ -401,7 +401,7 @@ export function canonicalToJiraPayload(issue: CanonicalTaskModel, options: JiraP
 }
 ```
 
-- [ ] **Step 5: Run mapper test**
+- [x] **Step 5: Run mapper test**
 
 Run:
 
@@ -411,7 +411,7 @@ pnpm --filter @kanban-task-engine/adapter-jira test -- tests/jira-mapper.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit Jira mapper package**
+- [x] **Step 6: Commit Jira mapper package**
 
 Run:
 
@@ -428,7 +428,7 @@ Expected: commit succeeds.
 - Create: `packages/adapter-jira/src/jira-adapter.ts`
 - Create: `packages/adapter-jira/tests/jira-adapter.test.ts`
 
-- [ ] **Step 1: Write failing adapter test**
+- [x] **Step 1: Write failing adapter test**
 
 Create `packages/adapter-jira/tests/jira-adapter.test.ts`:
 
@@ -456,7 +456,7 @@ describe('JiraAdapter', () => {
 });
 ```
 
-- [ ] **Step 2: Implement Jira adapter**
+- [x] **Step 2: Implement Jira adapter**
 
 Create `packages/adapter-jira/src/jira-adapter.ts`:
 
@@ -506,7 +506,7 @@ export class JiraAdapter {
 }
 ```
 
-- [ ] **Step 3: Run adapter tests**
+- [x] **Step 3: Run adapter tests**
 
 Run:
 
@@ -516,7 +516,7 @@ pnpm --filter @kanban-task-engine/adapter-jira test
 
 Expected: PASS.
 
-- [ ] **Step 4: Commit Jira adapter**
+- [x] **Step 4: Commit Jira adapter**
 
 Run:
 
@@ -532,7 +532,7 @@ Expected: commit succeeds.
 **Files:**
 - Modify: `scripts/migrate-tickets.ts`
 
-- [ ] **Step 1: Replace hardcoded destination helper**
+- [x] **Step 1: Replace hardcoded destination helper**
 
 In `scripts/migrate-tickets.ts`, add:
 
@@ -548,7 +548,7 @@ function kanbanHome(): string {
 }
 ```
 
-- [ ] **Step 2: Update migration destinations**
+- [x] **Step 2: Update migration destinations**
 
 Replace each `to: path.join(process.env.HOME!, 'Projects/kanban-task-engine/issues/...')` with `path.join(kanbanHome(), 'issues', ...)`.
 
@@ -558,7 +558,7 @@ Example replacement:
 to: path.join(kanbanHome(), 'issues', 'vibe-coding'),
 ```
 
-- [ ] **Step 3: Run migration script in dry check mode through TypeScript compiler**
+- [x] **Step 3: Run migration script in dry check mode through TypeScript compiler**
 
 Run:
 
@@ -574,7 +574,7 @@ pnpm exec tsx scripts/migrate-tickets.ts
 
 Expected: script prints skipped source directories or migrated files. It must not write to `~/Projects/kanban-task-engine/issues`.
 
-- [ ] **Step 4: Commit migration update**
+- [x] **Step 4: Commit migration update**
 
 Run:
 
@@ -591,7 +591,7 @@ Expected: commit succeeds.
 - Create or modify: `docs/kanban-runtime.md`
 - Modify: `docs/archive/2026-04-23-kanban-legacy-design-notes.md` if a link needs updating.
 
-- [ ] **Step 1: Create runtime documentation**
+- [x] **Step 1: Create runtime documentation**
 
 Create `docs/kanban-runtime.md`:
 
@@ -615,7 +615,7 @@ Markdown issue files under `kanban/issues/` are the source of truth. Canonical J
 Work mode uses the same schema and parser, but external integration is limited to Atlassian/Jira export. Jira can write selected metadata such as `jiraKey`, `jiraStatus`, and `exportedAt` back to Markdown when policy allows it.
 ```
 
-- [ ] **Step 2: Verify no stale live-state path remains in docs outside archive**
+- [x] **Step 2: Verify no stale live-state path remains in docs outside archive**
 
 Run:
 
@@ -625,7 +625,7 @@ rg -n '~/Projects/kanban-task-engine/issues|kanban-task-engine/issues' docs temp
 
 Expected: no output except code comments that explicitly say the old path is rejected.
 
-- [ ] **Step 3: Commit docs cleanup**
+- [x] **Step 3: Commit docs cleanup**
 
 Run:
 
@@ -641,7 +641,7 @@ Expected: commit succeeds.
 **Files:**
 - Read: changed files under `packages/core`, `packages/adapter-jira`, `templates`, `scripts`, and `docs`.
 
-- [ ] **Step 1: Run core board tests**
+- [x] **Step 1: Run core board tests**
 
 Run:
 
@@ -651,7 +651,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/board-generator.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 2: Run Jira adapter tests**
+- [x] **Step 2: Run Jira adapter tests**
 
 Run:
 
@@ -661,7 +661,7 @@ pnpm --filter @kanban-task-engine/adapter-jira test
 
 Expected: PASS.
 
-- [ ] **Step 3: Build affected packages**
+- [x] **Step 3: Build affected packages**
 
 Run:
 
@@ -672,7 +672,7 @@ pnpm --filter @kanban-task-engine/adapter-jira build
 
 Expected: PASS.
 
-- [ ] **Step 4: Run stale path scan**
+- [x] **Step 4: Run stale path scan**
 
 Run:
 
@@ -682,7 +682,7 @@ rg -n '~/Projects/kanban-task-engine/issues|triggerOnStatus|status: Backlog' . -
 
 Expected: no stale implementation references. Historical references are allowed only under `docs/archive/`.
 
-- [ ] **Step 5: Verify clean state**
+- [x] **Step 5: Verify clean state**
 
 Run:
 

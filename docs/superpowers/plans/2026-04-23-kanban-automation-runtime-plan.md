@@ -1,6 +1,6 @@
 # Kanban Automation Runtime Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Build the composable module runtime, recipe/policy loader, and Home execution modules needed for explicit issue execution.
 
@@ -40,7 +40,7 @@
 - Create: `packages/core/src/runtime/policy.ts`
 - Create: `packages/core/tests/module-runner.test.ts`
 
-- [ ] **Step 1: Write failing module runner tests**
+- [x] **Step 1: Write failing module runner tests**
 
 Create `packages/core/tests/module-runner.test.ts`:
 
@@ -79,7 +79,7 @@ describe('ModuleRunner', () => {
 });
 ```
 
-- [ ] **Step 2: Run failing test**
+- [x] **Step 2: Run failing test**
 
 Run:
 
@@ -89,7 +89,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/module-runner.test.ts
 
 Expected: FAIL because runtime files do not exist.
 
-- [ ] **Step 3: Implement policy and module contracts**
+- [x] **Step 3: Implement policy and module contracts**
 
 Create `packages/core/src/runtime/policy.ts`:
 
@@ -132,7 +132,7 @@ export interface AutomationModule {
 }
 ```
 
-- [ ] **Step 4: Implement module runner**
+- [x] **Step 4: Implement module runner**
 
 Create `packages/core/src/runtime/module-runner.ts`:
 
@@ -154,7 +154,7 @@ export class ModuleRunner {
 }
 ```
 
-- [ ] **Step 5: Export runtime APIs**
+- [x] **Step 5: Export runtime APIs**
 
 Add to `packages/core/src/index.ts`:
 
@@ -164,7 +164,7 @@ export type { AutomationModule, ModuleContext } from './runtime/module';
 export type { RuntimePolicy, ModuleSideEffect } from './runtime/policy';
 ```
 
-- [ ] **Step 6: Run module tests**
+- [x] **Step 6: Run module tests**
 
 Run:
 
@@ -174,7 +174,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/module-runner.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit runtime contracts**
+- [x] **Step 7: Commit runtime contracts**
 
 Run:
 
@@ -194,7 +194,7 @@ Expected: commit succeeds.
 - Create: `recipes/home-full-auto.yaml`
 - Create: `recipes/validate-only.yaml`
 
-- [ ] **Step 1: Write default recipe files**
+- [x] **Step 1: Write default recipe files**
 
 Create `recipes/home-assisted.yaml`:
 
@@ -249,7 +249,7 @@ policy:
     - readIssue
 ```
 
-- [ ] **Step 2: Write failing recipe loader tests**
+- [x] **Step 2: Write failing recipe loader tests**
 
 Create `packages/core/tests/recipe-loader.test.ts`:
 
@@ -278,7 +278,7 @@ policy:
 });
 ```
 
-- [ ] **Step 3: Run failing test**
+- [x] **Step 3: Run failing test**
 
 Run:
 
@@ -288,7 +288,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/recipe-loader.test.ts
 
 Expected: FAIL because `recipe-loader` is missing.
 
-- [ ] **Step 4: Implement recipe loader**
+- [x] **Step 4: Implement recipe loader**
 
 Create `packages/core/src/recipes/recipe-loader.ts`:
 
@@ -318,7 +318,7 @@ export function parseRecipeYaml(content: string): AutomationRecipe {
 }
 ```
 
-- [ ] **Step 5: Export recipe loader**
+- [x] **Step 5: Export recipe loader**
 
 Add to `packages/core/src/index.ts`:
 
@@ -327,7 +327,7 @@ export type { AutomationRecipe } from './recipes/recipe-loader';
 export { parseRecipeYaml } from './recipes/recipe-loader';
 ```
 
-- [ ] **Step 6: Run recipe tests**
+- [x] **Step 6: Run recipe tests**
 
 Run:
 
@@ -337,7 +337,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/recipe-loader.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit recipes**
+- [x] **Step 7: Commit recipes**
 
 Run:
 
@@ -355,7 +355,7 @@ Expected: commit succeeds.
 - Create: `packages/core/src/modules/state-transition-module.ts`
 - Create: `packages/core/tests/home-execution-flow.test.ts`
 
-- [ ] **Step 1: Write failing Home flow test**
+- [x] **Step 1: Write failing Home flow test**
 
 Create `packages/core/tests/home-execution-flow.test.ts`:
 
@@ -394,7 +394,7 @@ describe('home execution flow modules', () => {
 });
 ```
 
-- [ ] **Step 2: Run failing Home flow test**
+- [x] **Step 2: Run failing Home flow test**
 
 Run:
 
@@ -404,7 +404,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/home-execution-flow.test.ts
 
 Expected: FAIL because module files are missing.
 
-- [ ] **Step 3: Implement manual command trigger**
+- [x] **Step 3: Implement manual command trigger**
 
 Create `packages/core/src/modules/manual-command-trigger.ts`:
 
@@ -432,7 +432,7 @@ export function createManualCommandTrigger(): AutomationModule {
 }
 ```
 
-- [ ] **Step 4: Implement state transition module**
+- [x] **Step 4: Implement state transition module**
 
 Create `packages/core/src/modules/state-transition-module.ts`:
 
@@ -456,7 +456,7 @@ export function createStateTransitionModule(stateMachine = new StateMachine()): 
 }
 ```
 
-- [ ] **Step 5: Export modules**
+- [x] **Step 5: Export modules**
 
 Add to `packages/core/src/index.ts`:
 
@@ -465,7 +465,7 @@ export { createManualCommandTrigger } from './modules/manual-command-trigger';
 export { createStateTransitionModule } from './modules/state-transition-module';
 ```
 
-- [ ] **Step 6: Run Home flow test**
+- [x] **Step 6: Run Home flow test**
 
 Run:
 
@@ -475,7 +475,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/home-execution-flow.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit command and transition modules**
+- [x] **Step 7: Commit command and transition modules**
 
 Run:
 
@@ -494,7 +494,7 @@ Expected: commit succeeds.
 - Create: `packages/core/tests/audit-log-module.test.ts`
 - Create: `packages/core/tests/git-checkpoint-module.test.ts`
 
-- [ ] **Step 1: Write failing audit log test**
+- [x] **Step 1: Write failing audit log test**
 
 Create `packages/core/tests/audit-log-module.test.ts`:
 
@@ -519,7 +519,7 @@ describe('audit log module', () => {
 });
 ```
 
-- [ ] **Step 2: Implement audit log module**
+- [x] **Step 2: Implement audit log module**
 
 Create `packages/core/src/modules/audit-log-module.ts`:
 
@@ -543,7 +543,7 @@ export function createAuditLogModule(filePath: string): AutomationModule {
 }
 ```
 
-- [ ] **Step 3: Write failing git checkpoint test**
+- [x] **Step 3: Write failing git checkpoint test**
 
 Create `packages/core/tests/git-checkpoint-module.test.ts`:
 
@@ -567,7 +567,7 @@ describe('git checkpoint module', () => {
 });
 ```
 
-- [ ] **Step 4: Implement git checkpoint module**
+- [x] **Step 4: Implement git checkpoint module**
 
 Create `packages/core/src/modules/git-checkpoint-module.ts`:
 
@@ -608,7 +608,7 @@ export function createGitCheckpointModule(vaultPath: string, message: string, ru
 }
 ```
 
-- [ ] **Step 5: Export and run tests**
+- [x] **Step 5: Export and run tests**
 
 Add to `packages/core/src/index.ts`:
 
@@ -625,7 +625,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/audit-log-module.test.ts te
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit audit and checkpoint modules**
+- [x] **Step 6: Commit audit and checkpoint modules**
 
 Run:
 
@@ -645,7 +645,7 @@ Expected: commit succeeds.
 - Create: `packages/adapter-claude-code/src/index.ts`
 - Create: `packages/adapter-claude-code/tests/claude-code-adapter.test.ts`
 
-- [ ] **Step 1: Write package files**
+- [x] **Step 1: Write package files**
 
 Create `packages/adapter-claude-code/package.json`:
 
@@ -686,7 +686,7 @@ Create `packages/adapter-claude-code/tsconfig.json`:
 }
 ```
 
-- [ ] **Step 2: Write failing adapter test**
+- [x] **Step 2: Write failing adapter test**
 
 Create `packages/adapter-claude-code/tests/claude-code-adapter.test.ts`:
 
@@ -704,7 +704,7 @@ describe('Claude Code adapter config', () => {
 });
 ```
 
-- [ ] **Step 3: Run failing test**
+- [x] **Step 3: Run failing test**
 
 Run:
 
@@ -714,7 +714,7 @@ pnpm --filter @kanban-task-engine/adapter-claude-code test -- tests/claude-code-
 
 Expected: FAIL because module is missing.
 
-- [ ] **Step 4: Implement adapter config**
+- [x] **Step 4: Implement adapter config**
 
 Create `packages/adapter-claude-code/src/claude-code-adapter.ts`:
 
@@ -735,7 +735,7 @@ export function createClaudeCodeAdapter(cwd: string): CliAdapter {
 }
 ```
 
-- [ ] **Step 5: Export adapter**
+- [x] **Step 5: Export adapter**
 
 Create `packages/adapter-claude-code/src/index.ts`:
 
@@ -743,7 +743,7 @@ Create `packages/adapter-claude-code/src/index.ts`:
 export { createClaudeCodeAdapter, createClaudeCodeAdapterConfig } from './claude-code-adapter';
 ```
 
-- [ ] **Step 6: Run adapter tests**
+- [x] **Step 6: Run adapter tests**
 
 Run:
 
@@ -753,7 +753,7 @@ pnpm --filter @kanban-task-engine/adapter-claude-code test -- tests/claude-code-
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit Claude Code adapter**
+- [x] **Step 7: Commit Claude Code adapter**
 
 Run:
 
@@ -769,7 +769,7 @@ Expected: commit succeeds.
 **Files:**
 - Read: all changed runtime, module, recipe, adapter files.
 
-- [ ] **Step 1: Run core runtime tests**
+- [x] **Step 1: Run core runtime tests**
 
 Run:
 
@@ -779,7 +779,7 @@ pnpm --filter @kanban-task-engine/core test -- tests/module-runner.test.ts tests
 
 Expected: PASS.
 
-- [ ] **Step 2: Run CLI adapter tests**
+- [x] **Step 2: Run CLI adapter tests**
 
 Run:
 
@@ -790,7 +790,7 @@ pnpm --filter @kanban-task-engine/adapter-claude-code test
 
 Expected: PASS.
 
-- [ ] **Step 3: Build changed packages**
+- [x] **Step 3: Build changed packages**
 
 Run:
 
@@ -802,7 +802,7 @@ pnpm --filter @kanban-task-engine/adapter-claude-code build
 
 Expected: PASS.
 
-- [ ] **Step 4: Verify clean state**
+- [x] **Step 4: Verify clean state**
 
 Run:
 
