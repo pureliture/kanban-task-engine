@@ -1,14 +1,13 @@
 import path from 'path';
-import os from 'os';
+import { getAllowedIssueBasePath } from '../config/kanban-home';
 
-export const ALLOWED_BASE_PATHS: string[] = [
-  path.resolve(process.env.ISSUES_BASE_PATH || path.join(os.homedir(), 'Projects', 'kanban-task-engine', 'issues'))
-];
+export function getAllowedBasePaths(): string[] {
+  return [path.resolve(getAllowedIssueBasePath())];
+}
 
 export function validatePath(requestedPath: string): string {
   const resolved = path.resolve(requestedPath);
-  const isAllowed = ALLOWED_BASE_PATHS.some(base => {
-    // Ensure base path ends with separator for proper prefix matching
+  const isAllowed = getAllowedBasePaths().some(base => {
     const normalizedBase = base.endsWith(path.sep) ? base : base + path.sep;
     return resolved.startsWith(normalizedBase);
   });

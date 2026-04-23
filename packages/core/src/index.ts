@@ -8,4 +8,4 @@ export { IdResolver } from './id-resolver';
 export { computeChecksum, hasChanged } from './checksum';
 export { SYNC_EVENTS, POLICY_EVENTS } from './events';
 export { StateTransition } from './types';
-export { DeadLetterQueue, DeadLetterEntry } from './dead-letter-queue';
+export { DeadLetterQueue, DeadLetterEntry } from './dead-letter-queue';export { resolveKanbanHome, getAllowedIssueBasePath, expandHome } from './config/kanban-home';
