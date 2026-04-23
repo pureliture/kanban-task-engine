@@ -1,0 +1,16 @@
+mode: home-full-auto
+vaultPath: ~/.openclaw/workspace-kanban/kanban
+modules:
+  - watcher
+  - state-transition
+  - openclaw-executor
+  - audit-log
+  - git-checkpoint
+policy:
+  allowedSideEffects:
+    - readIssue
+    - writeIssue
+    - startExecution
+    - writeEvent
+    - gitCommit
+    - externalRequest

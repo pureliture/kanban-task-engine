@@ -1,0 +1,15 @@
+mode: home-assisted
+vaultPath: ~/.openclaw/workspace-kanban/kanban
+modules:
+  - manual-command-trigger
+  - state-transition
+  - claude-code-executor
+  - audit-log
+  - git-checkpoint
+policy:
+  allowedSideEffects:
+    - readIssue
+    - writeIssue
+    - startExecution
+    - writeEvent
+    - gitCommit
