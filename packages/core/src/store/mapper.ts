@@ -1,5 +1,6 @@
 import { CanonicalTaskModel, NormalizedStatus, RawStatusCategory } from '../types';
 import grayMatter from 'gray-matter';
+import { parseIssueMarkdown } from '@kanban-task-engine/schema';
 
 const STATUS_MAP: Record<string, NormalizedStatus> = {
   'todo': 'TODO',
@@ -151,4 +152,64 @@ function extractWorkspace(filePath: string): string {
   if (match) return `workspace-${match[1]}`;
   if (filePath.includes('/workspace/issues')) return 'workspace';
   return 'workspace';
+}
+
+export function markdownIssueToCanonical(content: string, filePath: string): CanonicalTaskModel {
+  const parsed = parseIssueMarkdown(content);
+  if (!parsed.ok) {
+    throw new Error(parsed.errors.join('; '));
+  }
+
+  const { frontmatter, sections } = parsed.value;
+  return {
+    task_ref: {
+      provider: 'local',
+      external_key: frontmatter.project,
+      external_id: frontmatter.id,
+    },
+    summary: frontmatter.title,
+    description_ref: filePath,
+    workflow: {
+      normalized_status: frontmatter.status,
+      raw_status: frontmatter.status,
+      raw_status_category: frontmatter.status === 'RUNNING' ? 'IN_PROGRESS' :
+        frontmatter.status === 'REVIEW' ? 'IN_REVIEW' :
+        frontmatter.status,
+    },
+    classification: {
+      issue_type: frontmatter.issueType as CanonicalTaskModel['classification']['issue_type'],
+      priority: normalizePriority(frontmatter.priority),
+      labels: frontmatter.labels ?? [],
+      component: [],
+    },
+    ownership: {
+      assignee: '',
+      reporter: '',
+    },
+    planning: {},
+    automation: {
+      policy_id: String(frontmatter.automation?.policy_id ?? 'default'),
+      on_enter: [],
+      on_exit: [],
+      execution_profile: 'standard',
+      workspace: frontmatter.project,
+      useAcp: frontmatter.executor === 'claude-code',
+    },
+    sync: {
+      last_synced_at: frontmatter.updatedAt,
+      last_source: 'local',
+    },
+    created: frontmatter.createdAt,
+    updated: frontmatter.updatedAt,
+  };
+}
+
+function normalizePriority(input: string): CanonicalTaskModel['classification']['priority'] {
+  const value = input.toLowerCase();
+  if (value === 'blocker') return 'Blocker';
+  if (value === 'critical') return 'Critical';
+  if (value === 'high') return 'High';
+  if (value === 'low') return 'Low';
+  if (value === 'trivial') return 'Trivial';
+  return 'Medium';
 }
