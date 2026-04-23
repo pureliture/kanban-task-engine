@@ -1,6 +1,6 @@
 import { CanonicalTaskModel, NormalizedStatus, RawStatusCategory } from '../types';
 import grayMatter from 'gray-matter';
-import { parseIssueMarkdown } from '@kanban-task-engine/schema';
+import { parseIssueMarkdown, validateCanonicalIssue } from '@kanban-task-engine/schema';
 
 const STATUS_MAP: Record<string, NormalizedStatus> = {
   'todo': 'TODO',
@@ -160,8 +160,8 @@ export function markdownIssueToCanonical(content: string, filePath: string): Can
     throw new Error(parsed.errors.join('; '));
   }
 
-  const { frontmatter, sections } = parsed.value;
-  return {
+  const { frontmatter } = parsed.value;
+  const task: CanonicalTaskModel = {
     task_ref: {
       provider: 'local',
       external_key: frontmatter.project,
@@ -177,7 +177,7 @@ export function markdownIssueToCanonical(content: string, filePath: string): Can
         frontmatter.status,
     },
     classification: {
-      issue_type: frontmatter.issueType as CanonicalTaskModel['classification']['issue_type'],
+      issue_type: normalizeIssueType(frontmatter.issueType),
       priority: normalizePriority(frontmatter.priority),
       labels: frontmatter.labels ?? [],
       component: [],
@@ -202,6 +202,22 @@ export function markdownIssueToCanonical(content: string, filePath: string): Can
     created: frontmatter.createdAt,
     updated: frontmatter.updatedAt,
   };
+
+  const canonical = validateCanonicalIssue(task);
+  if (!canonical.ok) {
+    throw new Error(canonical.errors.join('; '));
+  }
+
+  return task;
+}
+
+function normalizeIssueType(input: string): CanonicalTaskModel['classification']['issue_type'] {
+  const value = input.toLowerCase();
+  if (value === 'epic') return 'Epic';
+  if (value === 'story') return 'Story';
+  if (value === 'bug') return 'Bug';
+  if (value === 'sub-task') return 'Sub-task';
+  return 'Task';
 }
 
 function normalizePriority(input: string): CanonicalTaskModel['classification']['priority'] {

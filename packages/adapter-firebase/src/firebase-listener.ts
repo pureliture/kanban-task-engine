@@ -27,8 +27,8 @@ export class FirebaseListener {
           const eventType = change.type;
 
           if (eventType === 'added' || eventType === 'modified') {
-            const prevStatus = (docData as any).prevStatus ?? 'BACKLOG';
-            const newStatus = (docData as any).status ?? 'BACKLOG';
+            const prevStatus = normalizeStatus((docData as any).prevStatus);
+            const newStatus = normalizeStatus((docData as any).status);
 
             const event: SyncEvent = {
               event_id: `${change.doc.id}-${Date.now()}`,
@@ -59,4 +59,14 @@ export class FirebaseListener {
       this.unsubscribe = null;
     }
   }
+}
+
+function normalizeStatus(status: unknown): SyncEvent['new_status'] {
+  const value = typeof status === 'string' ? status.toLowerCase() : 'todo';
+  if (value === 'ready' || value === 'selected' || value === 'todo') return 'READY';
+  if (value === 'running' || value === 'active' || value === 'in progress') return 'RUNNING';
+  if (value === 'review' || value === 'in review') return 'REVIEW';
+  if (value === 'done') return 'DONE';
+  if (value === 'failed' || value === 'blocked' || value === 'cancelled') return 'FAILED';
+  return 'TODO';
 }

@@ -29,34 +29,36 @@ export interface FirestoreTaskDoc {
 }
 
 const STATUS_MAP: Record<string, NormalizedStatus> = {
-  'backlog': 'BACKLOG',
-  'todo': 'SELECTED',
-  'selected': 'SELECTED',
-  'in progress': 'ACTIVE',
-  'active': 'ACTIVE',
-  'blocked': 'BLOCKED',
+  'backlog': 'TODO',
+  'todo': 'TODO',
+  'selected': 'READY',
+  'ready': 'READY',
+  'in progress': 'RUNNING',
+  'active': 'RUNNING',
+  'running': 'RUNNING',
+  'blocked': 'FAILED',
+  'failed': 'FAILED',
   'in review': 'REVIEW',
   'review': 'REVIEW',
   'done': 'DONE',
-  'cancelled': 'CANCELLED',
+  'cancelled': 'FAILED',
 };
 
 const CATEGORY_MAP: Record<string, RawStatusCategory> = {
-  'BACKLOG': 'BACKLOG',
-  'SELECTED': 'BACKLOG',
-  'ACTIVE': 'IN_PROGRESS',
-  'BLOCKED': 'BLOCKED',
+  'TODO': 'TODO',
+  'READY': 'READY',
+  'RUNNING': 'IN_PROGRESS',
   'REVIEW': 'IN_REVIEW',
   'DONE': 'DONE',
-  'CANCELLED': 'CANCELLED',
+  'FAILED': 'FAILED',
 };
 
 export function firestoreDocToCanonical(
   doc: FirestoreTaskDoc,
   workspace: string
 ): CanonicalTaskModel {
-  const rawStatus = doc.status ?? 'Backlog';
-  const normalized = STATUS_MAP[rawStatus.toLowerCase()] ?? 'BACKLOG';
+  const rawStatus = doc.status ?? 'TODO';
+  const normalized = STATUS_MAP[rawStatus.toLowerCase()] ?? 'TODO';
 
   return {
     task_ref: {
@@ -68,7 +70,7 @@ export function firestoreDocToCanonical(
     workflow: {
       normalized_status: normalized,
       raw_status: rawStatus,
-      raw_status_category: CATEGORY_MAP[normalized] ?? 'BACKLOG',
+      raw_status_category: CATEGORY_MAP[normalized] ?? 'TODO',
     },
     classification: {
       issue_type: (doc.issueType as CanonicalTaskModel['classification']['issue_type']) ?? 'Task',
@@ -87,7 +89,7 @@ export function firestoreDocToCanonical(
     },
     automation: {
       policy_id: doc.policyId ?? 'default',
-      on_enter: ['ACTIVE'],
+      on_enter: ['RUNNING'],
       on_exit: [],
       execution_profile: 'standard',
       workspace: doc.workspace ?? workspace,

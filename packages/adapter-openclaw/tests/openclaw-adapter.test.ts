@@ -14,8 +14,8 @@ function createMockTask(overrides: Partial<CanonicalTaskModel> = {}): CanonicalT
     task_ref: { provider: 'local', external_key: 'TEST-001', external_id: 'TEST-001' },
     summary: 'Test task',
     workflow: {
-      normalized_status: 'ACTIVE',
-      raw_status: 'In Progress',
+      normalized_status: 'RUNNING',
+      raw_status: 'RUNNING',
       raw_status_category: 'IN_PROGRESS'
     },
     classification: {

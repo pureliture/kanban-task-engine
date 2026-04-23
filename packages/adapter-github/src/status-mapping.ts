@@ -2,28 +2,32 @@ import { NormalizedStatus } from '@kanban-task-engine/core';
 
 // GitHub Projects status option names → Canonical status
 const GITHUB_TO_CANONICAL: Record<string, NormalizedStatus> = {
-  'Backlog': 'BACKLOG',
-  'Todo': 'SELECTED',
-  'In Progress': 'ACTIVE',
-  'Blocked': 'BLOCKED',
+  'Backlog': 'TODO',
+  'To Do': 'TODO',
+  'Todo': 'TODO',
+  'Ready': 'READY',
+  'Selected': 'READY',
+  'Selected for Development': 'READY',
+  'In Progress': 'RUNNING',
+  'Blocked': 'FAILED',
   'In Review': 'REVIEW',
   'Done': 'DONE',
-  'Cancelled': 'CANCELLED',
+  'Cancelled': 'FAILED',
+  'Failed': 'FAILED',
 };
 
 // Canonical status → GitHub Projects status option name
 const CANONICAL_TO_GITHUB: Record<NormalizedStatus, string> = {
-  'BACKLOG': 'Backlog',
-  'SELECTED': 'Todo',
-  'ACTIVE': 'In Progress',
-  'BLOCKED': 'Blocked',
+  'TODO': 'Backlog',
+  'READY': 'Ready',
+  'RUNNING': 'In Progress',
   'REVIEW': 'In Review',
   'DONE': 'Done',
-  'CANCELLED': 'Cancelled',
+  'FAILED': 'Blocked',
 };
 
 export function githubStatusToNormalized(githubStatus: string): NormalizedStatus {
-  return GITHUB_TO_CANONICAL[githubStatus] ?? 'BACKLOG';
+  return GITHUB_TO_CANONICAL[githubStatus] ?? 'TODO';
 }
 
 export function normalizedToGithubStatus(normalized: NormalizedStatus): string {
