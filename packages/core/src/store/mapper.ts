@@ -100,7 +100,9 @@ export function yamlToCanonical(yaml: Record<string, unknown>, filePath: string)
     },
     automation: {
       policy_id: String((yaml.automation as Record<string, unknown>)?.policy_id ?? (yaml.automation as Record<string, unknown>)?.workspace ?? 'default'),
-      on_enter: ((yaml.automation as Record<string, unknown>)?.triggerOnStatus as string[])?.map(rawStatusToNormalized) ?? ['READY'],
+      on_enter: ((yaml.automation as Record<string, unknown>)?.onEnter as string[])?.map(rawStatusToNormalized)
+        ?? ((yaml.automation as Record<string, unknown>)?.triggerOnStatus as string[])?.map(rawStatusToNormalized) // legacy field
+        ?? ['READY'],
       on_exit: [],
       execution_profile: 'standard',
       workspace: String(yaml.workspace ?? workspace),
@@ -134,7 +136,7 @@ export function canonicalToYaml(task: CanonicalTaskModel): Record<string, unknow
     automation: {
       workspace: task.automation.workspace,
       useAcp: task.automation.useAcp,
-      triggerOnStatus: task.automation.on_enter.map(normalizedToRawStatus),
+      onEnter: task.automation.on_enter.map(normalizedToRawStatus),
       policy_id: task.automation.policy_id,
     },
     created: task.created,
