@@ -1,0 +1,21 @@
+{
+  "name": "@kanban-task-engine/adapter-jira",
+  "version": "0.1.0",
+  "description": "Jira export adapter for Markdown issue control plane",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@kanban-task-engine/core": "workspace:*",
+    "@kanban-task-engine/schema": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.0.0"
+  }
+}
