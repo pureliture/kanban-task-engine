@@ -4,20 +4,30 @@ import { isIssueStatus, IssueStatus } from './status';
 export interface IssueFrontmatter {
   id: string;
   title: string;
-  issueType: string;
-  project: string;
+  type: IssueType;
   status: IssueStatus;
-  priority: string;
-  createdAt: string;
-  updatedAt: string;
-  parent?: string;
+  executor: string;
+  project: string;
+  created: string;
+  updated: string;
+  // Optional
+  epic?: string;
+  priority?: Priority;
+  assignee?: string;
+  completed?: string;
   labels?: string[];
-  executor?: string;
+  depends_on?: string[];
+  working_dir?: string;
+  merge_into?: string;
+  run_count?: number;
   syncTarget?: string;
   jiraProject?: string;
   jiraKey?: string;
   automation?: Record<string, unknown>;
 }
+
+export type IssueType = 'epic' | 'task' | 'bug' | 'chore' | 'docs';
+export type Priority = 'P0' | 'P1' | 'P2' | 'P3';
 
 export interface ParsedIssueMarkdown {
   frontmatter: IssueFrontmatter;
@@ -68,10 +78,11 @@ export type ValidationResult<T> =
   | { ok: true; value: T }
   | { ok: false; errors: string[] };
 
-const REQUIRED_FIELDS = ['id', 'title', 'issueType', 'project', 'status', 'priority', 'createdAt', 'updatedAt'] as const;
-const REQUIRED_SECTIONS = ['Goal', 'Acceptance Criteria', 'Implementation Tasks', 'Notes'] as const;
-const ISSUE_TYPES = ['epic', 'story', 'task', 'bug', 'sub-task'] as const;
-const PRIORITIES = ['blocker', 'critical', 'high', 'medium', 'low', 'trivial'] as const;
+const REQUIRED_FIELDS = ['id', 'title', 'type', 'status', 'executor', 'project', 'created', 'updated'] as const;
+const REQUIRED_SECTIONS_TASK = ['목적', '컨텍스트', 'Acceptance Criteria', '실행 힌트'] as const;
+const REQUIRED_SECTIONS_EPIC = ['목표', '범위', '성공 지표', '하위 티켓'] as const;
+const ISSUE_TYPES = ['epic', 'task', 'bug', 'chore', 'docs'] as const;
+const PRIORITIES = ['P0', 'P1', 'P2', 'P3'] as const;
 
 export function validateIssueFrontmatter(input: unknown): ValidationResult<IssueFrontmatter> {
   if (!isRecord(input)) {
@@ -80,31 +91,56 @@ export function validateIssueFrontmatter(input: unknown): ValidationResult<Issue
 
   const errors: string[] = [];
   for (const field of REQUIRED_FIELDS) {
-    if (input[field] === undefined || input[field] === null || input[field] === '') {
+    const v = input[field];
+    // Epic은 project를 빈 문자열로 허용, non-epic은 비허용.
+    if (field === 'project' && input.type === 'epic') continue;
+    if (v === undefined || v === null || v === '') {
       errors.push(`Missing required field: ${field}`);
     }
   }
 
-  for (const field of ['id', 'title', 'issueType', 'project', 'priority', 'createdAt', 'updatedAt'] as const) {
+  for (const field of ['id', 'title', 'executor', 'created', 'updated'] as const) {
     if (input[field] !== undefined && typeof input[field] !== 'string') {
       errors.push(`Invalid field type: ${field} must be a string`);
     }
+  }
+
+  // project는 epic일 때 빈 문자열 허용
+  if (input.project !== undefined && input.project !== null && typeof input.project !== 'string') {
+    errors.push('Invalid field type: project must be a string');
   }
 
   if (input.status !== undefined && !isIssueStatus(input.status)) {
     errors.push(`Invalid status: ${String(input.status)}`);
   }
 
-  if (typeof input.issueType === 'string' && !ISSUE_TYPES.includes(input.issueType.toLowerCase() as typeof ISSUE_TYPES[number])) {
-    errors.push(`Invalid issueType: ${input.issueType}`);
+  if (typeof input.type === 'string' && !(ISSUE_TYPES as readonly string[]).includes(input.type)) {
+    errors.push(`Invalid type: ${input.type}`);
   }
 
-  if (typeof input.priority === 'string' && !PRIORITIES.includes(input.priority.toLowerCase() as typeof PRIORITIES[number])) {
+  if (input.priority !== undefined && typeof input.priority === 'string'
+      && !(PRIORITIES as readonly string[]).includes(input.priority)) {
     errors.push(`Invalid priority: ${input.priority}`);
   }
 
-  if (input.labels !== undefined && (!Array.isArray(input.labels) || !input.labels.every(label => typeof label === 'string'))) {
+  if (input.labels !== undefined && (!Array.isArray(input.labels)
+      || !input.labels.every(label => typeof label === 'string'))) {
     errors.push('Invalid field type: labels must be a string array');
+  }
+
+  if (input.depends_on !== undefined && (!Array.isArray(input.depends_on)
+      || !input.depends_on.every((v: unknown) => typeof v === 'string'))) {
+    errors.push('Invalid field type: depends_on must be a string array');
+  }
+
+  if (input.run_count !== undefined && typeof input.run_count !== 'number') {
+    errors.push('Invalid field type: run_count must be a number');
+  }
+
+  for (const field of ['epic', 'assignee', 'completed', 'working_dir', 'merge_into'] as const) {
+    if (input[field] !== undefined && input[field] !== null && typeof input[field] !== 'string') {
+      errors.push(`Invalid field type: ${field} must be a string`);
+    }
   }
 
   if (input.automation !== undefined && !isRecord(input.automation)) {
@@ -116,7 +152,8 @@ export function validateIssueFrontmatter(input: unknown): ValidationResult<Issue
 }
 
 export function parseIssueMarkdown(content: string): ValidationResult<ParsedIssueMarkdown> {
-  const frontmatterMatch = content.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
+  const normalized = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const frontmatterMatch = normalized.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
   if (!frontmatterMatch) return { ok: false, errors: ['Missing YAML frontmatter'] };
 
   let parsed: unknown;
@@ -130,10 +167,13 @@ export function parseIssueMarkdown(content: string): ValidationResult<ParsedIssu
   const frontmatterResult = validateIssueFrontmatter(parsed);
   const errors: string[] = frontmatterResult.ok ? [] : [...frontmatterResult.errors];
 
-  const body = content.slice(frontmatterMatch[0].length);
+  const body = normalized.slice(frontmatterMatch[0].length);
   const sections = extractSections(body);
 
-  for (const section of REQUIRED_SECTIONS) {
+  const issueType = isRecord(parsed) ? String(parsed.type ?? '') : '';
+  const required = issueType === 'epic' ? REQUIRED_SECTIONS_EPIC : REQUIRED_SECTIONS_TASK;
+
+  for (const section of required) {
     if (!sections[section] || sections[section].trim() === '') {
       errors.push(`Missing required section: ${section}`);
     }
