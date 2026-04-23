@@ -34,7 +34,7 @@ export function githubIssueToCanonical(
   const projectStatus = issue.project_items?.[0]?.status;
   const normalizedStatus = projectStatus
     ? githubStatusToNormalized(projectStatus)
-    : (issue.state === 'closed' ? 'DONE' : 'BACKLOG');
+    : (issue.state === 'closed' ? 'DONE' : 'TODO');
 
   const priority = issue.project_items?.[0]?.priority;
   const sprint = issue.project_items?.[0]?.sprint;
@@ -67,7 +67,7 @@ export function githubIssueToCanonical(
     },
     automation: {
       policy_id: 'default',
-      on_enter: ['ACTIVE'],
+      on_enter: ['RUNNING'],
       on_exit: [],
       execution_profile: 'standard',
     },
@@ -83,13 +83,12 @@ export function githubIssueToCanonical(
 
 function mapToCategory(status: NormalizedStatus): RawStatusCategory {
   const map: Record<NormalizedStatus, RawStatusCategory> = {
-    'BACKLOG': 'BACKLOG',
-    'SELECTED': 'BACKLOG',
-    'ACTIVE': 'IN_PROGRESS',
-    'BLOCKED': 'BLOCKED',
+    'TODO': 'TODO',
+    'READY': 'READY',
+    'RUNNING': 'IN_PROGRESS',
     'REVIEW': 'IN_REVIEW',
     'DONE': 'DONE',
-    'CANCELLED': 'CANCELLED',
+    'FAILED': 'FAILED',
   };
   return map[status];
 }

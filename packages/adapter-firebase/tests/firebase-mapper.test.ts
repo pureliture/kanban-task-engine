@@ -19,19 +19,19 @@ describe('Firebase mapper', () => {
       const result = firestoreDocToCanonical(doc, 'workspace-claude');
       expect(result.task_ref.provider).toBe('firebase');
       expect(result.task_ref.external_id).toBe('T-001');
-      expect(result.workflow.normalized_status).toBe('ACTIVE');
+      expect(result.workflow.normalized_status).toBe('RUNNING');
       expect(result.classification.priority).toBe('High');
     });
 
-    it('maps "todo" status to SELECTED', () => {
+    it('maps "todo" status to TODO', () => {
       const doc = { id: 'T-002', status: 'todo' };
       const result = firestoreDocToCanonical(doc, 'ws');
-      expect(result.workflow.normalized_status).toBe('SELECTED');
+      expect(result.workflow.normalized_status).toBe('TODO');
     });
 
     it('provides defaults for missing fields', () => {
       const result = firestoreDocToCanonical({ id: 'T-003' }, 'ws');
-      expect(result.workflow.normalized_status).toBe('BACKLOG');
+      expect(result.workflow.normalized_status).toBe('TODO');
       expect(result.classification.priority).toBe('Medium');
       expect(result.ownership.assignee).toBe('');
     });

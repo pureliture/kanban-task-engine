@@ -3,23 +3,23 @@ import { githubStatusToNormalized, normalizedToGithubStatus } from '../src/statu
 
 describe('GitHub status mapping', () => {
   describe('githubStatusToNormalized', () => {
-    it('maps "In Progress" to ACTIVE', () => {
-      expect(githubStatusToNormalized('In Progress')).toBe('ACTIVE');
+    it('maps "In Progress" to RUNNING', () => {
+      expect(githubStatusToNormalized('In Progress')).toBe('RUNNING');
     });
     it('maps "Done" to DONE', () => {
       expect(githubStatusToNormalized('Done')).toBe('DONE');
     });
-    it('maps "Todo" to SELECTED', () => {
-      expect(githubStatusToNormalized('Todo')).toBe('SELECTED');
+    it('maps "Todo" to TODO', () => {
+      expect(githubStatusToNormalized('Todo')).toBe('TODO');
     });
-    it('defaults unknown to BACKLOG', () => {
-      expect(githubStatusToNormalized('Unknown')).toBe('BACKLOG');
+    it('defaults unknown to TODO', () => {
+      expect(githubStatusToNormalized('Unknown')).toBe('TODO');
     });
   });
 
   describe('normalizedToGithubStatus', () => {
-    it('maps ACTIVE to "In Progress"', () => {
-      expect(normalizedToGithubStatus('ACTIVE')).toBe('In Progress');
+    it('maps RUNNING to "In Progress"', () => {
+      expect(normalizedToGithubStatus('RUNNING')).toBe('In Progress');
     });
     it('maps DONE to "Done"', () => {
       expect(normalizedToGithubStatus('DONE')).toBe('Done');

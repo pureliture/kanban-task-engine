@@ -45,20 +45,20 @@ describe('WorkspaceResolver', () => {
 
   describe('parseTicketPath', () => {
     it('should parse single-ticket workspace path', () => {
-      const result = resolver.parseTicketPath('/test/issues/openclaw/OC-001.md');
+      const result = resolver.parseTicketPath('/test/issues/openclaw/issue-auth-refresh-001.md');
       expect(result).toEqual({
         workspace: 'openclaw',
         project: undefined,
-        ticketId: 'OC-001'
+        ticketId: 'issue-auth-refresh-001'
       });
     });
 
     it('should parse project-container workspace path', () => {
-      const result = resolver.parseTicketPath('/test/issues/vibe-coding/ai-cli-orch-wrapper/AO-001.md');
+      const result = resolver.parseTicketPath('/test/issues/vibe-coding/ai-cli-orch-wrapper/issue-schema-core-001.md');
       expect(result).toEqual({
         workspace: 'vibe-coding',
         project: 'ai-cli-orch-wrapper',
-        ticketId: 'AO-001'
+        ticketId: 'issue-schema-core-001'
       });
     });
 
@@ -109,6 +109,28 @@ describe('WorkspaceResolver', () => {
 
       expect(resolver.getTicketPath('openclaw', 'issue-1')).toBe('/vault/issues/openclaw/issue-1.md');
       expect(resolver.getTicketPath('vibe-coding', 'kanban-task-engine', 'issue-2')).toBe('/vault/issues/vibe-coding/kanban-task-engine/issue-2.md');
+    });
+
+    it('uses explicit registry project paths instead of project names', () => {
+      const resolver = WorkspaceResolver.fromRegistry({
+        spaces: {
+          'vibe-coding': {
+            type: 'container',
+            issues: 'issues/vibe-coding',
+            board: 'boards/vibe-coding.md',
+            projects: {
+              renamed: { path: 'issues/vibe-coding/custom-folder' },
+            },
+          },
+        },
+      }, '/vault');
+
+      expect(resolver.getTicketPath('vibe-coding', 'renamed', 'issue-1')).toBe('/vault/issues/vibe-coding/custom-folder/issue-1.md');
+      expect(resolver.parseTicketPath('/vault/issues/vibe-coding/custom-folder/issue-1.md')).toEqual({
+        workspace: 'vibe-coding',
+        project: 'renamed',
+        ticketId: 'issue-1',
+      });
     });
   });
 });

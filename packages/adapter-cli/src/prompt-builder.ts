@@ -63,29 +63,25 @@ export function buildExecutionPrompt(
 
 function getTransitionInstructions(transition: StateTransition): string {
   const instructions: Record<string, Record<string, string>> = {
-    'BACKLOG': {
-      'SELECTED': 'Review the task requirements and confirm it is ready for development. Update any relevant documentation.',
-      'ACTIVE': 'Begin working on this task. Set up the development environment and create necessary branches.',
-      'CANCELLED': 'Mark this task as cancelled. Document the reason for cancellation.',
+    'TODO': {
+      'READY': 'Review the task requirements and confirm it is ready for development. Update any relevant documentation.',
+      'FAILED': 'Mark this task as failed or blocked. Document the reason.',
     },
-    'SELECTED': {
-      'ACTIVE': 'Start development on this task. Create a branch and begin implementation.',
-      'CANCELLED': 'Cancel this task. Document the reason.',
+    'READY': {
+      'RUNNING': 'Start development on this task. Create a branch and begin implementation.',
+      'TODO': 'Move this task back to todo and document what is missing.',
     },
-    'ACTIVE': {
-      'BLOCKED': 'This task is blocked. Document what is blocking it and what needs to happen to unblock.',
+    'RUNNING': {
       'REVIEW': 'Submit this task for review. Ensure all tests pass and documentation is updated.',
-      'DONE': 'Complete this task. Verify all acceptance criteria are met.',
-      'CANCELLED': 'Cancel this task. Document the reason.',
+      'FAILED': 'This task failed or is blocked. Document what happened and what needs to happen next.',
     },
-    'BLOCKED': {
-      'ACTIVE': 'The blocker has been resolved. Resume work on this task.',
-      'CANCELLED': 'Cancel this blocked task. Document the reason.',
+    'FAILED': {
+      'READY': 'The blocker has been resolved. Prepare this task to run again.',
     },
     'REVIEW': {
-      'ACTIVE': 'Address review feedback and continue working on this task.',
+      'RUNNING': 'Address review feedback and continue working on this task.',
       'DONE': 'Review is complete. Mark this task as done.',
-      'CANCELLED': 'Cancel this task during review. Document the reason.',
+      'FAILED': 'Review found a blocking issue. Document it and mark this task failed.',
     },
   };
 

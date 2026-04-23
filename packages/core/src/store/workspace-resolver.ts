@@ -6,6 +6,7 @@ export interface WorkspaceConfig {
   type: WorkspaceType;
   path: string;
   projects?: string[];
+  projectPaths?: Record<string, string>;
 }
 
 export interface ParsedTicketPath {
@@ -37,6 +38,14 @@ export class WorkspaceResolver {
         type: entry.type,
         path: path.join(vaultRoot, entry.issues),
         projects: entry.projects ? Object.keys(entry.projects) : undefined,
+        projectPaths: entry.projects
+          ? Object.fromEntries(
+              Object.entries(entry.projects).map(([project, projectEntry]) => [
+                project,
+                path.join(vaultRoot, projectEntry.path),
+              ])
+            )
+          : undefined,
       };
     }
     return new WorkspaceResolver(config);
@@ -66,28 +75,31 @@ export class WorkspaceResolver {
       throw new Error(`Unknown project '${project}' in workspace '${workspace}'`);
     }
 
-    return path.join(wsConfig.path, project, `${ticketId}.md`);
+    const projectPath = wsConfig.projectPaths?.[project] ?? path.join(wsConfig.path, project);
+    return path.join(projectPath, `${ticketId}.md`);
   }
 
   parseTicketPath(filePath: string): ParsedTicketPath | null {
+    const resolvedFilePath = path.resolve(filePath);
     for (const [workspace, wsConfig] of Object.entries(this.config)) {
       const wsPath = path.resolve(wsConfig.path);
 
-      if (!filePath.startsWith(wsPath)) continue;
+      if (!isWithinBase(resolvedFilePath, wsPath)) continue;
 
-      const relative = path.relative(wsPath, filePath);
+      const relative = path.relative(wsPath, resolvedFilePath);
 
       if (wsConfig.type === 'single') {
-        const match = relative.match(/^([A-Z]+-\d+)\.md$/);
-        if (match) {
-          return { workspace, ticketId: match[1] };
+        if (path.dirname(relative) === '.' && relative.endsWith('.md')) {
+          return { workspace, ticketId: path.basename(relative, '.md') };
         }
       } else {
-        const match = relative.match(/^([^/]+)\/([A-Z]+-\d+)\.md$/);
-        if (match) {
-          const [, project, ticketId] = match;
-          if (wsConfig.projects?.includes(project)) {
-            return { workspace, project, ticketId };
+        for (const project of wsConfig.projects ?? []) {
+          const projectPath = path.resolve(wsConfig.projectPaths?.[project] ?? path.join(wsPath, project));
+          if (!isWithinBase(resolvedFilePath, projectPath)) continue;
+
+          const projectRelative = path.relative(projectPath, resolvedFilePath);
+          if (path.dirname(projectRelative) === '.' && projectRelative.endsWith('.md')) {
+            return { workspace, project, ticketId: path.basename(projectRelative, '.md') };
           }
         }
       }
@@ -111,4 +123,9 @@ export class WorkspaceResolver {
     }
     return wsConfig.type;
   }
+}
+
+function isWithinBase(filePath: string, basePath: string): boolean {
+  const relative = path.relative(basePath, filePath);
+  return relative !== '' && !relative.startsWith('..') && !path.isAbsolute(relative);
 }

@@ -1,6 +1,5 @@
 import type { CanonicalTaskModel } from '@kanban-task-engine/core';
 import type { GatewayCredentials, GatewayCompletionResponse } from './types';
-import type { TaskLike } from './rate-limit-queue';
 import { ConfigAdapter, TokenExpiredError } from './config-adapter';
 import { PersistentRateLimitQueue } from './rate-limit-queue';
 
@@ -36,7 +35,7 @@ export class OpenClawAdapter implements ExecutionAdapter {
       const response = await this.sendRequest(task, credentials);
 
       if (response.status === 429) {
-        await this.queue.enqueue(task as unknown as TaskLike, this.getPriority(task));
+        await this.queue.enqueue(task, this.getPriority(task));
         throw new Error('Rate limited: task enqueued for retry');
       }
 

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { githubIssueToCanonical } from '../src/github-mapper';
 
 describe('GitHub mapper', () => {
-  it('maps open issue with no project status to BACKLOG', () => {
+  it('maps open issue with no project status to TODO', () => {
     const issue = {
       number: 42,
       title: 'Test issue',
@@ -15,7 +15,7 @@ describe('GitHub mapper', () => {
     const result = githubIssueToCanonical(issue, 'owner/repo');
     expect(result.task_ref.provider).toBe('github');
     expect(result.task_ref.external_id).toBe('#42');
-    expect(result.workflow.normalized_status).toBe('BACKLOG');
+    expect(result.workflow.normalized_status).toBe('TODO');
     expect(result.classification.issue_type).toBe('Bug');
   });
 
@@ -45,7 +45,7 @@ describe('GitHub mapper', () => {
       project_items: [{ status: 'In Progress' }],
     };
     const result = githubIssueToCanonical(issue, 'owner/repo');
-    expect(result.workflow.normalized_status).toBe('ACTIVE');
+    expect(result.workflow.normalized_status).toBe('RUNNING');
   });
 
   it('extracts assignee login', () => {

@@ -1,6 +1,6 @@
 import { CanonicalTaskModel, NormalizedStatus, StateTransition, TaskFilter, TaskStore } from '../types';
-import { yamlToCanonical, canonicalToYaml, rawStatusToNormalized } from './mapper';
-import { parseFrontmatter, extractBody, serializeWithFrontmatter } from './frontmatter-utils';
+import { canonicalToYaml, markdownIssueToCanonical, rawStatusToNormalized } from './mapper';
+import { extractBody, serializeWithFrontmatter } from './frontmatter-utils';
 import { atomicWriteFile } from './fs-utils';
 import fs from 'fs/promises';
 import path from 'path';
@@ -50,11 +50,12 @@ export class MarkdownStore implements TaskStore {
     const filePath = await this.findIssueFile(externalKey);
     if (!filePath) return null;
 
-    const content = await fs.readFile(filePath, 'utf-8');
-    const frontmatter = parseFrontmatter(content);
-    if (!frontmatter) return null;
-
-    return yamlToCanonical(frontmatter, filePath);
+    try {
+      return await this.readIssueFile(filePath);
+    } catch (err) {
+      this.policyEngine?.onParseError?.(err as Error, filePath);
+      return null;
+    }
   }
 
   async saveTask(task: CanonicalTaskModel): Promise<void> {
@@ -112,13 +113,13 @@ export class MarkdownStore implements TaskStore {
     const tasks: CanonicalTaskModel[] = [];
 
     for (const filePath of allFiles) {
-      const content = await fs.readFile(filePath, 'utf-8');
-      const frontmatter = parseFrontmatter(content);
-      if (!frontmatter) continue;
-
-      const task = yamlToCanonical(frontmatter, filePath);
-      if (this.matchesFilter(task, filter)) {
-        tasks.push(task);
+      try {
+        const task = await this.readIssueFile(filePath);
+        if (this.matchesFilter(task, filter)) {
+          tasks.push(task);
+        }
+      } catch (err) {
+        this.policyEngine?.onParseError?.(err as Error, filePath);
       }
     }
 
@@ -187,10 +188,7 @@ export class MarkdownStore implements TaskStore {
 
   async loadFromFile(filePath: string): Promise<CanonicalTaskModel | null> {
     try {
-      const content = await fs.readFile(filePath, 'utf-8');
-      const frontmatter = parseFrontmatter(content);
-      if (!frontmatter) return null;
-      const task = yamlToCanonical(frontmatter, filePath);
+      const task = await this.readIssueFile(filePath);
 
       // Update caches when loading
       const checksum = await this.computeChecksum(filePath);
@@ -202,6 +200,11 @@ export class MarkdownStore implements TaskStore {
       this.policyEngine?.onParseError?.(err as Error, filePath);
       return null;
     }
+  }
+
+  private async readIssueFile(filePath: string): Promise<CanonicalTaskModel> {
+    const content = await fs.readFile(filePath, 'utf-8');
+    return markdownIssueToCanonical(content, filePath);
   }
 
   async onFileChange(filePath: string): Promise<void> {
