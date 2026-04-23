@@ -6,11 +6,11 @@ describe('checksum', () => {
   const baseTask: CanonicalTaskModel = {
     task_ref: { provider: 'local', external_key: 'ws', external_id: 'T-1' },
     summary: 'Test',
-    workflow: { normalized_status: 'BACKLOG', raw_status: 'Backlog', raw_status_category: 'BACKLOG' },
+    workflow: { normalized_status: 'TODO', raw_status: 'TODO', raw_status_category: 'TODO' },
     classification: { issue_type: 'Task', priority: 'Medium', labels: [], component: [] },
     ownership: { assignee: '', reporter: '' },
     planning: {},
-    automation: { policy_id: 'default', on_enter: ['ACTIVE'], on_exit: [], execution_profile: 'standard' },
+    automation: { policy_id: 'default', on_enter: ['RUNNING'], on_exit: [], execution_profile: 'standard' },
     sync: { last_synced_at: '2026-01-01T00:00:00Z', last_source: 'local' },
   };
 
@@ -39,7 +39,7 @@ describe('checksum', () => {
 
   it('checksum changes when workflow status changes', () => {
     const cs1 = computeChecksum(baseTask);
-    const active = { ...baseTask, workflow: { ...baseTask.workflow, normalized_status: 'ACTIVE' as const, raw_status: 'In Progress', raw_status_category: 'IN_PROGRESS' as const } };
+    const active = { ...baseTask, workflow: { ...baseTask.workflow, normalized_status: 'RUNNING' as const, raw_status: 'RUNNING', raw_status_category: 'IN_PROGRESS' as const } };
     const cs2 = computeChecksum(active);
     expect(cs1).not.toBe(cs2);
   });

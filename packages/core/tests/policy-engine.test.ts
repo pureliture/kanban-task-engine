@@ -8,11 +8,11 @@ describe('PolicyEngine', () => {
   const baseTask: CanonicalTaskModel = {
     task_ref: { provider: 'local', external_key: 'ws', external_id: 'T-1' },
     summary: 'Test',
-    workflow: { normalized_status: 'BACKLOG', raw_status: 'Backlog', raw_status_category: 'BACKLOG' },
+    workflow: { normalized_status: 'TODO', raw_status: 'TODO', raw_status_category: 'TODO' },
     classification: { issue_type: 'Task', priority: 'Medium', labels: [], component: [] },
     ownership: { assignee: '', reporter: '' },
     planning: {},
-    automation: { policy_id: 'default', on_enter: ['ACTIVE'], on_exit: [], execution_profile: 'standard' },
+    automation: { policy_id: 'default', on_enter: ['READY'], on_exit: [], execution_profile: 'standard' },
     sync: { last_synced_at: '2026-01-01T00:00:00Z', last_source: 'local' },
   };
 
@@ -24,12 +24,12 @@ describe('PolicyEngine', () => {
 
     engine.addRule({
       id: 'rule-1',
-      toStatus: 'ACTIVE',
+      toStatus: 'READY',
       action: 'enter',
       handler,
     });
 
-    await engine.onTransition(baseTask, 'ACTIVE');
+    await engine.onTransition(baseTask, 'READY');
     expect(handler).toHaveBeenCalledTimes(1);
   });
 
@@ -41,12 +41,12 @@ describe('PolicyEngine', () => {
 
     engine.addRule({
       id: 'exit-rule',
-      fromStatus: 'BACKLOG',
+      fromStatus: 'TODO',
       action: 'exit',
       handler,
     });
 
-    await engine.onTransition(baseTask, 'SELECTED');
+    await engine.onTransition(baseTask, 'READY');
     expect(handler).toHaveBeenCalledTimes(1);
   });
 
@@ -55,8 +55,8 @@ describe('PolicyEngine', () => {
     const bus = new EventBus();
     const engine = new PolicyEngine(sm, bus);
 
-    const result = await engine.onTransition(baseTask, 'ACTIVE');
-    expect(result.workflow.normalized_status).toBe('ACTIVE');
+    const result = await engine.onTransition(baseTask, 'READY');
+    expect(result.workflow.normalized_status).toBe('READY');
   });
 
   it('removes rules by id', () => {
@@ -83,7 +83,7 @@ describe('PolicyEngine', () => {
       handler, // no toStatus = matches all enter transitions
     });
 
-    await engine.onTransition(baseTask, 'ACTIVE');
+    await engine.onTransition(baseTask, 'READY');
     expect(handler).toHaveBeenCalled();
   });
 
@@ -100,7 +100,7 @@ describe('PolicyEngine', () => {
       handler: () => { throw new Error('fail'); },
     });
 
-    await engine.onTransition(baseTask, 'ACTIVE');
+    await engine.onTransition(baseTask, 'READY');
     expect(errorHandler).toHaveBeenCalled();
   });
 });

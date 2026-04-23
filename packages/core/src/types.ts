@@ -1,3 +1,8 @@
+import { IssueStatus as NormalizedStatus, IssueTransition as StateTransition, VALID_ISSUE_TRANSITIONS as VALID_TRANSITIONS } from '@kanban-task-engine/schema';
+
+export type { NormalizedStatus, StateTransition };
+export { VALID_TRANSITIONS };
+
 // === 식별 ===
 export interface TaskRef {
   provider: 'local' | 'github' | 'jira' | 'firebase';
@@ -6,22 +11,13 @@ export interface TaskRef {
 }
 
 // === 워크플로우 ===
-export type NormalizedStatus =
-  | 'BACKLOG'
-  | 'SELECTED'
-  | 'ACTIVE'
-  | 'BLOCKED'
-  | 'REVIEW'
-  | 'DONE'
-  | 'CANCELLED';
-
 export type RawStatusCategory =
-  | 'BACKLOG'
+  | 'TODO'
+  | 'READY'
   | 'IN_PROGRESS'
-  | 'BLOCKED'
   | 'IN_REVIEW'
   | 'DONE'
-  | 'CANCELLED';
+  | 'FAILED';
 
 export interface Workflow {
   normalized_status: NormalizedStatus;
@@ -91,34 +87,6 @@ export interface CanonicalTaskModel {
   updated?: string;
   completed?: string;
 }
-
-// === 상태 전이 규칙 ===
-export interface StateTransition {
-  from: NormalizedStatus;
-  to: NormalizedStatus;
-}
-
-export const VALID_TRANSITIONS: StateTransition[] = [
-  // BACKLOG
-  { from: 'BACKLOG', to: 'SELECTED' },
-  { from: 'BACKLOG', to: 'ACTIVE' },
-  { from: 'BACKLOG', to: 'CANCELLED' },
-  // SELECTED
-  { from: 'SELECTED', to: 'ACTIVE' },
-  { from: 'SELECTED', to: 'CANCELLED' },
-  // ACTIVE
-  { from: 'ACTIVE', to: 'BLOCKED' },
-  { from: 'ACTIVE', to: 'REVIEW' },
-  { from: 'ACTIVE', to: 'DONE' },
-  { from: 'ACTIVE', to: 'CANCELLED' },
-  // BLOCKED
-  { from: 'BLOCKED', to: 'ACTIVE' },
-  { from: 'BLOCKED', to: 'CANCELLED' },
-  // REVIEW
-  { from: 'REVIEW', to: 'ACTIVE' },
-  { from: 'REVIEW', to: 'DONE' },
-  { from: 'REVIEW', to: 'CANCELLED' },
-];
 
 // === 어댑터 인터페이스 ===
 
