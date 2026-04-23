@@ -9,7 +9,7 @@ export interface FirestoreTaskDoc {
   summary?: string;
   status?: string;
   priority?: string;
-  issueType?: string;
+  type?: string;
   labels?: string[];
   components?: string[];
   assignee?: string;
@@ -73,7 +73,7 @@ export function firestoreDocToCanonical(
       raw_status_category: CATEGORY_MAP[normalized] ?? 'TODO',
     },
     classification: {
-      issue_type: (doc.issueType as CanonicalTaskModel['classification']['issue_type']) ?? 'Task',
+      issue_type: mapFirebaseTypeToCanonical(doc.type),
       priority: (doc.priority as CanonicalTaskModel['classification']['priority']) ?? 'Medium',
       labels: doc.labels ?? [],
       component: doc.components ?? [],
@@ -111,7 +111,7 @@ export function canonicalToFirestoreDoc(task: CanonicalTaskModel): Omit<Firestor
     summary: task.summary,
     status: task.workflow.raw_status,
     priority: task.classification.priority,
-    issueType: task.classification.issue_type,
+    type: mapCanonicalToFirebaseType(task.classification.issue_type),
     labels: task.classification.labels,
     components: task.classification.component,
     assignee: task.ownership.assignee,
@@ -129,4 +129,24 @@ export function canonicalToFirestoreDoc(task: CanonicalTaskModel): Omit<Firestor
     updated: task.updated,
     completed: task.completed,
   };
+}
+
+function mapFirebaseTypeToCanonical(input?: string): CanonicalTaskModel['classification']['issue_type'] {
+  switch ((input ?? 'task').toLowerCase()) {
+    case 'epic': return 'Epic';
+    case 'bug':  return 'Bug';
+    case 'task':
+    case 'chore':
+    case 'docs':
+    default:
+      return 'Task';
+  }
+}
+
+function mapCanonicalToFirebaseType(input: CanonicalTaskModel['classification']['issue_type']): string {
+  switch (input) {
+    case 'Epic': return 'epic';
+    case 'Bug':  return 'bug';
+    default:     return 'task';
+  }
 }
