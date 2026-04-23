@@ -259,7 +259,7 @@ Events:
 
 ## 8. Markdown Issue Schema
 
-The Markdown issue document is the control-plane document. It is edited by humans, OpenClaw, or other automation depending on policy. Each space registers an `idPrefix` in `registry.yaml` (§15). Issue ids follow `<PREFIX>-<zero-padded-seq>` where the sequence is a space-wide monotonic integer shared across all types (Jira issue-key parity).
+The Markdown issue document is the control-plane document. It is edited by humans, OpenClaw, or other automation depending on policy. Each space registers an `idPrefix` in `registry.yaml` (§15). Issue ids follow `<PREFIX>-<zero-padded-seq>` where the sequence is a space-wide monotonic integer shared across all types (Jira issue-key parity). 시퀀스는 **3자리 zero-padding** 기본값 (`VC-001`, `VC-042`, `VC-999`). 999 초과 시 자릿수 자연 확장 (`VC-1000`, `VC-1001`, ...).
 
 ### 8.1 Frontmatter (일반 티켓 예시)
 
@@ -290,7 +290,7 @@ automation:
   allowedActions:
     - transitionIssue
     - startExecution
-    - writeExecutionLog
+    - writeExecutionLog   # 내부 action 식별자. 로그 섹션명(`로그`)과 무관하게 Plan 3에서 확정
 ---
 
 ## 목적
@@ -363,7 +363,7 @@ run_count: 0
 ## 로그
 ```
 
-Epic은 실행 대상이 아니다. `executor: human` 고정, `READY` 전이 불허, `TODO → RUNNING → DONE` 3개 상태만 실질 사용.
+Epic은 실행 대상이 아니다. `executor: human` 고정. 엔진은 `READY`·`REVIEW`·`FAILED` 전이를 차단한다. Epic 자신이 직접 취할 수 있는 상태는 `TODO → DONE` 두 단계이며, `하위 티켓` 블록의 `RUNNING:` 항목은 Epic이 RUNNING 상태임을 뜻하는 것이 **아니라** 하위 티켓 상태 집계 결과를 표시하는 것이다. Epic의 `status` 필드가 `RUNNING`으로 직접 전이되는 경우는 없다. `automation` 블록이 있어도 무시된다.
 
 ### 8.3 Required frontmatter fields
 
@@ -390,7 +390,7 @@ Epic은 실행 대상이 아니다. `executor: human` 고정, `READY` 전이 불
 - `syncTarget`
 - `jiraProject`
 - `jiraKey`
-- `automation` (trigger 및 allowedActions 블록; 레시피/정책 입력)
+- `automation` (trigger 및 allowedActions 블록; 레시피/정책 입력. `type: epic`에서는 무시됨)
 
 ### 8.5 `type` enum
 
@@ -460,6 +460,8 @@ REVIEW  -> In Review
 DONE    -> Done
 FAILED  -> Blocked, Failed, or a custom status
 ```
+
+단, `type: epic`은 `READY`·`RUNNING`·`REVIEW`·`FAILED` 전이가 엔진에 의해 차단된다 (§8.2 참조). Epic validator를 구현할 때 6개 상태를 모두 허용해서는 안 된다.
 
 ## 10. Canonical JSON
 
