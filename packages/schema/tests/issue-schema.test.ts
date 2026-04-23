@@ -34,3 +34,12 @@ describe('issue schema', () => {
     expect(result.ok).toBe(false);
   });
 });
+
+  it('parses valid issue markdown with CRLF line endings', () => {
+    const CRLF_MARKDOWN = VALID_ISSUE_MARKDOWN.replace(/\n/g, '\r\n');
+    const result = parseIssueMarkdown(CRLF_MARKDOWN);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.sections.Goal).toContain('만료 직전');
+    }
+  });
