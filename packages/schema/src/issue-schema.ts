@@ -54,7 +54,7 @@ export function parseIssueMarkdown(content: string): ValidationResult<ParsedIssu
   const errors: string[] = frontmatterResult.ok ? [] : [...frontmatterResult.errors];
 
   const body = content.slice(frontmatterMatch[0].length);
-  const sections = extractSections(body);
+  const sections = extractSections(body); 
 
   for (const section of REQUIRED_SECTIONS) {
     if (!sections[section] || sections[section].trim() === '') {
@@ -70,7 +70,7 @@ export function parseIssueMarkdown(content: string): ValidationResult<ParsedIssu
 
 function extractSections(body: string): Record<string, string> {
   const sections: Record<string, string> = {};
-  const lines = body.split('\n');
+  const lines = body.split(/\r?\n/);
   let currentSection: string | null = null;
   let currentContent: string[] = [];
 
