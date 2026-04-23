@@ -1,46 +1,41 @@
 ---
-id: TICKET-ID
-status: Backlog
-priority: High
-issueType: Bug
-workspace: {{workspace}}
-summary: "[BUG] 버그 제목"
-assignee: 
-labels: [bug]
-jira:
-  issueType: "Bug"
+id: issue-example-001
+title: 새 이슈 제목
+issueType: bug
+project: example-project
+status: READY
+priority: high
+labels:
+  - bug
+executor:
+syncTarget:
+jiraProject:
+jiraKey:
+createdAt: 2026-04-23
+updatedAt: 2026-04-23
 automation:
-  workspace: {{workspace}}
-  useAcp: true
-  triggerOnStatus: [In Progress]
-created: {{created}}
-updated: {{updated}}
+  trigger: manual
+  allowedActions:
+    - transitionIssue
+    - startExecution
+    - writeExecutionLog
 ---
 
-# {{summary}}
+## Goal
 
-## 재현 단계
+이슈의 목표를 한 문단으로 작성합니다.
 
+## Acceptance Criteria
+
+- 완료 여부를 확인할 수 있는 조건을 작성합니다.
+
+## Implementation Tasks
+
+- [ ] 첫 번째 실행 단위를 작성합니다.
+
+## Notes
+
+재현 단계:
 1. 단계 1
 2. 단계 2
 3. 단계 3
-
-## 예상 결과
-
-예상 동작을 작성하세요.
-
-## 실제 결과
-
-실제 동작을 작성하세요.
-
-## 환경
-
-- OS: 
-- 브라우저/버전: 
-- 기타: 
-
-## 체크리스트
-
-- [ ] 원인 분석
-- [ ] 수정 완료
-- [ ] 테스트 완료
