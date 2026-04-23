@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MarkdownStore } from '../src/store/markdown-store';
 import fs from 'fs/promises';
-import { VALID_ISSUE_MARKDOWN, INVALID_ISSUE_MISSING_GOAL } from '@kanban-task-engine/schema';
+import { VALID_ISSUE_MARKDOWN, INVALID_ISSUE_MISSING_목적 } from '@kanban-task-engine/schema';
 
 vi.mock('fs/promises');
 
@@ -40,13 +40,13 @@ describe('MarkdownStore', () => {
       const store = new MarkdownStore('/test', { policyEngine: mockPolicyEngine });
 
       vi.mocked(fs.readdir).mockResolvedValueOnce(['invalid.md'] as any);
-      vi.mocked(fs.readFile).mockResolvedValueOnce(INVALID_ISSUE_MISSING_GOAL);
+      vi.mocked(fs.readFile).mockResolvedValueOnce(INVALID_ISSUE_MISSING_목적);
 
       const tasks = await store.listTasks();
 
       expect(tasks).toEqual([]);
       expect(mockPolicyEngine.onParseError).toHaveBeenCalledWith(
-        expect.objectContaining({ message: expect.stringContaining('Missing required section: Goal') }),
+        expect.objectContaining({ message: expect.stringContaining('Missing required section: 목적') }),
         '/test/issues/invalid.md'
       );
     });

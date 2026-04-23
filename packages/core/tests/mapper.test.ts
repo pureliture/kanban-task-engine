@@ -38,27 +38,69 @@ describe('mapper', () => {
   describe('yamlToCanonical', () => {
     it('converts YAML frontmatter to CanonicalTaskModel', () => {
       const yaml = {
-        id: 'OC-001',
+        id: 'VC-001',
         status: 'RUNNING',
-        summary: 'Test task',
-        priority: 'High',
-        issueType: 'Task',
+        title: 'Test task',
+        priority: 'P1',
+        type: 'task',
         assignee: 'claude',
-        reporter: 'user',
         labels: ['frontend'],
-        components: ['web'],
       };
-      const result = yamlToCanonical(yaml, '/workspace-claude/issues/OC-001-test.md');
-      expect(result.task_ref.external_id).toBe('OC-001');
+      const result = yamlToCanonical(yaml, '/workspace-vibe-coding/issues/VC-001-test.md');
+      expect(result.task_ref.external_id).toBe('VC-001');
       expect(result.workflow.normalized_status).toBe('RUNNING');
       expect(result.summary).toBe('Test task');
       expect(result.classification.priority).toBe('High');
+      expect(result.classification.issue_type).toBe('Task');
       expect(result.classification.labels).toEqual(['frontend']);
     });
 
+    it('maps type=bug to canonical Bug', () => {
+      const result = yamlToCanonical(
+        { id: 'VC-002', type: 'bug', title: 'A bug' },
+        '/workspace-vibe-coding/issues/VC-002.md',
+      );
+      expect(result.classification.issue_type).toBe('Bug');
+    });
+
+    it('maps type=epic to canonical Epic', () => {
+      const result = yamlToCanonical(
+        { id: 'VC-003', type: 'epic', title: 'An epic' },
+        '/workspace-vibe-coding/issues/VC-003.md',
+      );
+      expect(result.classification.issue_type).toBe('Epic');
+    });
+
+    it('maps type=chore to canonical Task', () => {
+      const result = yamlToCanonical(
+        { id: 'VC-004', type: 'chore', title: 'Chore' },
+        '/workspace-vibe-coding/issues/VC-004.md',
+      );
+      expect(result.classification.issue_type).toBe('Task');
+    });
+
+    it('maps P0 priority to canonical Blocker', () => {
+      const result = yamlToCanonical(
+        { id: 'VC-005', type: 'task', priority: 'P0' },
+        '/workspace-vibe-coding/issues/VC-005.md',
+      );
+      expect(result.classification.priority).toBe('Blocker');
+    });
+
+    it('maps P3 priority to canonical Low', () => {
+      const result = yamlToCanonical(
+        { id: 'VC-006', type: 'task', priority: 'P3' },
+        '/workspace-vibe-coding/issues/VC-006.md',
+      );
+      expect(result.classification.priority).toBe('Low');
+    });
+
     it('extracts workspace from path', () => {
-      const result = yamlToCanonical({ id: 'T-1' }, '/workspace-claude/issues/T-1.md');
-      expect(result.task_ref.external_key).toBe('workspace-claude');
+      const result = yamlToCanonical(
+        { id: 'VC-001' },
+        '/workspace-vibe-coding/issues/VC-001.md',
+      );
+      expect(result.task_ref.external_key).toBe('workspace-vibe-coding');
     });
 
     it('provides defaults for missing fields', () => {
@@ -72,24 +114,37 @@ describe('mapper', () => {
   describe('canonicalToYaml', () => {
     it('round-trips through yamlToCanonical and back', () => {
       const original = {
-        id: 'OC-002',
+        id: 'VC-002',
         status: 'TODO',
-        priority: 'Medium',
-        issueType: 'Bug',
-        summary: 'Bug report',
+        priority: 'P2',
+        type: 'bug',
+        title: 'Bug report',
         assignee: 'dev',
-        reporter: 'qa',
         labels: [],
-        components: [],
         created: '2026-04-16T10:00:00Z',
         updated: '2026-04-16T10:00:00Z',
       };
-      const canonical = yamlToCanonical(original, '/workspace/issues/OC-002-bug.md');
+      const canonical = yamlToCanonical(original, '/workspace-vibe-coding/issues/VC-002-bug.md');
       const yaml = canonicalToYaml(canonical);
-      expect(yaml.id).toBe('OC-002');
+      expect(yaml.id).toBe('VC-002');
       expect(yaml.status).toBe('TODO');
-      expect(yaml.priority).toBe('Medium');
-      expect(yaml.issueType).toBe('Bug');
+      expect(yaml.priority).toBe('P2');
+      expect(yaml.type).toBe('bug');
+      expect(yaml.title).toBe('Bug report');
+    });
+
+    it('maps canonical Blocker priority back to P0', () => {
+      const original = { id: 'VC-001', type: 'task', priority: 'P0', title: 't' };
+      const canonical = yamlToCanonical(original, '/workspace/issues/VC-001.md');
+      const yaml = canonicalToYaml(canonical);
+      expect(yaml.priority).toBe('P0');
+    });
+
+    it('maps canonical Epic type back to epic', () => {
+      const original = { id: 'VC-001', type: 'epic', title: 'An epic' };
+      const canonical = yamlToCanonical(original, '/workspace/issues/VC-001.md');
+      const yaml = canonicalToYaml(canonical);
+      expect(yaml.type).toBe('epic');
     });
   });
 });

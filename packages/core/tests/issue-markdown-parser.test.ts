@@ -6,12 +6,14 @@ describe('markdownIssueToCanonical', () => {
   it('converts constrained Markdown issue to canonical JSON', () => {
     const task = markdownIssueToCanonical(
       VALID_ISSUE_MARKDOWN,
-      '/vault/issues/openclaw/issue-auth-refresh-001.md'
+      '/vault/issues/vibe-coding/VC-006.md'
     );
     expect(task.task_ref.provider).toBe('local');
-    expect(task.task_ref.external_id).toBe('issue-auth-refresh-001');
-    expect(task.summary).toBe('토큰 갱신 플로우 개선');
+    expect(task.task_ref.external_id).toBe('VC-006');
+    expect(task.summary).toBe('로그인 페이지 UI 스켈레톤');
     expect(task.workflow.normalized_status).toBe('READY');
-    expect(task.description_ref).toBe('/vault/issues/openclaw/issue-auth-refresh-001.md');
+    expect(task.description_ref).toBe('/vault/issues/vibe-coding/VC-006.md');
+    expect(task.classification.issue_type).toBe('Task');
+    expect(task.classification.priority).toBe('Medium');
   });
 });
