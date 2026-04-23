@@ -112,22 +112,34 @@ The OpenClaw workspace that runs automation against a vault.
 ├── registry.yaml
 ├── issues/
 │   ├── openclaw/
+│   │   └── _epics/
 │   ├── vibe-coding/
+│   │   ├── _epics/
 │   │   ├── ai-cli-orch-wrapper/
 │   │   ├── kanban-task-engine/
 │   │   ├── cc-openclaw-harness/
 │   │   └── flow-weaver/
 │   ├── stocks/
+│   │   └── _epics/
 │   ├── web/
+│   │   └── _epics/
 │   ├── personal/
+│   │   └── _epics/
 │   └── career/
+│       └── _epics/
 ├── boards/
 │   ├── openclaw.md
+│   ├── openclaw-epics.md
 │   ├── vibe-coding.md
+│   ├── vibe-coding-epics.md
 │   ├── stocks.md
+│   ├── stocks-epics.md
 │   ├── web.md
+│   ├── web-epics.md
 │   ├── personal.md
-│   └── career.md
+│   ├── personal-epics.md
+│   ├── career.md
+│   └── career-epics.md
 ├── templates/
 ├── events/
 ├── canonical/
@@ -135,6 +147,10 @@ The OpenClaw workspace that runs automation against a vault.
 ├── archive/
 └── runtime/
 ```
+
+Each space has an `_epics/` subdirectory that stores `type: epic` issue documents. Epics are never rendered as board cards; they exist only as a filter/aggregation dimension (see §8 and §11). Non-epic issues live under `issues/<space>/` directly for `single` spaces, or under `issues/<space>/<project>/` for `container` spaces with projects.
+
+Each space has two board files: the main board (`boards/<space>.md`) and the Epic index (`boards/<space>-epics.md`). The main board is an Obsidian Kanban-compatible 6-column view over non-epic issues. The Epic index is a generated table (not a Kanban board) listing epics with progress counts.
 
 The vault is a standalone git repository. `workspace-kanban/.gitignore` ignores `/kanban/` so the parent workspace does not track the vault as a submodule or nested working tree.
 
@@ -243,28 +259,32 @@ Events:
 
 ## 8. Markdown Issue Schema
 
-The Markdown issue document is the control-plane document. It is edited by humans, OpenClaw, or other automation depending on policy.
+The Markdown issue document is the control-plane document. It is edited by humans, OpenClaw, or other automation depending on policy. Each space registers an `idPrefix` in `registry.yaml` (§15). Issue ids follow `<PREFIX>-<zero-padded-seq>` where the sequence is a space-wide monotonic integer shared across all types (Jira issue-key parity).
 
-Example:
+### 8.1 Frontmatter (일반 티켓 예시)
 
 ```markdown
 ---
-id: issue-auth-refresh-001
-title: 토큰 갱신 플로우 개선
-issueType: story
-project: auth-platform
-parent: board-auth-platform
-status: READY
-priority: high
-labels:
-  - auth
-  - backend
+id: VC-006
+title: 로그인 페이지 UI 스켈레톤
+type: task
+status: TODO
 executor: claude-code
-syncTarget: jira
-jiraProject: AUTH
+project: flow-weaver
+epic: VC-005
+priority: P2
+assignee: ddalkak
+created: 2026-04-23
+updated: 2026-04-23
+completed:
+labels: []
+depends_on: []
+working_dir: ~/Projects/flow-weaver
+merge_into:
+run_count: 0
+syncTarget:
+jiraProject:
 jiraKey:
-createdAt: 2026-04-20
-updatedAt: 2026-04-20
 automation:
   trigger: manual
   allowedActions:
@@ -273,67 +293,140 @@ automation:
     - writeExecutionLog
 ---
 
-## Goal
+## 목적
 
-만료 직전 access token 자동 갱신 처리.
+<왜 이 작업이 필요한가 — 한 문단>
+
+## 컨텍스트
+
+<executor가 읽어야 할 배경. 참조 파일 경로, 관련 티켓, 선행 결정 등>
 
 ## Acceptance Criteria
 
-- refresh token이 유효하면 access token 재발급
-- 만료 또는 위조 refresh token은 401 반환
-- 기존 로그인 플로우 회귀 없음
+- [ ] <검증 가능한 완료 조건 1>
+- [ ] <검증 가능한 완료 조건 2>
 
-## Implementation Tasks
+## 실행 힌트
 
-- [ ] refresh token 검증 로직 추가
-- [ ] 재발급 API 테스트 작성
-- [ ] 예외 응답 스키마 정리
+<수행 지침 — 스킬 이름, 테스트 명령, 제외 경로 등. 자유 서술>
 
-## Notes
+## 로그
 
-...
-
-## Execution Log
-
-...
+<append-only. 각 run마다 ISO-8601 타임스탬프 + 3~10줄 요약. executor가 RUNNING/REVIEW/FAILED 전이 시 자동 append>
 ```
 
-Required frontmatter fields:
+### 8.2 Frontmatter (Epic 예시)
+
+```markdown
+---
+id: VC-005
+title: 온보딩 플로우 개편
+type: epic
+status: TODO
+executor: human
+project:
+epic:
+priority: P1
+assignee: ddalkak
+created: 2026-04-20
+updated: 2026-04-20
+completed:
+labels: []
+depends_on: []
+working_dir:
+merge_into:
+run_count: 0
+---
+
+## 목표
+
+<이 Epic이 완료되면 달성되는 결과 — 1~2문단>
+
+## 범위
+
+- 포함: ...
+- 제외: ...
+
+## 성공 지표
+
+- [ ] <측정 가능한 완료 기준>
+
+## 하위 티켓
+
+<!-- kanban:auto-render start -->
+- DONE: VC-007, VC-009
+- RUNNING: VC-008
+- READY: VC-010
+- TODO: VC-011, VC-012
+<!-- kanban:auto-render end -->
+
+## 로그
+```
+
+Epic은 실행 대상이 아니다. `executor: human` 고정, `READY` 전이 불허, `TODO → RUNNING → DONE` 3개 상태만 실질 사용.
+
+### 8.3 Required frontmatter fields
 
 - `id`
 - `title`
-- `issueType`
-- `project`
+- `type`
 - `status`
-- `priority`
-- `createdAt`
-- `updatedAt`
-
-Optional frontmatter fields:
-
-- `parent`
-- `labels`
 - `executor`
+- `project` (type=`epic` 또는 `single` space에서는 빈 문자열 허용)
+- `created`
+- `updated`
+
+### 8.4 Optional frontmatter fields
+
+- `epic` (부모 Epic 포인터)
+- `priority` (P0..P3)
+- `assignee`
+- `completed` (status=DONE 시 엔진이 자동 기입)
+- `labels`
+- `depends_on` — MVP는 metadata-only (상태 전이 차단에 사용하지 않음; sync가 경고만 표시)
+- `working_dir` (executor cwd override; 미지정 시 `~/Projects/<project>/`)
+- `merge_into` (approve 시 merge 대상 브랜치; 미지정 시 프로젝트 repo default)
+- `run_count` (엔진 자동 증가)
 - `syncTarget`
 - `jiraProject`
 - `jiraKey`
-- `automation`
+- `automation` (trigger 및 allowedActions 블록; 레시피/정책 입력)
 
-Required Markdown sections:
+### 8.5 `type` enum
 
-- `Goal`
+- `epic` — 다수 티켓을 묶는 상위 단위. 보드 카드가 아니며 필터 차원으로 기능. `#epic/<id>` 태그를 자식 카드 라인에 부여.
+- `task` — 기본 작업 단위. 기능 구현·리팩터링 포함.
+- `bug` — 결함 수정.
+- `chore` — 유지보수 / 운영.
+- `docs` — 문서 작업.
+
+`story`, `spike`, `subtask`는 MVP에서 제외. 협업 레이어 확장 시 재도입 가능.
+
+### 8.6 Required Markdown sections
+
+일반 티켓:
+
+- `목적`
+- `컨텍스트`
 - `Acceptance Criteria`
-- `Implementation Tasks`
-- `Notes`
+- `실행 힌트`
+- `로그`
 
-Optional Markdown sections:
+Epic 티켓:
 
-- `Execution Log`
-- `Links`
-- `Decisions`
-- `Review Notes`
+- `목표`
+- `범위`
+- `성공 지표`
+- `하위 티켓` (내부에 `<!-- kanban:auto-render start/end -->` 마커 필수)
+- `로그`
 
-The parser only supports the constrained template. Free-form documents are allowed elsewhere in the vault, but they are not parsed as issues unless they match the schema.
+### 8.7 READY 전이의 본문 요구치
+
+`executor: claude-code`(또는 기타 기계 executor)인 일반 티켓이 `status: READY`로 전이되려면 `목적`, `컨텍스트`, `Acceptance Criteria`, `실행 힌트` 네 섹션이 모두 비어 있지 않아야 한다. `kanban sync`/`kanban run`이 이 요구치를 검증하며 미충족 시 READY 전이를 거부하거나 즉시 FAILED 처리한다. `executor: human` 티켓은 이 요구치에서 면제된다.
+
+### 8.8 Body section parsing
+
+The parser only supports the constrained template above. Free-form documents are allowed elsewhere in the vault, but they are not parsed as issues unless they match the schema. `하위 티켓` 섹션의 `<!-- kanban:auto-render start/end -->` 마커 사이는 `kanban sync`가 재생성하는 영역으로, 사람이 손으로 유지하지 않는다.
 
 ## 9. Status Model
 
@@ -471,6 +564,43 @@ policy:
       - jiraStatus
 ```
 
+### 11.1 Worktree Execution Contract (`claude-code-executor`)
+
+Home 모드에서 `claude-code-executor` 모듈은 아래 계약을 준수한다. Work 모드에서는 이 모듈이 recipe에서 비활성화되므로 해당하지 않는다.
+
+**입력:** `status: READY`인 issue 한 건. lock은 `kanban/runtime/current.lock` (space 무관 단일 lock). 이미 존재하면 실행 거절.
+
+**Worktree 생성:**
+
+1. Working directory 결정: frontmatter `working_dir` 또는 `~/Projects/<project>/`.
+2. Remote 확인: `git -C <working_dir> remote get-url origin` 성공이고 `--no-fetch` 미지정이면 `git fetch origin --prune`.
+3. Base ref 결정: remote 있으면 `git symbolic-ref --short refs/remotes/origin/HEAD` → 실패 시 `main`→`master` fallback. remote 없으면 로컬 default.
+4. Worktree 생성: `git worktree add -b kanban/<id> <working_dir>/.worktrees/kanban/<id>/ <base-ref>`. 경로는 **작업 대상 repo 내부**로 고정. 중앙집중(`~/.openclaw/.worktrees/` 등) 금지.
+
+**실행:**
+
+5. 프롬프트 조립: `목적 / 컨텍스트 / Acceptance Criteria / 실행 힌트` 4섹션 + 프로토콜 꼬리(commit 지침, acceptance 체크박스 재평가 지침, 로그 append 지침).
+6. `claude -p @prompt.md` headless 호출. stdout/stderr은 `kanban/runs/<date>/<id>/<run-N>.log`. 타임아웃 기본 30분.
+
+**상태 전이 (RUNNING → REVIEW / FAILED):**
+
+7. exit 0 + worktree에 신규 커밋 존재 → `status: REVIEW`.
+8. exit 0 + 커밋 없음 → `status: REVIEW`, 로그에 `no changes produced` 경고.
+9. exit != 0 또는 timeout → `status: FAILED`, stderr 꼬리 로그 저장.
+10. `run_count` 증가, `updated` 갱신, `kanban/events/<date>.jsonl`에 전이 이벤트 append, lock 해제.
+
+### 11.2 Approval / Abort / Retry
+
+- `approve`: `status: REVIEW` → `DONE`. 조건:
+  - worktree `git status --porcelain` clean.
+  - `merge_into`(없으면 default branch) 로컬 브랜치를 `origin/<merge_into>`로 ff 갱신 (divergent면 거절).
+  - `git merge --ff-only kanban/<id>` 성공 필수. ff 불가 + `--rebase` 지정 시 worktree에서 `git rebase origin/<merge_into>` 후 재시도.
+  - 성공 시 worktree/브랜치 제거, `completed` 타임스탬프 기입.
+- `abort`: `status: REVIEW|FAILED` → `READY`. 기본은 worktree 유지. `--discard` 지정 시 `git merge-base --is-ancestor` 통과 시에만 worktree/브랜치 제거.
+- `retry`: `status: FAILED|REVIEW` → `READY`. worktree/브랜치를 **ancestor 체크 없이 강제 제거** (명시적 "처음부터 다시" 신호). 본문 수정이 필요하면 retry 전에 사람이 이슈를 편집한다.
+
+자세한 CLI 표면과 lock/artifact 규약은 후속 plan(Layer 3)에서 확정한다. 여기서는 **상태 전이 의미론과 worktree 경로 규약**만을 정본으로 박는다.
+
 ## 12. Trigger Model
 
 Issue status movement and execution are separate.
@@ -478,14 +608,14 @@ Issue status movement and execution are separate.
 Recommended Home flow:
 
 ```text
-1. Issue is created.
-2. Issue reaches READY.
-3. A human or allowed automation issues an explicit Run command.
-4. Automation changes READY -> RUNNING.
-5. Executor starts OpenClaw or Claude Code.
-6. Result is written to Execution Log.
-7. Automation changes RUNNING -> REVIEW or FAILED.
-8. Human or policy-approved automation changes REVIEW -> DONE.
+1. Issue is created with status=TODO.
+2. Human grooms the body (목적/컨텍스트/Acceptance Criteria/실행 힌트) and transitions to READY (card drag or frontmatter edit + `kanban sync`).
+3. Human (or policy-approved automation) issues an explicit Run command (`kanban run <id>` or `kanban next`).
+4. `claude-code-executor` acquires the lock, creates `<working_dir>/.worktrees/kanban/<id>/` from `origin/<default>` tip (after `git fetch`), transitions status READY → RUNNING.
+5. Executor invokes the configured backend (`claude -p` headless for Home claude-code; OpenClaw/ACP and others are out of MVP scope).
+6. Executor appends a timestamped summary to the issue's `로그` section and writes structured artifacts to `kanban/runs/<date>/<id>/<run-N>.{log,json}`. Run metadata records base/head commits and acceptance checkbox ratio.
+7. `state-transition` moves RUNNING → REVIEW (exit 0) or RUNNING → FAILED (non-zero/timeout), emits a `kanban/events/<date>.jsonl` line, releases the lock.
+8. Human inspects worktree + log and issues `kanban approve <id>` (ff-only merge + worktree cleanup → DONE) or `kanban abort <id>` (→ READY, worktree retained unless `--discard`).
 ```
 
 This avoids the earlier overly strong rule where moving a card to a work column immediately started execution.
@@ -548,11 +678,13 @@ Document SoT: Markdown
 Operational SoR: Jira
 ```
 
-Allowed Work write-back is limited to local Markdown metadata fields that record export results, such as `jiraKey`, `jiraStatus`, and `exportedAt`. Jira must not rewrite Goal, Acceptance Criteria, Implementation Tasks, Notes, or other document body sections.
+Allowed Work write-back is limited to local Markdown metadata fields that record export results, such as `jiraKey`, `jiraStatus`, and `exportedAt`. Jira must not rewrite `목적`, `컨텍스트`, `Acceptance Criteria`, `실행 힌트`, `로그`, or other document body sections (same constraint applies to Epic sections: `목표`, `범위`, `성공 지표`, `하위 티켓`).
 
 ## 15. Registry
 
 The vault registry maps spaces and projects.
+
+Each space declares `idPrefix`, which is used as the frontmatter `id` prefix (`<idPrefix>-<zero-padded-seq>`). Sequences are space-wide monotonic integers shared across all `type` values (`epic`, `task`, `bug`, `chore`, `docs`). `epics:` and `epicBoard:` entries are mandatory for every space even when no epics exist yet (the generator tolerates empty folders and empty indexes).
 
 Example:
 
@@ -560,12 +692,18 @@ Example:
 spaces:
   openclaw:
     type: single
+    idPrefix: OC
     issues: issues/openclaw
+    epics: issues/openclaw/_epics
     board: boards/openclaw.md
+    epicBoard: boards/openclaw-epics.md
   vibe-coding:
     type: container
+    idPrefix: VC
     issues: issues/vibe-coding
+    epics: issues/vibe-coding/_epics
     board: boards/vibe-coding.md
+    epicBoard: boards/vibe-coding-epics.md
     projects:
       ai-cli-orch-wrapper:
         path: issues/vibe-coding/ai-cli-orch-wrapper
@@ -577,20 +715,32 @@ spaces:
         path: issues/vibe-coding/flow-weaver
   stocks:
     type: single
+    idPrefix: ST
     issues: issues/stocks
+    epics: issues/stocks/_epics
     board: boards/stocks.md
+    epicBoard: boards/stocks-epics.md
   web:
     type: single
+    idPrefix: WB
     issues: issues/web
+    epics: issues/web/_epics
     board: boards/web.md
+    epicBoard: boards/web-epics.md
   personal:
     type: single
+    idPrefix: PS
     issues: issues/personal
+    epics: issues/personal/_epics
     board: boards/personal.md
+    epicBoard: boards/personal-epics.md
   career:
     type: single
+    idPrefix: CR
     issues: issues/career
+    epics: issues/career/_epics
     board: boards/career.md
+    epicBoard: boards/career-epics.md
 ```
 
 ## 16. Migration Strategy
@@ -808,7 +958,7 @@ Exit criteria:
 
 - A READY issue can be explicitly run.
 - Automation moves it to RUNNING.
-- Execution result updates Execution Log.
+- Execution result appends to issue `로그` section.
 - Issue moves to REVIEW or FAILED.
 - Events are logged.
 
