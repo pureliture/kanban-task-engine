@@ -94,6 +94,25 @@ importers:
         specifier: ^1.0.0
         version: 1.6.1(@types/node@20.19.39)
 
+  packages/adapter-jira:
+    dependencies:
+      '@kanban-task-engine/core':
+        specifier: workspace:*
+        version: link:../core
+      '@kanban-task-engine/schema':
+        specifier: workspace:*
+        version: link:../schema
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.39
+      typescript:
+        specifier: ^5.4.0
+        version: 5.9.3
+      vitest:
+        specifier: ^1.0.0
+        version: 1.6.1(@types/node@20.19.39)
+
   packages/adapter-openclaw:
     dependencies:
       '@kanban-task-engine/core':
