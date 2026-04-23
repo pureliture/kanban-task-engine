@@ -90,4 +90,25 @@ describe('WorkspaceResolver', () => {
       expect(() => resolver.getWorkspaceType('unknown')).toThrow('Unknown workspace');
     });
   });
+
+  describe('fromRegistry', () => {
+    it('creates resolver from vault registry shape', () => {
+      const resolver = WorkspaceResolver.fromRegistry({
+        spaces: {
+          openclaw: { type: 'single', issues: 'issues/openclaw', board: 'boards/openclaw.md' },
+          'vibe-coding': {
+            type: 'container',
+            issues: 'issues/vibe-coding',
+            board: 'boards/vibe-coding.md',
+            projects: {
+              'kanban-task-engine': { path: 'issues/vibe-coding/kanban-task-engine' },
+            },
+          },
+        },
+      }, '/vault');
+
+      expect(resolver.getTicketPath('openclaw', 'issue-1')).toBe('/vault/issues/openclaw/issue-1.md');
+      expect(resolver.getTicketPath('vibe-coding', 'kanban-task-engine', 'issue-2')).toBe('/vault/issues/vibe-coding/kanban-task-engine/issue-2.md');
+    });
+  });
 });

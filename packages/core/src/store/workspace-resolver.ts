@@ -14,11 +14,32 @@ export interface ParsedTicketPath {
   ticketId: string;
 }
 
+export interface VaultRegistry {
+  spaces: Record<string, {
+    type: WorkspaceType;
+    issues: string;
+    board: string;
+    projects?: Record<string, { path: string }>;
+  }>;
+}
+
 export class WorkspaceResolver {
   private config: Record<string, WorkspaceConfig>;
 
   constructor(config: Record<string, WorkspaceConfig>) {
     this.config = config;
+  }
+
+  static fromRegistry(registry: VaultRegistry, vaultRoot: string): WorkspaceResolver {
+    const config: Record<string, WorkspaceConfig> = {};
+    for (const [space, entry] of Object.entries(registry.spaces)) {
+      config[space] = {
+        type: entry.type,
+        path: path.join(vaultRoot, entry.issues),
+        projects: entry.projects ? Object.keys(entry.projects) : undefined,
+      };
+    }
+    return new WorkspaceResolver(config);
   }
 
   getTicketPath(workspace: string, ticketIdOrProject: string, ticketId?: string): string {
