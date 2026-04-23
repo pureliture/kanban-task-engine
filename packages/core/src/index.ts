@@ -16,3 +16,6 @@ export type { RuntimePolicy, ModuleSideEffect } from './runtime/policy';
 
 export type { AutomationRecipe } from './recipes/recipe-loader';
 export { parseRecipeYaml } from './recipes/recipe-loader';
+
+export { createManualCommandTrigger } from './modules/manual-command-trigger';
+export { createStateTransitionModule } from './modules/state-transition-module';
