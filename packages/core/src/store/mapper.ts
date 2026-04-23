@@ -76,7 +76,7 @@ export function yamlToCanonical(yaml: Record<string, unknown>, filePath: string)
       external_key: workspace,
       external_id: String(yaml.id ?? ''),
     },
-    summary: String(yaml.summary ?? ''),
+    summary: String(yaml.title ?? yaml.summary ?? ''),
     description_ref: filePath,
     workflow: {
       normalized_status: rawStatusToNormalized(rawStatus),
@@ -84,8 +84,8 @@ export function yamlToCanonical(yaml: Record<string, unknown>, filePath: string)
       raw_status_category: STATUS_CATEGORY_MAP[rawStatus.toLowerCase()] ?? 'TODO',
     },
     classification: {
-      issue_type: String(yaml.issueType ?? 'Task') as CanonicalTaskModel['classification']['issue_type'],
-      priority: String(yaml.priority ?? 'Medium') as CanonicalTaskModel['classification']['priority'],
+      issue_type: mapTypeToCanonical(String(yaml.type ?? yaml.issueType ?? 'task')),
+      priority: mapPriorityToCanonical(String(yaml.priority ?? 'P2')),
       labels: Array.isArray(yaml.labels) ? yaml.labels as string[] : [],
       component: Array.isArray(yaml.components) ? yaml.components as string[] : [],
     },
@@ -123,16 +123,12 @@ export function canonicalToYaml(task: CanonicalTaskModel): Record<string, unknow
   const yaml: Record<string, unknown> = {
     id: task.task_ref.external_id,
     status: task.workflow.raw_status,
-    priority: task.classification.priority,
-    issueType: task.classification.issue_type,
-    summary: task.summary,
+    priority: mapPriorityToFrontmatter(task.classification.priority),
+    type: mapTypeToFrontmatter(task.classification.issue_type),
+    title: task.summary,
     assignee: task.ownership.assignee,
-    reporter: task.ownership.reporter,
     labels: task.classification.labels,
     project: task.task_ref.external_key,
-    components: task.classification.component,
-    sprint: task.planning.sprint,
-    storyPoints: task.planning.estimate?.story_points,
     automation: {
       workspace: task.automation.workspace,
       useAcp: task.automation.useAcp,
@@ -179,8 +175,8 @@ export function markdownIssueToCanonical(content: string, filePath: string): Can
         frontmatter.status,
     },
     classification: {
-      issue_type: normalizeIssueType(frontmatter.issueType),
-      priority: normalizePriority(frontmatter.priority),
+      issue_type: mapTypeToCanonical(frontmatter.type),
+      priority: mapPriorityToCanonical(frontmatter.priority ?? 'P2'),
       labels: frontmatter.labels ?? [],
       component: [],
     },
@@ -198,11 +194,12 @@ export function markdownIssueToCanonical(content: string, filePath: string): Can
       useAcp: frontmatter.executor === 'claude-code',
     },
     sync: {
-      last_synced_at: frontmatter.updatedAt,
+      last_synced_at: frontmatter.updated,
       last_source: 'local',
     },
-    created: frontmatter.createdAt,
-    updated: frontmatter.updatedAt,
+    created: frontmatter.created,
+    updated: frontmatter.updated,
+    completed: frontmatter.completed,
   };
 
   const canonical = validateCanonicalIssue(task);
@@ -213,21 +210,49 @@ export function markdownIssueToCanonical(content: string, filePath: string): Can
   return task;
 }
 
-function normalizeIssueType(input: string): CanonicalTaskModel['classification']['issue_type'] {
-  const value = input.toLowerCase();
-  if (value === 'epic') return 'Epic';
-  if (value === 'story') return 'Story';
-  if (value === 'bug') return 'Bug';
-  if (value === 'sub-task') return 'Sub-task';
-  return 'Task';
+function mapTypeToCanonical(input: string): CanonicalTaskModel['classification']['issue_type'] {
+  switch (input.toLowerCase()) {
+    case 'epic': return 'Epic';
+    case 'bug':  return 'Bug';
+    case 'task':
+    case 'chore':
+    case 'docs':
+    default:
+      return 'Task';
+  }
 }
 
-function normalizePriority(input: string): CanonicalTaskModel['classification']['priority'] {
-  const value = input.toLowerCase();
-  if (value === 'blocker') return 'Blocker';
-  if (value === 'critical') return 'Critical';
-  if (value === 'high') return 'High';
-  if (value === 'low') return 'Low';
-  if (value === 'trivial') return 'Trivial';
-  return 'Medium';
+function mapTypeToFrontmatter(input: CanonicalTaskModel['classification']['issue_type']): string {
+  switch (input) {
+    case 'Epic':     return 'epic';
+    case 'Bug':      return 'bug';
+    case 'Story':    return 'task';
+    case 'Sub-task': return 'task';
+    case 'Task':
+    default:         return 'task';
+  }
+}
+
+const PRIORITY_TO_CANONICAL: Record<string, CanonicalTaskModel['classification']['priority']> = {
+  P0: 'Blocker',
+  P1: 'High',
+  P2: 'Medium',
+  P3: 'Low',
+};
+
+const PRIORITY_TO_FRONTMATTER: Record<string, string> = {
+  Blocker:  'P0',
+  Critical: 'P0',
+  High:     'P1',
+  Medium:   'P2',
+  Low:      'P3',
+  Trivial:  'P3',
+};
+
+function mapPriorityToCanonical(input: string): CanonicalTaskModel['classification']['priority'] {
+  return PRIORITY_TO_CANONICAL[input] ?? 'Medium';
+}
+
+function mapPriorityToFrontmatter(input: CanonicalTaskModel['classification']['priority']): string {
+  return PRIORITY_TO_FRONTMATTER[input] ?? 'P2';
 }

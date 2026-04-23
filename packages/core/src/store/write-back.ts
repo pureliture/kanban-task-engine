@@ -5,8 +5,8 @@ import { parseFrontmatter, extractBody, serializeWithFrontmatter } from './front
 import { atomicWriteFile } from './fs-utils';
 
 const VALID_FIELDS = new Set([
-  'id', 'status', 'priority', 'issueType', 'summary', 'assignee', 'reporter',
-  'labels', 'project', 'components', 'sprint', 'storyPoints', 'due_date',
+  'id', 'status', 'priority', 'type', 'title', 'assignee',
+  'labels', 'project', 'due_date',
   'automation', 'created', 'updated', 'completed',
 ]);
 
