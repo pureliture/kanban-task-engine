@@ -1,52 +1,49 @@
 import { CanonicalTaskModel, NormalizedStatus, RawStatusCategory } from '../types';
 import grayMatter from 'gray-matter';
 
-// Status mapping: This is the canonical local mapping.
-// Adapters (GitHub, Firebase) maintain their own provider-specific mappings.
-// When adding new status aliases here, ensure consistency with:
-// - packages/adapter-github/src/status-mapping.ts
-// - packages/adapter-firebase/src/firebase-mapper.ts
-// - packages/core/src/state-machine.ts (STATUS_TO_RAW, STATUS_TO_CATEGORY)
 const STATUS_MAP: Record<string, NormalizedStatus> = {
-  'backlog': 'BACKLOG',
-  'in progress': 'ACTIVE',
-  'in-progress': 'ACTIVE',
+  'todo': 'TODO',
+  'ready': 'READY',
+  'running': 'RUNNING',
+  'in progress': 'RUNNING',
+  'in-progress': 'RUNNING',
+  'review': 'REVIEW',
   'in review': 'REVIEW',
   'in-review': 'REVIEW',
   'done': 'DONE',
-  'selected': 'SELECTED',
-  'todo': 'SELECTED',
-  'blocked': 'BLOCKED',
-  'cancelled': 'CANCELLED',
+  'failed': 'FAILED',
+  'blocked': 'FAILED',
 };
 
 const STATUS_CATEGORY_MAP: Record<string, RawStatusCategory> = {
-  'backlog': 'BACKLOG',
+  'todo': 'TODO',
+  'ready': 'READY',
+  'running': 'IN_PROGRESS',
   'in progress': 'IN_PROGRESS',
   'in-progress': 'IN_PROGRESS',
+  'review': 'IN_REVIEW',
   'in review': 'IN_REVIEW',
   'in-review': 'IN_REVIEW',
   'done': 'DONE',
-  'blocked': 'BLOCKED',
-  'cancelled': 'CANCELLED',
+  'failed': 'FAILED',
+  'blocked': 'FAILED',
 };
 
 export function rawStatusToNormalized(raw: string): NormalizedStatus {
-  return STATUS_MAP[raw.toLowerCase()] ?? 'BACKLOG';
+  return STATUS_MAP[raw.toLowerCase()] ?? 'TODO';
 }
 
-const REVERSE_STATUS_MAP: Record<string, string> = {
-  'BACKLOG': 'Backlog',
-  'SELECTED': 'Todo',
-  'ACTIVE': 'In Progress',
-  'BLOCKED': 'Blocked',
-  'REVIEW': 'In Review',
-  'DONE': 'Done',
-  'CANCELLED': 'Cancelled',
+const REVERSE_STATUS_MAP: Record<NormalizedStatus, string> = {
+  'TODO': 'TODO',
+  'READY': 'READY',
+  'RUNNING': 'RUNNING',
+  'REVIEW': 'REVIEW',
+  'DONE': 'DONE',
+  'FAILED': 'FAILED',
 };
 
 export function normalizedToRawStatus(normalized: NormalizedStatus): string {
-  return REVERSE_STATUS_MAP[normalized] ?? 'Backlog';
+  return REVERSE_STATUS_MAP[normalized] ?? 'TODO';
 }
 
 export function parseMarkdownFile(content: string): { data: Record<string, any>; body: string } {
@@ -70,7 +67,7 @@ export function parseMarkdownFile(content: string): { data: Record<string, any>;
  */
 export function yamlToCanonical(yaml: Record<string, unknown>, filePath: string): CanonicalTaskModel {
   const workspace = extractWorkspace(filePath);
-  const rawStatus = String(yaml.status ?? 'Backlog');
+  const rawStatus = String(yaml.status ?? 'TODO');
 
   return {
     task_ref: {
@@ -83,7 +80,7 @@ export function yamlToCanonical(yaml: Record<string, unknown>, filePath: string)
     workflow: {
       normalized_status: rawStatusToNormalized(rawStatus),
       raw_status: rawStatus,
-      raw_status_category: STATUS_CATEGORY_MAP[rawStatus.toLowerCase()] ?? 'BACKLOG',
+      raw_status_category: STATUS_CATEGORY_MAP[rawStatus.toLowerCase()] ?? 'TODO',
     },
     classification: {
       issue_type: String(yaml.issueType ?? 'Task') as CanonicalTaskModel['classification']['issue_type'],
@@ -102,7 +99,7 @@ export function yamlToCanonical(yaml: Record<string, unknown>, filePath: string)
     },
     automation: {
       policy_id: String((yaml.automation as Record<string, unknown>)?.policy_id ?? (yaml.automation as Record<string, unknown>)?.workspace ?? 'default'),
-      on_enter: ((yaml.automation as Record<string, unknown>)?.triggerOnStatus as string[])?.map(rawStatusToNormalized) ?? ['ACTIVE'],
+      on_enter: ((yaml.automation as Record<string, unknown>)?.triggerOnStatus as string[])?.map(rawStatusToNormalized) ?? ['READY'],
       on_exit: [],
       execution_profile: 'standard',
       workspace: String(yaml.workspace ?? workspace),

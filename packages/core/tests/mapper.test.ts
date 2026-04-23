@@ -3,35 +3,35 @@ import { yamlToCanonical, canonicalToYaml, rawStatusToNormalized, normalizedToRa
 
 describe('mapper', () => {
   describe('rawStatusToNormalized', () => {
-    it('maps "backlog" to BACKLOG', () => {
-      expect(rawStatusToNormalized('backlog')).toBe('BACKLOG');
+    it('maps "todo" to TODO', () => {
+      expect(rawStatusToNormalized('todo')).toBe('TODO');
     });
-    it('maps "In Progress" to ACTIVE', () => {
-      expect(rawStatusToNormalized('In Progress')).toBe('ACTIVE');
+    it('maps "RUNNING" to RUNNING', () => {
+      expect(rawStatusToNormalized('RUNNING')).toBe('RUNNING');
     });
-    it('maps "in-progress" to ACTIVE', () => {
-      expect(rawStatusToNormalized('in-progress')).toBe('ACTIVE');
+    it('maps "in-progress" to RUNNING', () => {
+      expect(rawStatusToNormalized('in-progress')).toBe('RUNNING');
     });
     it('maps "Done" to DONE', () => {
       expect(rawStatusToNormalized('Done')).toBe('DONE');
     });
-    it('maps "Blocked" to BLOCKED', () => {
-      expect(rawStatusToNormalized('Blocked')).toBe('BLOCKED');
+    it('maps "Blocked" to FAILED', () => {
+      expect(rawStatusToNormalized('Blocked')).toBe('FAILED');
     });
-    it('defaults unknown status to BACKLOG', () => {
-      expect(rawStatusToNormalized('unknown')).toBe('BACKLOG');
+    it('defaults unknown status to TODO', () => {
+      expect(rawStatusToNormalized('unknown')).toBe('TODO');
     });
   });
 
   describe('normalizedToRawStatus', () => {
-    it('maps BACKLOG to "Backlog"', () => {
-      expect(normalizedToRawStatus('BACKLOG')).toBe('Backlog');
+    it('maps TODO to "TODO"', () => {
+      expect(normalizedToRawStatus('TODO')).toBe('TODO');
     });
-    it('maps ACTIVE to "In Progress"', () => {
-      expect(normalizedToRawStatus('ACTIVE')).toBe('In Progress');
+    it('maps RUNNING to "RUNNING"', () => {
+      expect(normalizedToRawStatus('RUNNING')).toBe('RUNNING');
     });
-    it('maps DONE to "Done"', () => {
-      expect(normalizedToRawStatus('DONE')).toBe('Done');
+    it('maps DONE to "DONE"', () => {
+      expect(normalizedToRawStatus('DONE')).toBe('DONE');
     });
   });
 
@@ -39,7 +39,7 @@ describe('mapper', () => {
     it('converts YAML frontmatter to CanonicalTaskModel', () => {
       const yaml = {
         id: 'OC-001',
-        status: 'In Progress',
+        status: 'RUNNING',
         summary: 'Test task',
         priority: 'High',
         issueType: 'Task',
@@ -50,7 +50,7 @@ describe('mapper', () => {
       };
       const result = yamlToCanonical(yaml, '/workspace-claude/issues/OC-001-test.md');
       expect(result.task_ref.external_id).toBe('OC-001');
-      expect(result.workflow.normalized_status).toBe('ACTIVE');
+      expect(result.workflow.normalized_status).toBe('RUNNING');
       expect(result.summary).toBe('Test task');
       expect(result.classification.priority).toBe('High');
       expect(result.classification.labels).toEqual(['frontend']);
@@ -63,7 +63,7 @@ describe('mapper', () => {
 
     it('provides defaults for missing fields', () => {
       const result = yamlToCanonical({}, '/workspace/issues/test.md');
-      expect(result.workflow.normalized_status).toBe('BACKLOG');
+      expect(result.workflow.normalized_status).toBe('TODO');
       expect(result.classification.issue_type).toBe('Task');
       expect(result.classification.priority).toBe('Medium');
     });
@@ -73,7 +73,7 @@ describe('mapper', () => {
     it('round-trips through yamlToCanonical and back', () => {
       const original = {
         id: 'OC-002',
-        status: 'Backlog',
+        status: 'TODO',
         priority: 'Medium',
         issueType: 'Bug',
         summary: 'Bug report',
@@ -87,7 +87,7 @@ describe('mapper', () => {
       const canonical = yamlToCanonical(original, '/workspace/issues/OC-002-bug.md');
       const yaml = canonicalToYaml(canonical);
       expect(yaml.id).toBe('OC-002');
-      expect(yaml.status).toBe('Backlog');
+      expect(yaml.status).toBe('TODO');
       expect(yaml.priority).toBe('Medium');
       expect(yaml.issueType).toBe('Bug');
     });

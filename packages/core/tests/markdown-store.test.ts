@@ -38,7 +38,7 @@ workspace: test
       const task = await (store as any).loadFromFile('/test/TEST-001.md');
 
       expect(task).not.toBeNull();
-      expect(task?.workflow?.normalized_status).toBe('BACKLOG');
+      expect(task?.workflow?.normalized_status).toBe('TODO');
     });
   });
 });

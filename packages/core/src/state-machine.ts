@@ -7,23 +7,21 @@ import {
 } from './types';
 
 const STATUS_TO_RAW: Record<NormalizedStatus, string> = {
-  'BACKLOG': 'Backlog',
-  'SELECTED': 'Todo',
-  'ACTIVE': 'In Progress',
-  'BLOCKED': 'Blocked',
-  'REVIEW': 'In Review',
-  'DONE': 'Done',
-  'CANCELLED': 'Cancelled',
+  TODO: 'TODO',
+  READY: 'READY',
+  RUNNING: 'RUNNING',
+  REVIEW: 'REVIEW',
+  DONE: 'DONE',
+  FAILED: 'FAILED',
 };
 
 const STATUS_TO_CATEGORY: Record<NormalizedStatus, RawStatusCategory> = {
-  'BACKLOG': 'BACKLOG',
-  'SELECTED': 'BACKLOG',
-  'ACTIVE': 'IN_PROGRESS',
-  'BLOCKED': 'BLOCKED',
-  'REVIEW': 'IN_REVIEW',
-  'DONE': 'DONE',
-  'CANCELLED': 'CANCELLED',
+  TODO: 'TODO',
+  READY: 'READY',
+  RUNNING: 'IN_PROGRESS',
+  REVIEW: 'IN_REVIEW',
+  DONE: 'DONE',
+  FAILED: 'FAILED',
 };
 
 export class StateMachine {
@@ -65,7 +63,7 @@ export class StateMachine {
         last_source: task.sync.last_source,
       },
       updated: new Date().toISOString(),
-      completed: newStatus === 'DONE' || newStatus === 'CANCELLED'
+      completed: newStatus === 'DONE' || newStatus === 'FAILED'
         ? new Date().toISOString()
         : task.completed,
     };
@@ -76,6 +74,6 @@ export class StateMachine {
   }
 
   isTerminalStatus(status: NormalizedStatus): boolean {
-    return status === 'DONE' || status === 'CANCELLED';
+    return status === 'DONE' || status === 'FAILED';
   }
 }

@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "chokidar": "^3.6.0",
-    "yaml": "^2.4.0"
+    "yaml": "^2.4.0",
+    "@kanban-task-engine/schema": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
