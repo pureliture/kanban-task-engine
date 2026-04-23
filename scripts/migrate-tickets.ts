@@ -2,6 +2,16 @@ import fs from 'fs/promises';
 import path from 'path';
 import grayMatter from 'gray-matter';
 
+function expandHome(input: string): string {
+  if (input === '~') return process.env.HOME!;
+  if (input.startsWith('~/')) return path.join(process.env.HOME!, input.slice(2));
+  return input;
+}
+
+function kanbanHome(): string {
+  return path.resolve(expandHome(process.env.KANBAN_HOME || '~/.openclaw/workspace-kanban/kanban'));
+}
+
 const MIGRATIONS: Array<{
   from: string;
   to: string;
@@ -10,25 +20,25 @@ const MIGRATIONS: Array<{
 }> = [
   {
     from: path.join(process.env.HOME!, '.openclaw/workspace-claude/issues'),
-    to: path.join(process.env.HOME!, 'Projects/kanban-task-engine/issues/vibe-coding'),
+    to: path.join(kanbanHome(), 'issues', 'vibe-coding'),
     workspace: 'vibe-coding',
     type: 'container'
   },
   {
     from: path.join(process.env.HOME!, '.openclaw/workspace-stocks/issues'),
-    to: path.join(process.env.HOME!, 'Projects/kanban-task-engine/issues/stocks'),
+    to: path.join(kanbanHome(), 'issues', 'stocks'),
     workspace: 'stocks',
     type: 'single'
   },
   {
     from: path.join(process.env.HOME!, '.openclaw/workspace-web/issues'),
-    to: path.join(process.env.HOME!, 'Projects/kanban-task-engine/issues/web'),
+    to: path.join(kanbanHome(), 'issues', 'web'),
     workspace: 'web',
     type: 'single'
   },
   {
     from: path.join(process.env.HOME!, '.openclaw/workspace-personal/issues'),
-    to: path.join(process.env.HOME!, 'Projects/kanban-task-engine/issues/personal'),
+    to: path.join(kanbanHome(), 'issues', 'personal'),
     workspace: 'personal',
     type: 'single'
   }
