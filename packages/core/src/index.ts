@@ -22,3 +22,6 @@ export { createStateTransitionModule } from './modules/state-transition-module';
 
 export { createAuditLogModule } from './modules/audit-log-module';
 export { createGitCheckpointModule } from './modules/git-checkpoint-module';
+
+export { renderBoardMarkdown } from './boards/board-generator';
+export type { BoardIssue, RenderBoardOptions } from './boards/board-generator';
