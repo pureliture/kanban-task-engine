@@ -8,7 +8,7 @@ Repository: `~/Projects/kanban-task-engine`
 
 The kanban system uses Markdown issue documents as the shared operational control plane. The same issue schema is used in Home and Work environments, but the automation policy and external adapters differ by environment.
 
-Home uses OpenClaw automation and may allow automated issue transitions, execution, indexing, rendering, and checkpoints. Work uses the same Markdown schema and engine, but avoids OpenClaw and external write-back. Work exports to Atlassian/Jira through a one-way adapter.
+Home uses OpenClaw automation and may allow automated issue transitions, execution, indexing, rendering, and checkpoints. Work uses the same Markdown schema and engine, but avoids OpenClaw and bidirectional external content sync. Work exports to Atlassian/Jira through a one-way adapter and may write selected export metadata back into Markdown when policy permits.
 
 The final layout separates three concerns:
 
@@ -129,7 +129,6 @@ The OpenClaw workspace that runs automation against a vault.
 │   ├── personal.md
 │   └── career.md
 ├── templates/
-├── schema-overrides/
 ├── events/
 ├── canonical/
 ├── exports/
@@ -138,6 +137,8 @@ The OpenClaw workspace that runs automation against a vault.
 ```
 
 The vault is a standalone git repository. `workspace-kanban/.gitignore` ignores `/kanban/` so the parent workspace does not track the vault as a submodule or nested working tree.
+
+Home vaults do not define core schema extensions. The shared schema lives in the engine repository. Vault-local files may provide display hints, local labels, or non-breaking validation preferences, but they must not change required fields, status semantics, canonical JSON shape, or adapter contracts.
 
 ### 6.3 Engine Repository
 
@@ -389,9 +390,10 @@ Pipeline:
 
 ```text
 Markdown issue
+  -> Markdown/frontmatter/template validation
   -> parser
   -> canonical JSON
-  -> validator
+  -> canonical schema validation
   -> adapter or automation module
 ```
 
@@ -527,7 +529,7 @@ Work uses:
 Work allows:
 
 - Markdown to Jira one-way export
-- Jira key/status metadata write-back if policy allows
+- Controlled local metadata write-back to Markdown if policy allows
 - Local validation
 
 Work forbids:
@@ -536,7 +538,7 @@ Work forbids:
 - Firebase
 - Mobile real-time sync
 - iCloud/Git sync unless explicitly permitted by company policy
-- Jira-to-Markdown bidirectional sync
+- Jira-to-Markdown bidirectional content sync
 - Jira as document SoT
 
 Work separation:
@@ -545,6 +547,8 @@ Work separation:
 Document SoT: Markdown
 Operational SoR: Jira
 ```
+
+Allowed Work write-back is limited to local Markdown metadata fields that record export results, such as `jiraKey`, `jiraStatus`, and `exportedAt`. Jira must not rewrite Goal, Acceptance Criteria, Implementation Tasks, Notes, or other document body sections.
 
 ## 15. Registry
 
@@ -604,6 +608,7 @@ Target state:
 - Move or copy current `~/.openclaw/kanban` into `~/.openclaw/workspace-kanban/kanban`.
 - Initialize `workspace-kanban/kanban` as standalone git repository.
 - Ignore `/kanban/` from `workspace-kanban`.
+- Preserve compatibility for existing `~/.openclaw/kanban` references during migration by creating a temporary symlink or by updating all known references before moving the directory.
 - Update engine defaults to use `KANBAN_HOME` and default to `~/.openclaw/workspace-kanban/kanban`.
 - Retire engine-repo `issues/` as live state.
 - Preserve old design notes as historical docs, but supersede them with this spec.
@@ -641,12 +646,13 @@ Scope:
 - Add `AGENTS.md`, `SOUL.md`, `USER.md`, `MEMORY.md`, `HEARTBEAT.md`, and `memory/`.
 - Add `config/active-recipe.yaml`, `config/module-overrides.yaml`, and `config/kanban-home.yaml`.
 - Add `.gitignore` that ignores `/kanban/` and runtime artifacts.
-- Initialize as a normal workspace repo if needed.
+- Initialize `workspace-kanban` using the same standalone workspace repository pattern as the other OpenClaw workspaces. The parent `.openclaw` repository may track it as a workspace entry or submodule pointer according to existing OpenClaw conventions, but must not track `workspace-kanban/kanban`.
 
 Exit criteria:
 
 - OpenClaw can enter `workspace-kanban` and know it is the kanban operator.
 - `kanban/` is ignored by the operator workspace repo.
+- The parent `.openclaw` repository does not recursively track `workspace-kanban/kanban`.
 
 ### Slice 2: Move Home Vault
 
@@ -659,13 +665,16 @@ Scope:
 - Initialize `workspace-kanban/kanban` as standalone git repo.
 - Create the target directory skeleton.
 - Preserve existing `KANBAN.md`, `registry.yaml`, and `spaces/` content.
-- Decide whether `spaces/` is retained, renamed to `boards/`, or supported as a legacy alias.
+- Keep existing `spaces/` as legacy read-only migration input.
+- Create `boards/` as the new generated view directory.
+- Do not delete or rename `spaces/` until board generation and compatibility are implemented.
 
 Exit criteria:
 
 - `git -C ~/.openclaw/workspace-kanban/kanban rev-parse --show-toplevel` resolves to the vault.
 - `workspace-kanban` parent git does not track the nested vault.
 - Obsidian can open `workspace-kanban/kanban` as the Home vault.
+- Existing references to `~/.openclaw/kanban` either still work through a temporary symlink or have been updated.
 
 ### Slice 3: Schema Package
 
@@ -811,7 +820,9 @@ Keep Obsidian useful without making it the engine.
 Scope:
 
 - Generate board Markdown from issues.
-- Decide whether `spaces/` remains as legacy view or migrates to `boards/`.
+- Read existing `spaces/` files as legacy migration input only.
+- Generate new board Markdown under `boards/`.
+- Keep generated board files clearly marked as generated.
 - Avoid treating generated board files as SoT unless explicitly designed later.
 - Support Dataview/Kanban-friendly output.
 
@@ -820,6 +831,7 @@ Exit criteria:
 - Boards reflect issue status.
 - Issue documents remain the SoT.
 - Generated files are clearly marked if generated.
+- `spaces/` is not deleted until an explicit cleanup slice verifies no references remain.
 
 ### Slice 11: Work/Jira Adapter
 
@@ -831,13 +843,13 @@ Scope:
 - Implement Jira export from canonical JSON.
 - Implement Jira create/update.
 - Implement optional `jiraKey` and export metadata write-back.
-- Prevent full bidirectional sync.
+- Prevent bidirectional content sync.
 - Add dry-run mode.
 
 Exit criteria:
 
 - Markdown issue can be exported to Jira payload.
-- Jira key can be written back if policy allows.
+- Jira metadata can be written back to explicitly allowed Markdown frontmatter fields if policy allows.
 - Work recipe does not invoke OpenClaw or Claude Code.
 
 ### Slice 12: Migration Cleanup
@@ -906,6 +918,9 @@ Mitigation: Rotate events monthly or by size.
 Risk: Existing old design docs conflict with the new spec.
 Mitigation: Mark the new spec as superseding the older engine-repo `issues/` design.
 
+Risk: Moving `~/.openclaw/kanban` breaks existing references.
+Mitigation: Maintain a temporary compatibility symlink or update all known references before the move.
+
 ## 20. Acceptance Criteria
 
 The architecture is accepted when:
@@ -925,10 +940,8 @@ The architecture is accepted when:
 ## 21. Open Decisions
 
 1. Whether Home tracks `events/*.jsonl` by default or only in debug mode.
-2. Whether existing `spaces/` files should be renamed to `boards/` immediately or supported as a compatibility layer.
-3. Whether `schema-overrides/` belongs in the Home vault, or whether all schema extensions must live in the engine repo.
-4. Whether `canonical/` should ever be committed for audit snapshots, or always ignored as generated state.
-5. Whether first implementation should start with vault migration or engine path configuration.
+2. Whether `canonical/` should ever be committed for audit snapshots, or always ignored as generated state.
+3. Whether first implementation should update engine path configuration before moving the vault, or move with a temporary compatibility symlink.
 
 ## 22. Recommended First Implementation Plan
 
