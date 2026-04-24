@@ -21,11 +21,19 @@ const PRIORITY_TO_P: Record<string, string> = {
   trivial:  'P3',
 };
 
+const REMOVED_TYPES = new Set(['story', 'sub-task', 'subtask', 'spike']);
+
 function migrateFields(data: Record<string, unknown>): void {
-  // issueType → type
+  // issueType → type (copy before normalization)
   if ('issueType' in data && !('type' in data)) {
     data.type = data.issueType;
     delete data.issueType;
+  }
+
+  // type: lowercase + remove retired values (story/sub-task → task)
+  if (typeof data.type === 'string') {
+    const t = data.type.toLowerCase();
+    data.type = REMOVED_TYPES.has(t) ? 'task' : t;
   }
 
   // createdAt → created
@@ -50,6 +58,7 @@ function migrateFields(data: Record<string, unknown>): void {
   delete data.syncTarget;
   delete data.jiraProject;
   delete data.jiraKey;
+  delete data.parent;
 
   // Remove automation.trigger/allowedActions block (keep policy_id/useAcp/onEnter if present)
   if (data.automation && typeof data.automation === 'object') {
@@ -99,7 +108,17 @@ const MIGRATIONS: Array<{
   }
 ];
 
-async function migrateFile(srcPath: string, destPath: string, workspace: string): Promise<void> {
+async function migrateFile(srcPath: string, destPath: string, workspace: string, force: boolean): Promise<void> {
+  if (!force) {
+    try {
+      await fs.access(destPath);
+      console.log(`Skipped (exists): ${destPath}  (use --force to overwrite)`);
+      return;
+    } catch {
+      // destination does not exist — proceed
+    }
+  }
+
   const content = await fs.readFile(srcPath, 'utf-8');
   const { data, content: body } = grayMatter(content);
 
@@ -121,6 +140,9 @@ async function migrateFile(srcPath: string, destPath: string, workspace: string)
 }
 
 async function main(): Promise<void> {
+  const force = process.argv.includes('--force');
+  if (force) console.log('--force: existing destination files will be overwritten');
+
   for (const migration of MIGRATIONS) {
     try {
       const files = await fs.readdir(migration.from);
@@ -131,7 +153,7 @@ async function main(): Promise<void> {
       for (const file of mdFiles) {
         const srcPath = path.join(migration.from, file);
         const destPath = path.join(migration.to, file);
-        await migrateFile(srcPath, destPath, migration.workspace);
+        await migrateFile(srcPath, destPath, migration.workspace, force);
       }
 
       await fs.mkdir(migration.to, { recursive: true });
