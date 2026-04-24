@@ -2,7 +2,7 @@
 id: XX-001
 title: 에픽 제목
 type: epic
-status: READY
+status: TODO
 executor: human
 project: example-project
 priority: P1
@@ -33,5 +33,6 @@ updated: 2026-04-24
 
 ## 하위 티켓
 
-- [ ] XX-002: 하위 태스크 1
-- [ ] XX-003: 하위 태스크 2
+<!-- kanban:auto-render start -->
+- TODO: XX-002, XX-003
+<!-- kanban:auto-render end -->
