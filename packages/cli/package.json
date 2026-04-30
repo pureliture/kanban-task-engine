@@ -1,0 +1,26 @@
+{
+  "name": "@kanban-task-engine/cli",
+  "version": "0.1.0",
+  "description": "Kanban task engine command line interface",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "kanban": "./dist/bin.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "@kanban-task-engine/core": "workspace:*",
+    "yaml": "^2.8.3"
+  }
+}
