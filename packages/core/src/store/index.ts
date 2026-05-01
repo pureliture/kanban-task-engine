@@ -6,3 +6,7 @@ export { parseFrontmatter, extractBody, serializeWithFrontmatter } from './front
 export { atomicWriteFile } from './fs-utils';
 export { validatePath, isPathWithinAllowed, getAllowedBasePaths } from './path-validator';
 export { WorkspaceResolver, WorkspaceConfig, WorkspaceType, ParsedTicketPath } from './workspace-resolver';
+export { loadRegistry, parseRegistryYaml, getRegistrySpace, listRegistrySpaces } from './registry';
+export type { VaultRegistry, RegistrySpace, RegistrySpaceType, RegistryProject } from './registry';
+export { allocateNextIssueId, parseIssueSequence } from './sequence';
+export type { AllocateIssueIdOptions } from './sequence';
