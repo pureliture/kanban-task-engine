@@ -84,7 +84,7 @@ export function yamlToCanonical(yaml: Record<string, unknown>, filePath: string)
       raw_status_category: STATUS_CATEGORY_MAP[rawStatus.toLowerCase()] ?? 'TODO',
     },
     classification: {
-      issue_type: mapTypeToCanonical(String(yaml.type ?? yaml.issueType ?? 'task')),
+      issue_type: mapTypeToCanonical(String(yaml.type ?? 'task')),
       priority: mapPriorityToCanonical(String(yaml.priority ?? 'P2')),
       labels: Array.isArray(yaml.labels) ? yaml.labels as string[] : [],
       component: Array.isArray(yaml.components) ? yaml.components as string[] : [],

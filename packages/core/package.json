@@ -2,8 +2,19 @@
   "name": "@kanban-task-engine/core",
   "version": "0.1.0",
   "description": "Core engine for task synchronization and automation",
+  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./executor": {
+      "types": "./dist/executor/index.d.ts",
+      "default": "./dist/executor/index.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
@@ -13,6 +24,7 @@
   },
   "dependencies": {
     "chokidar": "^3.6.0",
+    "execa": "^8.0.1",
     "yaml": "^2.4.0",
     "@kanban-task-engine/schema": "workspace:*"
   },

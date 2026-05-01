@@ -6,7 +6,8 @@ import { atomicWriteFile } from './fs-utils';
 
 const VALID_FIELDS = new Set([
   'id', 'status', 'priority', 'type', 'title', 'assignee',
-  'labels', 'project', 'due_date',
+  'labels', 'project', 'epic', 'depends_on', 'due_date',
+  'working_dir', 'merge_into', 'run_count',
   'automation', 'created', 'updated', 'completed',
 ]);
 
