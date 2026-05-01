@@ -69,5 +69,17 @@ export function createClaudeCliRunner(options: ClaudeCliRunnerOptions = {}): Cla
 }
 
 export function createClaudeAgentRunner(options: ClaudeCliRunnerOptions = {}): AgentRunner {
-  return adaptClaudeRunnerToAgent(createClaudeCliRunner(options));
+  const executable = options.executable ?? 'claude';
+  return {
+    backend: 'claude-code',
+    run(input) {
+      return spawnAgentProcess({
+        executable,
+        args: ['-p', `@${input.promptPath}`],
+        cwd: input.cwd,
+        timeoutMs: input.timeoutMs ?? options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+        env: process.env,
+      });
+    },
+  };
 }

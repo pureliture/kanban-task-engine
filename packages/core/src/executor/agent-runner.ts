@@ -28,6 +28,8 @@ export interface LegacyClaudeRunner {
   run(promptPath: string, cwd: string): Promise<AgentRunResult>;
 }
 
+// This bridge preserves the legacy two-argument Claude runner contract; callers that need
+// per-run timeout handling should use a native AgentRunner implementation.
 export function adaptClaudeRunnerToAgent(claude: LegacyClaudeRunner): AgentRunner {
   return {
     backend: 'claude-code',

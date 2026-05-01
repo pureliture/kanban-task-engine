@@ -374,6 +374,28 @@ describe('cli', () => {
     expect(await fs.readFile(issuePath, 'utf8')).toContain('status: REVIEW');
   });
 
+  it('restores the operator branch when approve cannot fast-forward the target branch', async () => {
+    const { originPath, repoPath } = await createGitFixture('VC-001');
+    await run('git', ['-C', repoPath, 'worktree', 'remove', '--force', path.join(repoPath, '.worktrees', 'kanban', 'VC-001')]);
+    await run('git', ['-C', repoPath, 'branch', '-D', 'kanban/VC-001']);
+    await pushOriginAheadCommit(originPath);
+    await fs.writeFile(path.join(repoPath, 'local-only.txt'), 'local only\n');
+    await run('git', ['-C', repoPath, 'add', 'local-only.txt']);
+    await run('git', ['-C', repoPath, 'commit', '-m', 'local diverged']);
+    await run('git', ['-C', repoPath, 'fetch', 'origin']);
+    await createKanbanWorktreeFrom(repoPath, 'VC-001', 'origin/main', { commitOnKanbanBranch: true });
+    await run('git', ['-C', repoPath, 'checkout', '-b', 'operator-context']);
+    const vaultRoot = await createVault({ workingDir: repoPath });
+    const issuePath = await setIssueStatus(vaultRoot, 'VC-001', 'REVIEW');
+
+    const result = await runCli(['approve', 'VC-001'], createCliContext({ KANBAN_HOME: vaultRoot }));
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('approve failed');
+    await expect(gitOutput(repoPath, ['branch', '--show-current'])).resolves.toBe('operator-context');
+    expect(await fs.readFile(issuePath, 'utf8')).toContain('status: REVIEW');
+  });
+
   it('aborts REVIEW and FAILED issues back to READY', async () => {
     const vaultRoot = await createVault();
     const reviewPath = await setIssueStatus(vaultRoot, 'VC-001', 'REVIEW');
