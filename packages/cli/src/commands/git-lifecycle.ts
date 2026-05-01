@@ -10,6 +10,7 @@ import {
   getKanbanBranchName,
   getKanbanWorktreePath,
   getStatusPorcelain,
+  GitRunner,
   isAncestor,
   mergeFfOnly,
   removeWorktree,
@@ -19,6 +20,7 @@ import type { CliIssue } from '../vault.js';
 
 export interface GitLifecycleResult {
   mergeInto: string;
+  cleanupWarning?: string;
 }
 
 interface ApproveFailureGuidanceInput {
@@ -30,10 +32,13 @@ interface ApproveFailureGuidanceInput {
   worktreePath: string;
   cause: unknown;
   localTargetDiverged?: boolean;
+  restoreWarning?: string;
 }
 
-export async function approveWithGit(issue: CliIssue): Promise<GitLifecycleResult> {
-  const runner = createNodeGitRunner();
+export async function approveWithGit(
+  issue: CliIssue,
+  runner: GitRunner = createNodeGitRunner(),
+): Promise<GitLifecycleResult> {
   const workingDir = requireWorkingDir(issue);
   await fetchOrigin(runner, workingDir);
   const target = await resolveExecutionTarget(runner, issue);
@@ -44,10 +49,12 @@ export async function approveWithGit(issue: CliIssue): Promise<GitLifecycleResul
   }
 
   const kanbanBranch = getKanbanBranchName(issue.id);
+  const originalBranch = await getCurrentBranch(runner, target.workingDir);
   await checkoutBranch(runner, target.workingDir, target.mergeInto);
   try {
     await mergeFfOnly(runner, target.workingDir, target.baseRef);
   } catch (error) {
+    const restoreWarning = await restoreOriginalBranch(runner, target.workingDir, originalBranch, target.mergeInto);
     throw new Error(formatApproveFailureGuidance({
       issueId: issue.id,
       workingDir: target.workingDir,
@@ -57,11 +64,13 @@ export async function approveWithGit(issue: CliIssue): Promise<GitLifecycleResul
       worktreePath,
       cause: error,
       localTargetDiverged: true,
+      restoreWarning,
     }));
   }
   try {
     await mergeFfOnly(runner, target.workingDir, kanbanBranch);
   } catch (error) {
+    const restoreWarning = await restoreOriginalBranch(runner, target.workingDir, originalBranch, target.mergeInto);
     throw new Error(formatApproveFailureGuidance({
       issueId: issue.id,
       workingDir: target.workingDir,
@@ -70,10 +79,20 @@ export async function approveWithGit(issue: CliIssue): Promise<GitLifecycleResul
       kanbanBranch,
       worktreePath,
       cause: error,
+      restoreWarning,
     }));
   }
-  await cleanupKanbanWorktree(runner, target.workingDir, issue.id);
-  return { mergeInto: target.mergeInto };
+  let cleanupWarning: string | undefined;
+  try {
+    await cleanupKanbanWorktree(runner, target.workingDir, issue.id);
+  } catch (error) {
+    cleanupWarning = formatCause(error);
+  }
+  cleanupWarning = appendWarning(
+    cleanupWarning,
+    await restoreOriginalBranch(runner, target.workingDir, originalBranch, target.mergeInto),
+  );
+  return { mergeInto: target.mergeInto, cleanupWarning };
 }
 
 export async function discardAbortWithGit(issue: CliIssue): Promise<GitLifecycleResult> {
@@ -131,9 +150,35 @@ async function exists(filePath: string): Promise<boolean> {
   }
 }
 
-async function branchExists(runner: ReturnType<typeof createNodeGitRunner>, repoPath: string, branchName: string): Promise<boolean> {
+async function branchExists(runner: GitRunner, repoPath: string, branchName: string): Promise<boolean> {
   const branchList = await runner.run(['branch', '--list', branchName], { cwd: repoPath });
   return branchList.stdout.trim() !== '';
+}
+
+async function getCurrentBranch(runner: GitRunner, repoPath: string): Promise<string | undefined> {
+  const result = await runner.run(['branch', '--show-current'], { cwd: repoPath });
+  return result.stdout.trim() || undefined;
+}
+
+async function restoreOriginalBranch(
+  runner: GitRunner,
+  repoPath: string,
+  originalBranch: string | undefined,
+  currentTargetBranch: string,
+): Promise<string | undefined> {
+  if (!originalBranch || originalBranch === currentTargetBranch) return undefined;
+  try {
+    await checkoutBranch(runner, repoPath, originalBranch);
+    return undefined;
+  } catch (error) {
+    return `failed to restore original branch ${originalBranch}: ${formatCause(error)}`;
+  }
+}
+
+function appendWarning(existing: string | undefined, next: string | undefined): string | undefined {
+  if (!existing) return next;
+  if (!next) return existing;
+  return `${existing}; ${next}`;
 }
 
 function formatApproveFailureGuidance(input: ApproveFailureGuidanceInput): string {
@@ -151,6 +196,9 @@ function formatApproveFailureGuidance(input: ApproveFailureGuidanceInput): strin
       `local target branch diverged from ${input.baseRef}; engine did not resolve local target divergence.`,
       'Resolve the local target branch first, then retry approve.',
     );
+  }
+  if (input.restoreWarning) {
+    lines.push(`restore_warning: ${input.restoreWarning}`);
   }
 
   lines.push(

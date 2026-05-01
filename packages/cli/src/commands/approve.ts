@@ -22,7 +22,9 @@ export const commandApprove: CliHandler = async (args, context) => {
   if (!flags.has('--mock-git')) {
     try {
       const result = await approveWithGit(issue);
-      logMessage = `Approved by ff-only merge into ${result.mergeInto}; worktree cleaned.`;
+      logMessage = result.cleanupWarning
+        ? `Approved by ff-only merge into ${result.mergeInto}; cleanup warning: ${result.cleanupWarning}`
+        : `Approved by ff-only merge into ${result.mergeInto}; worktree cleaned.`;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       return fail(`approve failed: ${message}`);
@@ -39,6 +41,7 @@ export const commandApprove: CliHandler = async (args, context) => {
     `issue: ${issue.id}`,
     'outcome: DONE',
     `completed: ${completedAt}`,
+    ...(logMessage.includes('cleanup warning:') ? [logMessage] : []),
   ].join('\n'));
 };
 

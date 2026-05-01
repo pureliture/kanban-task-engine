@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 
 type Check = {
   name: string;
@@ -20,7 +21,23 @@ type SuperpowerEval = {
   checks: Check[];
 };
 
+type TestGateCommand = {
+  command: string;
+  args: string[];
+  exitCode: number | null;
+  stdoutTail: string;
+  stderrTail: string;
+};
+
+type TestGate = {
+  enabled: boolean;
+  passed: boolean;
+  commands: TestGateCommand[];
+};
+
 const root = process.cwd();
+const argv = new Set(process.argv.slice(2));
+const withTests = argv.has('--with-tests');
 
 function file(relPath: string): string {
   return path.join(root, relPath);
@@ -65,6 +82,48 @@ function score(checks: Check[]): Pick<SuperpowerEval, 'deterministicScore' | 'pa
     total,
     deterministicScore: total === 0 ? 0 : Math.round((passed / total) * 100),
   };
+}
+
+function runTestGate(enabled: boolean): TestGate {
+  if (!enabled) {
+    return {
+      enabled: false,
+      passed: true,
+      commands: [],
+    };
+  }
+
+  const commands = [
+    { command: 'pnpm', args: ['-r', 'build'] },
+    { command: 'pnpm', args: ['-r', 'test'] },
+  ];
+  const results: TestGateCommand[] = [];
+
+  for (const command of commands) {
+    const result = spawnSync(command.command, command.args, {
+      cwd: root,
+      encoding: 'utf8',
+      maxBuffer: 20 * 1024 * 1024,
+    });
+    results.push({
+      command: command.command,
+      args: command.args,
+      exitCode: result.status,
+      stdoutTail: tail(result.stdout ?? ''),
+      stderrTail: tail(result.stderr ?? ''),
+    });
+    if (result.status !== 0) break;
+  }
+
+  return {
+    enabled: true,
+    passed: results.every(result => result.exitCode === 0) && results.length === commands.length,
+    commands: results,
+  };
+}
+
+function tail(content: string, max = 4000): string {
+  return content.length <= max ? content : content.slice(-max);
 }
 
 function planProgress(planFile: string): { checked: number; unchecked: number; score: number } {
@@ -254,6 +313,7 @@ const evals: SuperpowerEval[] = [];
 }
 
 const deterministicScore = Math.round(evals.reduce((sum, item) => sum + item.deterministicScore, 0) / evals.length);
+const testGate = runTestGate(withTests);
 const planFiles = [
   'docs/superpowers/plans/2026-04-23-kanban-spec-reconciliation.md',
   'docs/superpowers/plans/2026-04-23-kanban-schema-migration.md',
@@ -274,6 +334,7 @@ const result = {
     globalOverall,
     llmJudgeAverage: null as number | null,
     llmJudgeStatus: 'unavailable: no repo-local LLM judge command or credentials were found',
+    testGate,
   },
   global: {
     buildCommand: packageJson.scripts?.build ?? null,
@@ -292,6 +353,12 @@ if (process.argv.includes('--json')) {
   console.log(`Deterministic score: ${result.scoring.deterministicScore}%`);
   console.log(`Plan progress score: ${result.scoring.planProgressScore}%`);
   console.log(`LLM judge average: ${result.scoring.llmJudgeAverage ?? 'n/a'} (${result.scoring.llmJudgeStatus})`);
+  if (result.scoring.testGate.enabled) {
+    console.log(`Test gate: ${result.scoring.testGate.passed ? 'pass' : 'fail'}`);
+    for (const command of result.scoring.testGate.commands) {
+      console.log(`- ${command.command} ${command.args.join(' ')}: exit ${command.exitCode ?? 'null'}`);
+    }
+  }
   console.log('');
   console.log('| Superpower | Score | Plan progress | Passed | Local eval |');
   console.log('| --- | ---: | ---: | ---: | --- |');
@@ -307,6 +374,6 @@ if (process.argv.includes('--json')) {
   }
 }
 
-if (requiredFailures) {
+if (requiredFailures || !testGate.passed) {
   process.exitCode = 1;
 }

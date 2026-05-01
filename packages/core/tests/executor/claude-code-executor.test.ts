@@ -312,7 +312,7 @@ describe('runIssueWithClaude', () => {
       executable: 'claude-agent',
       args: ['-p', '@/tmp/prompt.md'],
       cwd: '/tmp/worktree',
-      timeoutMs: 5678,
+      timeoutMs: 1234,
       env: process.env,
     }));
   });

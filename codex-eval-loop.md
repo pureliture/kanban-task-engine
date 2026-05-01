@@ -334,6 +334,37 @@ kanban approve <legacy-issue-id>
 - `pnpm eval:superpowers`: PASS, global overall 100%, AgentRunner/Codex 21/21
 - fake Codex artifact smoke: PASS, `READY -> RUNNING -> REVIEW`, backend `codex`, checkpoint `4bfa9cf -> b7a2c0a`, `.ndjson`/`.log`/`.last-message.md` redaction 확인
 
+## Iteration 19: Claude Code 리뷰 hardening 반영
+
+대상: AgentRunner + Codex Target, Worktree Execution + CLI, eval harness
+
+변경:
+
+- `eval:superpowers:full`을 추가하고 `scripts/eval-superpowers.ts --with-tests`가 `pnpm -r build`와 `pnpm -r test`를 실제 실행하도록 했다.
+- `approveWithGit()`가 ff-only 실패 시 작업 전 브랜치로 복원하도록 하고, merge 성공 후 cleanup 실패는 `DONE` 전이를 막지 않는 `cleanupWarning`으로 반환하도록 했다.
+- `createClaudeAgentRunner()`를 native `AgentRunner`로 구현해 per-run `timeoutMs`가 runner default보다 우선되도록 했다.
+- legacy `adaptClaudeRunnerToAgent()`에는 2-argument compatibility bridge라 per-run timeout을 강제하지 않는다는 주석을 남겼다.
+
+RED 확인:
+
+- `pnpm --silent eval:superpowers --with-tests --json` 계약 확인: `testGate`가 없어 실패.
+- `pnpm --filter @kanban-task-engine/core test -- tests/executor/claude-code-executor.test.ts`: per-run timeout 기대값 불일치로 실패.
+- `pnpm --filter @kanban-task-engine/cli test -- tests/index.test.ts tests/git-lifecycle.test.ts`: approve 실패 후 current branch가 `main`에 남고 cleanup warning injectable test가 실패.
+
+GREEN 확인:
+
+- `pnpm --filter @kanban-task-engine/core test -- tests/executor/claude-code-executor.test.ts`: PASS, 203 core tests
+- `pnpm --filter @kanban-task-engine/cli test -- tests/index.test.ts tests/git-lifecycle.test.ts`: PASS, 47 CLI tests
+- `pnpm --silent eval:superpowers --with-tests --json`: PASS, `testGate.enabled=true`, `pnpm -r build` exit 0, `pnpm -r test` exit 0
+- `pnpm -r build`: PASS
+- `pnpm -r test`: PASS, 315 tests
+- `pnpm eval:superpowers`: PASS, global overall 100%, AgentRunner/Codex 21/21
+- `pnpm eval:superpowers:full`: PASS, global overall 100%, test gate PASS
+
+회귀:
+
+- 없음. LLM judge는 계속 `n/a`.
+
 ## 알려진 blocker / 비적용 점수
 
 - LLM judge: `n/a`. repo-local LLM judge command 또는 credential이 없다.
