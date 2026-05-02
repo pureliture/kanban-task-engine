@@ -3,6 +3,8 @@ import { PolicyEngine } from '../src/policy-engine';
 import { StateMachine } from '../src/state-machine';
 import { EventBus } from '../src/event-bus';
 import { CanonicalTaskModel } from '../src/types';
+import { assertAdapterAllowed } from '../src/runtime/adapter-policy';
+import { parseRecipeYaml } from '../src/recipes/recipe-loader';
 
 describe('PolicyEngine', () => {
   const baseTask: CanonicalTaskModel = {
@@ -102,5 +104,38 @@ describe('PolicyEngine', () => {
 
     await engine.onTransition(baseTask, 'READY');
     expect(errorHandler).toHaveBeenCalled();
+  });
+
+  it('denies adapters when deniedAdapters wins', () => {
+    expect(() => assertAdapterAllowed({
+      mode: 'work',
+      automationCanMoveIssues: false,
+      automationCanStartExecution: false,
+      externalSync: 'atlassian-only',
+      allowedAdapters: ['jira'],
+      deniedAdapters: ['codex'],
+      allowedExecutionRoots: [],
+      jira: { allowedHosts: ['your-company.atlassian.net'] },
+      writeBack: { allowedFields: ['sync.jira.key'], bodyAllowed: false },
+      allowedSideEffects: ['readIssue'],
+    }, 'codex', 'execute')).toThrow('Adapter codex is denied');
+  });
+
+  it('fails closed for unknown adapter ids from recipes', () => {
+    expect(() => parseRecipeYaml(`mode: work
+modules: []
+policy:
+  mode: work
+  allowedAdapters: [wat]
+  deniedAdapters: []
+  automationCanMoveIssues: false
+  automationCanStartExecution: false
+  externalSync: none
+  allowedExecutionRoots: []
+  writeBack:
+    allowedFields: []
+    bodyAllowed: false
+  allowedSideEffects: []
+`)).toThrow('Invalid adapter id');
   });
 });

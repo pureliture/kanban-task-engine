@@ -9,14 +9,12 @@ export interface IssueTransition {
 
 export const VALID_ISSUE_TRANSITIONS: IssueTransition[] = [
   { from: 'TODO', to: 'READY' },
-  { from: 'TODO', to: 'FAILED' },
   { from: 'READY', to: 'RUNNING' },
   { from: 'READY', to: 'TODO' },
   { from: 'RUNNING', to: 'REVIEW' },
   { from: 'RUNNING', to: 'FAILED' },
   { from: 'REVIEW', to: 'DONE' },
   { from: 'REVIEW', to: 'RUNNING' },
-  { from: 'REVIEW', to: 'FAILED' },
   { from: 'FAILED', to: 'READY' },
 ];
 

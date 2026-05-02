@@ -120,6 +120,7 @@ export function yamlToCanonical(yaml: Record<string, unknown>, filePath: string)
 }
 
 export function canonicalToYaml(task: CanonicalTaskModel): Record<string, unknown> {
+  const automation = canonicalAutomationToYaml(task.automation);
   const yaml: Record<string, unknown> = {
     id: task.task_ref.external_id,
     status: task.workflow.raw_status,
@@ -129,20 +130,41 @@ export function canonicalToYaml(task: CanonicalTaskModel): Record<string, unknow
     assignee: task.ownership.assignee,
     labels: task.classification.labels,
     project: task.task_ref.external_key,
-    automation: {
-      workspace: task.automation.workspace,
-      useAcp: task.automation.useAcp,
-      onEnter: task.automation.on_enter.map(normalizedToRawStatus),
-      policy_id: task.automation.policy_id,
-    },
+    automation,
     created: task.created,
     updated: task.updated ?? new Date().toISOString(),
     completed: task.completed,
   };
 
   if (task.planning.due_date) yaml.due_date = task.planning.due_date;
+  if (task.sync.jira) {
+    yaml.sync = { jira: task.sync.jira };
+  }
 
   return yaml;
+}
+
+function canonicalAutomationToYaml(taskAutomation: CanonicalTaskModel['automation']): Record<string, unknown> {
+  const automation: Record<string, unknown> = {
+    workspace: taskAutomation.workspace,
+    useAcp: taskAutomation.useAcp,
+    onEnter: taskAutomation.on_enter.map(normalizedToRawStatus),
+    policy_id: taskAutomation.policy_id,
+  };
+
+  if (taskAutomation.trigger !== undefined) {
+    automation.trigger = taskAutomation.trigger;
+  }
+  if (taskAutomation.allowedActions !== undefined) {
+    automation.allowedActions = taskAutomation.allowedActions;
+  }
+  for (const [key, value] of Object.entries(taskAutomation.extra ?? {})) {
+    if (automation[key] === undefined) {
+      automation[key] = value;
+    }
+  }
+
+  return automation;
 }
 
 function extractWorkspace(filePath: string): string {
@@ -185,17 +207,11 @@ export function markdownIssueToCanonical(content: string, filePath: string): Can
       reporter: '',
     },
     planning: {},
-    automation: {
-      policy_id: String(frontmatter.automation?.policy_id ?? 'default'),
-      on_enter: [],
-      on_exit: [],
-      execution_profile: 'standard',
-      workspace: frontmatter.project,
-      useAcp: frontmatter.executor === 'claude-code',
-    },
+    automation: buildCanonicalAutomation(frontmatter),
     sync: {
       last_synced_at: frontmatter.updated,
       last_source: 'local',
+      jira: frontmatter.sync?.jira,
     },
     created: frontmatter.created,
     updated: frontmatter.updated,
@@ -208,6 +224,94 @@ export function markdownIssueToCanonical(content: string, filePath: string): Can
   }
 
   return task;
+}
+
+type SerializableAutomationValue =
+  | string
+  | number
+  | boolean
+  | null
+  | SerializableAutomationValue[]
+  | { [key: string]: SerializableAutomationValue };
+
+function buildCanonicalAutomation(frontmatter: {
+  project: string;
+  executor: string;
+  automation?: Record<string, unknown>;
+}): CanonicalTaskModel['automation'] {
+  const source = frontmatter.automation ?? {};
+  const automation: CanonicalTaskModel['automation'] = {
+    policy_id: String(source.policy_id ?? 'default'),
+    on_enter: [],
+    on_exit: [],
+    execution_profile: 'standard',
+    workspace: frontmatter.project,
+    useAcp: frontmatter.executor === 'claude-code',
+  };
+
+  if (typeof source.trigger === 'string') {
+    automation.trigger = source.trigger;
+  }
+
+  if (Array.isArray(source.allowedActions) && source.allowedActions.every(action => typeof action === 'string')) {
+    automation.allowedActions = [...source.allowedActions];
+  }
+
+  const extra = collectAutomationExtra(source);
+  if (Object.keys(extra).length > 0) {
+    automation.extra = extra;
+  }
+
+  return automation;
+}
+
+function collectAutomationExtra(source: Record<string, unknown>): Record<string, SerializableAutomationValue> {
+  const knownKeys = new Set([
+    'policy_id',
+    'onEnter',
+    'on_enter',
+    'onExit',
+    'on_exit',
+    'triggerOnStatus',
+    'execution_profile',
+    'workspace',
+    'useAcp',
+    'trigger',
+    'allowedActions',
+  ]);
+  const extra: Record<string, SerializableAutomationValue> = {};
+  for (const [key, value] of Object.entries(source)) {
+    if (knownKeys.has(key)) continue;
+    const serializable = toSerializableAutomationValue(value);
+    if (serializable !== undefined) {
+      extra[key] = serializable;
+    }
+  }
+  return extra;
+}
+
+function toSerializableAutomationValue(value: unknown): SerializableAutomationValue | undefined {
+  if (value === null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    const values = value.map(toSerializableAutomationValue);
+    return values.every((entry): entry is SerializableAutomationValue => entry !== undefined) ? values : undefined;
+  }
+  if (isRecord(value)) {
+    const record: Record<string, SerializableAutomationValue> = {};
+    for (const [key, entry] of Object.entries(value)) {
+      const serializable = toSerializableAutomationValue(entry);
+      if (serializable === undefined) return undefined;
+      record[key] = serializable;
+    }
+    return record;
+  }
+  return undefined;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function mapTypeToCanonical(input: string): CanonicalTaskModel['classification']['issue_type'] {

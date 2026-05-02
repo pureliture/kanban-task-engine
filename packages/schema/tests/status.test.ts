@@ -17,6 +17,11 @@ describe('issue status schema', () => {
     expect(VALID_ISSUE_TRANSITIONS).toContainEqual({ from: 'RUNNING', to: 'FAILED' });
   });
 
+  it('does not expose FAILED as a default transition from TODO or REVIEW', () => {
+    expect(VALID_ISSUE_TRANSITIONS).not.toContainEqual({ from: 'TODO', to: 'FAILED' });
+    expect(VALID_ISSUE_TRANSITIONS).not.toContainEqual({ from: 'REVIEW', to: 'FAILED' });
+  });
+
   it('maps statuses to Jira hints', () => {
     expect(toJiraStatusHint('RUNNING')).toBe('In Progress');
     expect(toJiraStatusHint('FAILED')).toBe('Blocked');

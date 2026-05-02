@@ -21,10 +21,24 @@ export interface IssueFrontmatter {
   merge_into?: string;
   run_count?: number;
   automation?: Record<string, unknown>;
+  sync?: IssueSyncMetadata;
 }
 
 export type IssueType = 'epic' | 'task' | 'bug' | 'chore' | 'docs';
 export type Priority = 'P0' | 'P1' | 'P2' | 'P3';
+
+export interface IssueSyncMetadata {
+  jira?: {
+    key?: string;
+    status?: string;
+    exportedAt?: string;
+  };
+}
+
+export interface IssueRegistryValidationContext {
+  idPrefix?: string;
+  spaceType?: 'single' | 'container';
+}
 
 export interface ParsedIssueMarkdown {
   frontmatter: IssueFrontmatter;
@@ -76,12 +90,46 @@ export type ValidationResult<T> =
   | { ok: false; errors: string[] };
 
 const REQUIRED_FIELDS = ['id', 'title', 'type', 'status', 'executor', 'project', 'created', 'updated'] as const;
-const REQUIRED_SECTIONS_TASK = ['목적', '컨텍스트', 'Acceptance Criteria', '실행 힌트'] as const;
-const REQUIRED_SECTIONS_EPIC = ['목표', '범위', '성공 지표', '하위 티켓'] as const;
+const REQUIRED_SECTIONS_TASK = ['목적', '컨텍스트', 'Acceptance Criteria', '실행 힌트', '로그'] as const;
+const REQUIRED_SECTIONS_EPIC = ['목표', '범위', '성공 지표', '하위 티켓', '로그'] as const;
 const ISSUE_TYPES = ['epic', 'task', 'bug', 'chore', 'docs'] as const;
 const PRIORITIES = ['P0', 'P1', 'P2', 'P3'] as const;
 
 export function validateIssueFrontmatter(input: unknown): ValidationResult<IssueFrontmatter> {
+  return validateIssueFrontmatterInternal(input, {});
+}
+
+export function validateIssueFrontmatterForRegistry(
+  input: unknown,
+  context: IssueRegistryValidationContext,
+): ValidationResult<IssueFrontmatter> {
+  return validateIssueFrontmatterInternal(input, {
+    allowSingleSpaceEmptyProject: context.spaceType === 'single',
+    idPrefix: context.idPrefix,
+  });
+}
+
+export function validateIssueIdSegment(id: string): string[] {
+  const errors: string[] = [];
+  if (id.length === 0 || id.trim() !== id || id.trim() === '') {
+    errors.push('Invalid issue id: must be a non-empty path segment');
+  }
+  if (id === '.' || id === '..' || id.includes('/') || id.includes('\\') || id.includes('\u0000')) {
+    errors.push('Invalid issue id: must not contain path separators');
+  }
+  if (id.startsWith('-')) {
+    errors.push('Invalid issue id: must not start with hyphen');
+  }
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(id)) {
+    errors.push('Invalid issue id: contains unsupported characters');
+  }
+  return errors;
+}
+
+function validateIssueFrontmatterInternal(
+  input: unknown,
+  options: { allowSingleSpaceEmptyProject?: boolean; idPrefix?: string },
+): ValidationResult<IssueFrontmatter> {
   if (!isRecord(input)) {
     return { ok: false, errors: ['Frontmatter must be an object'] };
   }
@@ -89,8 +137,10 @@ export function validateIssueFrontmatter(input: unknown): ValidationResult<Issue
   const errors: string[] = [];
   for (const field of REQUIRED_FIELDS) {
     const v = input[field];
-    // Epic은 project를 빈 문자열로 허용, non-epic은 비허용.
-    if (field === 'project' && input.type === 'epic') continue;
+    const allowsEmptyProject = input.type === 'epic' || options.allowSingleSpaceEmptyProject === true;
+    if (field === 'project' && allowsEmptyProject && Object.prototype.hasOwnProperty.call(input, field)) {
+      continue;
+    }
     if (v === undefined || v === null || v === '') {
       errors.push(`Missing required field: ${field}`);
     }
@@ -102,7 +152,7 @@ export function validateIssueFrontmatter(input: unknown): ValidationResult<Issue
     }
   }
 
-  // project는 epic일 때 빈 문자열 허용
+  // project는 문자열이어야 하며, 빈 값 허용 여부는 required-field 검증에서 결정한다.
   if (input.project !== undefined && input.project !== null && typeof input.project !== 'string') {
     errors.push('Invalid field type: project must be a string');
   }
@@ -111,8 +161,24 @@ export function validateIssueFrontmatter(input: unknown): ValidationResult<Issue
     errors.push(`Invalid status: ${String(input.status)}`);
   }
 
+  if (typeof input.id === 'string') {
+    errors.push(...validateIssueIdSegment(input.id));
+    if (options.idPrefix && !input.id.startsWith(`${options.idPrefix}-`)) {
+      errors.push(`Invalid issue id: expected prefix ${options.idPrefix}`);
+    }
+  }
+
   if (typeof input.type === 'string' && !(ISSUE_TYPES as readonly string[]).includes(input.type)) {
     errors.push(`Invalid type: ${input.type}`);
+  }
+
+  if (input.type === 'epic') {
+    if (input.status !== undefined && input.status !== 'TODO' && input.status !== 'DONE') {
+      errors.push(`Invalid epic status: ${String(input.status)}`);
+    }
+    if (input.executor !== undefined && input.executor !== 'human') {
+      errors.push('Epic executor must be human');
+    }
   }
 
   if (input.priority !== undefined && typeof input.priority === 'string'
@@ -134,7 +200,7 @@ export function validateIssueFrontmatter(input: unknown): ValidationResult<Issue
     errors.push('Invalid field type: run_count must be a number');
   }
 
-  for (const field of ['syncTarget', 'jiraProject', 'jiraKey'] as const) {
+  for (const field of ['jiraKey', 'jiraStatus', 'exportedAt', 'syncTarget', 'jiraProject'] as const) {
     if (input[field] !== undefined) {
       errors.push(`Deprecated field is not supported: ${field}`);
     }
@@ -148,6 +214,10 @@ export function validateIssueFrontmatter(input: unknown): ValidationResult<Issue
 
   if (input.automation !== undefined && !isRecord(input.automation)) {
     errors.push('Invalid field type: automation must be an object');
+  }
+
+  if (input.sync !== undefined) {
+    validateSyncMetadata(input.sync, errors);
   }
 
   if (errors.length > 0) return { ok: false, errors };
@@ -271,6 +341,24 @@ function extractSections(body: string): Record<string, string> {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function validateSyncMetadata(input: unknown, errors: string[]): void {
+  if (!isRecord(input)) {
+    errors.push('Invalid field type: sync must be an object');
+    return;
+  }
+  if (input.jira !== undefined) {
+    if (!isRecord(input.jira)) {
+      errors.push('Invalid field type: sync.jira must be an object');
+      return;
+    }
+    for (const field of ['key', 'status', 'exportedAt'] as const) {
+      if (input.jira[field] !== undefined && typeof input.jira[field] !== 'string') {
+        errors.push(`Invalid field type: sync.jira.${field} must be a string`);
+      }
+    }
+  }
 }
 
 function requireRecord(input: Record<string, unknown>, field: string, errors: string[]): void {

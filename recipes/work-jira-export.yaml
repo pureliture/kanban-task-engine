@@ -1,0 +1,29 @@
+mode: work
+modules:
+  - parser
+  - validator
+  - jira-exporter
+  - audit-log
+policy:
+  allowedSideEffects:
+    - readIssue
+    - writeIssue
+    - writeEvent
+    - externalRequest
+  automationCanMoveIssues: false
+  automationCanStartExecution: false
+  externalSync: atlassian-only
+  allowedAdapters:
+    - jira
+  deniedAdapters:
+    - firebase
+    - openclaw
+    - claude-code
+    - codex
+    - cli
+  writeBack:
+    allowedFields:
+      - sync.jira.key
+      - sync.jira.status
+      - sync.jira.exportedAt
+    bodyAllowed: false

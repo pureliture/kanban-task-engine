@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { validatePath, getAllowedBasePaths, isPathWithinAllowed } from '../src/store/path-validator';
+import { resolveVaultPath } from '../src/store/vault-path';
+import fs from 'fs/promises';
+import os from 'os';
 import path from 'path';
 
 describe('path-validator', () => {
@@ -42,6 +45,32 @@ describe('path-validator', () => {
 
     it('should return false for disallowed paths', () => {
       expect(isPathWithinAllowed('/etc/passwd')).toBe(false);
+    });
+  });
+
+  describe('resolveVaultPath', () => {
+    it('rejects unsafe path segments', async () => {
+      for (const segment of ['..', '.', '', '   ', '/absolute', 'a/b', 'a\\b', `nul\0x`]) {
+        await expect(resolveVaultPath('/vault', 'issues', segment, 'escape.md'))
+          .rejects.toThrow('Unsafe vault path segment');
+      }
+    });
+
+    it('rejects symlink escapes from the vault root', async () => {
+      const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kanban-vault-'));
+      const outside = await fs.mkdtemp(path.join(os.tmpdir(), 'kanban-outside-'));
+      await fs.symlink(outside, path.join(root, 'issues-link'));
+
+      await expect(resolveVaultPath(root, 'issues-link', 'VC-001.md'))
+        .rejects.toThrow('Vault path escapes root');
+    });
+
+    it('allows non-existing writes below an existing safe parent', async () => {
+      const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kanban-vault-'));
+      await fs.mkdir(path.join(root, 'issues'));
+
+      await expect(resolveVaultPath(root, 'issues', 'VC-001.md'))
+        .resolves.toBe(path.join(root, 'issues', 'VC-001.md'));
     });
   });
 });

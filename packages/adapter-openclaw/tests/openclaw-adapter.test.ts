@@ -2,11 +2,23 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { OpenClawAdapter } from '../src/openclaw-adapter';
 import { ConfigAdapter, TokenExpiredError } from '../src/config-adapter';
 import { PersistentRateLimitQueue } from '../src/rate-limit-queue';
-import type { CanonicalTaskModel } from '@kanban-task-engine/core';
+import type { CanonicalTaskModel, RuntimePolicy } from '@kanban-task-engine/core';
 
 // Mock fetch
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
+
+const allowOpenClawPolicy: RuntimePolicy = {
+  mode: 'home',
+  automationCanMoveIssues: true,
+  automationCanStartExecution: true,
+  externalSync: 'home-automation',
+  allowedAdapters: ['openclaw'],
+  deniedAdapters: [],
+  allowedExecutionRoots: [],
+  writeBack: { allowedFields: [], bodyAllowed: false },
+  allowedSideEffects: ['startExecution', 'externalRequest'],
+};
 
 // Helper to create a minimal CanonicalTaskModel for testing
 function createMockTask(overrides: Partial<CanonicalTaskModel> = {}): CanonicalTaskModel {
@@ -46,10 +58,16 @@ describe('OpenClawAdapter', () => {
     mockQueue = new PersistentRateLimitQueue('/tmp/test-queue.json', { maxSize: 100 });
     await mockQueue.clear();
 
-    adapter = new OpenClawAdapter(mockConfig, mockQueue, 'https://gateway.test.local');
+    adapter = new OpenClawAdapter(mockConfig, mockQueue, 'https://gateway.test.local', {}, allowOpenClawPolicy);
   });
 
   describe('execute', () => {
+    it('requires RuntimePolicy before execution', async () => {
+      const unsafeAdapter = new OpenClawAdapter(mockConfig, mockQueue, 'https://gateway.test.local');
+      await expect(unsafeAdapter.execute(mockTask)).rejects.toThrow('OpenClawAdapter requires RuntimePolicy');
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
     it('should send task to gateway API', async () => {
       mockFetch.mockResolvedValue({
         ok: true,

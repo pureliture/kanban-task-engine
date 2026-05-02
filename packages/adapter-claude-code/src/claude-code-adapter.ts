@@ -1,4 +1,5 @@
 import { CliAdapter, CliAdapterConfig } from '@kanban-task-engine/adapter-cli';
+import type { RuntimePolicy } from '@kanban-task-engine/core';
 
 const DEFAULT_TIMEOUT_MS = 30 * 60 * 1000;
 
@@ -11,6 +12,6 @@ export function createClaudeCodeAdapterConfig(cwd: string): CliAdapterConfig {
   };
 }
 
-export function createClaudeCodeAdapter(cwd: string): CliAdapter {
-  return new CliAdapter(createClaudeCodeAdapterConfig(cwd));
+export function createClaudeCodeAdapter(cwd: string, policy: RuntimePolicy): CliAdapter {
+  return new CliAdapter(createClaudeCodeAdapterConfig(cwd), policy);
 }

@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   parseIssueMarkdown,
   validateIssueFrontmatter,
+  validateIssueFrontmatterForRegistry,
   validateCanonicalIssue,
   VALID_ISSUE_MARKDOWN,
   VALID_EPIC_MARKDOWN,
@@ -81,6 +82,27 @@ x
       expect(result.errors[0]).toContain('Invalid YAML frontmatter');
     }
   });
+
+  it('rejects task issues missing 로그 section', () => {
+    const markdown = VALID_ISSUE_MARKDOWN.replace(/\n## 로그\n[\s\S]*$/m, '\n');
+    const result = parseIssueMarkdown(markdown);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors).toContain('Missing required section: 로그');
+  });
+
+  it.each(['READY', 'RUNNING', 'REVIEW', 'FAILED'])('rejects epic status %s', status => {
+    const markdown = VALID_EPIC_MARKDOWN.replace('status: TODO', `status: ${status}`);
+    const result = parseIssueMarkdown(markdown);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.join('\n')).toContain('Invalid epic status');
+  });
+
+  it('rejects epic executor other than human', () => {
+    const markdown = VALID_EPIC_MARKDOWN.replace('executor: human', 'executor: codex');
+    const result = parseIssueMarkdown(markdown);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.join('\n')).toContain('Epic executor must be human');
+  });
 });
 
 describe('validateIssueFrontmatter', () => {
@@ -141,6 +163,90 @@ describe('validateIssueFrontmatter', () => {
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.errors.some(e => e.includes('Invalid field type: id'))).toBe(true);
+  });
+
+  it('rejects unsafe issue ids before path usage', () => {
+    const unsafeIds = ['../VC-001', 'VC/001', 'VC\\001', '.', '..', '', '   ', '-VC-001', 'VC-\u0000-001'];
+    for (const unsafeId of unsafeIds) {
+      const result = validateIssueFrontmatter({
+        id: unsafeId,
+        title: 'x',
+        type: 'task',
+        status: 'TODO',
+        executor: 'human',
+        project: 'kanban-task-engine',
+        created: '2026-05-02',
+        updated: '2026-05-02',
+      });
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.errors.join('\n')).toContain('Invalid issue id');
+    }
+  });
+
+  it('rejects registry idPrefix mismatch in registry-aware validation', () => {
+    const result = validateIssueFrontmatterForRegistry({
+      id: 'OC-001',
+      title: 'x',
+      type: 'task',
+      status: 'TODO',
+      executor: 'human',
+      project: 'kanban-task-engine',
+      created: '2026-05-02',
+      updated: '2026-05-02',
+    }, { idPrefix: 'VC', spaceType: 'container' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.join('\n')).toContain('Invalid issue id');
+  });
+
+  it('requires project to be present while allowing empty project for single-space registry validation', () => {
+    const missingProject = validateIssueFrontmatterForRegistry({
+      id: 'OC-001',
+      title: 'x',
+      type: 'task',
+      status: 'TODO',
+      executor: 'human',
+      created: '2026-05-02',
+      updated: '2026-05-02',
+    }, { idPrefix: 'OC', spaceType: 'single' });
+    expect(missingProject.ok).toBe(false);
+    if (!missingProject.ok) expect(missingProject.errors).toContain('Missing required field: project');
+
+    const emptyProject = validateIssueFrontmatterForRegistry({
+      id: 'OC-001',
+      title: 'x',
+      type: 'task',
+      status: 'TODO',
+      executor: 'human',
+      project: '',
+      created: '2026-05-02',
+      updated: '2026-05-02',
+    }, { idPrefix: 'OC', spaceType: 'single' });
+    expect(emptyProject.ok).toBe(true);
+  });
+
+  it('accepts namespaced Jira sync metadata but rejects flat Jira fields', () => {
+    expect(validateIssueFrontmatter({
+      id: 'VC-100',
+      title: 'x',
+      type: 'task',
+      status: 'TODO',
+      executor: 'human',
+      project: 'kanban-task-engine',
+      created: '2026-05-02',
+      updated: '2026-05-02',
+      sync: { jira: { key: 'AUTH-1', status: 'To Do', exportedAt: '2026-05-02T00:00:00.000Z' } },
+    }).ok).toBe(true);
+    expect(validateIssueFrontmatter({
+      id: 'VC-100',
+      title: 'x',
+      type: 'task',
+      status: 'TODO',
+      executor: 'human',
+      project: 'kanban-task-engine',
+      created: '2026-05-02',
+      updated: '2026-05-02',
+      jiraKey: 'AUTH-1',
+    }).ok).toBe(false);
   });
 });
 

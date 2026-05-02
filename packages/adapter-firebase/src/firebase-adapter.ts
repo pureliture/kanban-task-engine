@@ -1,6 +1,8 @@
 import {
+  assertAdapterAllowed,
   SyncTransport,
   SyncEvent,
+  RuntimePolicy,
 } from '@kanban-task-engine/core';
 import * as admin from 'firebase-admin';
 import { FirebaseListener, FirestoreListenerConfig } from './firebase-listener';
@@ -20,7 +22,8 @@ export class FirebaseAdapter implements SyncTransport {
   private handlers: ((event: SyncEvent) => void)[] = [];
   private connected = false;
 
-  constructor(config: FirebaseAdapterConfig) {
+  constructor(config: FirebaseAdapterConfig, private policy?: RuntimePolicy) {
+    this.assertPolicyAllowsFirebase('connect');
     this.config = config;
 
     this.app = admin.apps.length > 0
@@ -67,6 +70,7 @@ export class FirebaseAdapter implements SyncTransport {
   }
 
   async publish(event: SyncEvent): Promise<void> {
+    this.assertPolicyAllowsFirebase('externalRequest');
     const db = admin.firestore(this.app);
     const docRef = db.collection(this.config.collectionPath).doc(event.task_ref.external_id);
 
@@ -81,6 +85,7 @@ export class FirebaseAdapter implements SyncTransport {
   }
 
   async acknowledge(eventId: string): Promise<void> {
+    this.assertPolicyAllowsFirebase('externalRequest');
     // Mark the event as processed
     const db = admin.firestore(this.app);
     const ackRef = db.collection(`${this.config.collectionPath}_acks`).doc(eventId);
@@ -88,6 +93,7 @@ export class FirebaseAdapter implements SyncTransport {
   }
 
   async connect(): Promise<void> {
+    this.assertPolicyAllowsFirebase('connect');
     // Firebase Admin SDK connects on first use
     this.connected = true;
   }
@@ -102,6 +108,7 @@ export class FirebaseAdapter implements SyncTransport {
   }
 
   async health(): Promise<{ connected: boolean; latencyMs?: number }> {
+    this.assertPolicyAllowsFirebase('externalRequest');
     if (!this.connected) return { connected: false };
 
     const start = Date.now();
@@ -112,5 +119,12 @@ export class FirebaseAdapter implements SyncTransport {
     } catch {
       return { connected: false };
     }
+  }
+
+  private assertPolicyAllowsFirebase(action: string): void {
+    if (!this.policy) {
+      throw new Error('FirebaseAdapter requires RuntimePolicy');
+    }
+    assertAdapterAllowed(this.policy, 'firebase', action);
   }
 }

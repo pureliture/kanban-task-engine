@@ -1,3 +1,4 @@
+import { assertAdapterAllowed, type RuntimePolicy } from '@kanban-task-engine/core';
 import { JiraIssuePayload } from './jira-mapper';
 
 export interface JiraAdapterConfig {
@@ -17,10 +18,12 @@ export type JiraTransport = (url: string, init: RequestInit) => Promise<Response
 export class JiraAdapter {
   constructor(
     private config: JiraAdapterConfig,
-    private transport: JiraTransport = fetch
+    private transport: JiraTransport = fetch,
+    private policy?: RuntimePolicy
   ) {}
 
   async createIssue(payload: JiraIssuePayload): Promise<JiraAdapterResult> {
+    this.assertPolicyAllowsJira();
     if (this.config.dryRun) {
       return { dryRun: true, payload };
     }
@@ -39,5 +42,12 @@ export class JiraAdapter {
     }
     const data = await response.json() as { key?: string };
     return { dryRun: false, key: data.key, payload };
+  }
+
+  private assertPolicyAllowsJira(): void {
+    if (!this.policy) {
+      throw new Error('JiraAdapter requires RuntimePolicy');
+    }
+    assertAdapterAllowed(this.policy, 'jira', 'externalRequest');
   }
 }

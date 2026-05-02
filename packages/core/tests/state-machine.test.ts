@@ -39,6 +39,14 @@ describe('StateMachine', () => {
     it('rejects FAILED -> DONE', () => {
       expect(sm.canTransition('FAILED', 'DONE')).toBe(false);
     });
+
+    it('rejects TODO -> FAILED as a default transition', () => {
+      expect(sm.canTransition('TODO', 'FAILED')).toBe(false);
+    });
+
+    it('rejects REVIEW -> FAILED as a default transition', () => {
+      expect(sm.canTransition('REVIEW', 'FAILED')).toBe(false);
+    });
   });
 
   describe('task transition', () => {
@@ -69,10 +77,10 @@ describe('StateMachine', () => {
       expect(result.completed).toBeDefined();
     });
 
-    it('sets completed date on FAILED', () => {
+    it('does not set completed date on FAILED', () => {
       const runningTask = { ...baseTask, workflow: { ...baseTask.workflow, normalized_status: 'RUNNING' as NormalizedStatus } };
       const result = sm.transition(runningTask, 'FAILED');
-      expect(result.completed).toBeDefined();
+      expect(result.completed).toBeUndefined();
     });
 
     it('does not mutate the original task object', () => {
