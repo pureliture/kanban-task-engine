@@ -1,0 +1,58 @@
+<h2>한 페이지 시각화 레이아웃 옵션</h2>
+<p class="subtitle">어떤 구조가 정보를 더 잘 전달할까요?</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>좌우 병렬</h3>
+      <div class="mockup" style="margin:8px 0">
+        <div style="display:flex;gap:8px;font-size:11px">
+          <div style="flex:1;border:2px solid #4CAF50;padding:6px;border-radius:4px">
+            <div style="font-weight:bold;color:#4CAF50">아키텍처</div>
+            <div>Engine ↔ Vault<br/>Canonical JSON<br/>Adapters</div>
+          </div>
+          <div style="flex:1;border:2px solid #2196F3;padding:6px;border-radius:4px">
+            <div style="font-weight:bold;color:#2196F3">유스케이스</div>
+            <div>READY → RUNNING<br/>→ REVIEW → DONE<br/>Worktree Loop</div>
+          </div>
+        </div>
+      </div>
+      <p>병렬 비교. 한눈에 관계를 볼 수 있으나 공간이 좁음.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>상하 계층 (추천)</h3>
+      <div class="mockup" style="margin:8px 0">
+        <div style="font-size:11px">
+          <div style="border:2px solid #4CAF50;padding:6px;border-radius:4px;margin-bottom:4px">
+            <div style="font-weight:bold;color:#4CAF50">상단: 아키텍처 개요</div>
+            <div>Markdown → Parser → Canonical JSON → Adapters → External</div>
+          </div>
+          <div style="border:2px solid #2196F3;padding:6px;border-radius:4px">
+            <div style="font-weight:bold;color:#2196F3">하단: 유스케이스 흐름</div>
+            <div>Issue 생성 → Worktree 실행 → Commit → Review → 완료</div>
+          </div>
+        </div>
+      </div>
+      <p>읽기 자연스움. 상단 정적 구조, 하단 동적 흐름.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>중앙 허브 (radial)</h3>
+      <div class="mockup" style="margin:8px 0">
+        <div style="display:flex;justify-content:center;align-items:center;gap:12px;font-size:11px;min-height:80px">
+          <div style="border:2px solid #FF9800;padding:4px 8px;border-radius:4px">Home Vault</div>
+          <div style="border:3px solid #E91E63;padding:8px;border-radius:50%;font-weight:bold">Canonical<br/>JSON</div>
+          <div style="border:2px solid #FF9800;padding:4px 8px;border-radius:4px">Work Vault</div>
+          <div style="border:2px solid #9C27B0;padding:4px 8px;border-radius:4px">Jira Export</div>
+        </div>
+      </div>
+      <p>중앙 집중형. 모드 비교에 강하지만 순서를 보여주기 어려움.</p>
+    </div>
+  </div>
+</div>
