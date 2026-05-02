@@ -25,3 +25,8 @@ export { createGitCheckpointModule } from './modules/git-checkpoint-module';
 
 export { renderBoardMarkdown } from './boards/board-generator';
 export type { BoardIssue, RenderBoardOptions } from './boards/board-generator';
+export { loadRegistry, parseRegistryYaml, getRegistrySpace, listRegistrySpaces } from './store/registry';
+export type { VaultRegistry, RegistrySpace, RegistrySpaceType, RegistryProject } from './store/registry';
+export { allocateNextIssueId, parseIssueSequence } from './store/sequence';
+export type { AllocateIssueIdOptions } from './store/sequence';
+export * from './executor';

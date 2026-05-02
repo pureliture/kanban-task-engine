@@ -122,6 +122,15 @@ describe('validateIssueFrontmatter', () => {
     expect(result.ok).toBe(false);
   });
 
+  it('rejects deprecated Work/Jira frontmatter fields', () => {
+    const result = validateIssueFrontmatter({ ...base, syncTarget: 'jira', jiraProject: 'AUTH', jiraKey: 'AUTH-1' });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.errors).toContain('Deprecated field is not supported: syncTarget');
+    expect(result.errors).toContain('Deprecated field is not supported: jiraProject');
+    expect(result.errors).toContain('Deprecated field is not supported: jiraKey');
+  });
+
   it('rejects unknown status', () => {
     const result = validateIssueFrontmatter({ ...base, status: 'ACTIVE' });
     expect(result.ok).toBe(false);
