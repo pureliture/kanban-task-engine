@@ -322,15 +322,15 @@ kanban approve <legacy-issue-id>
 
 ## 결정론적 확인
 
-- `pnpm --filter @kanban-task-engine/core test -- tests/executor/run-issue.test.ts`: PASS, 199 core tests
+- `pnpm --filter @kanban-task-engine/core test -- tests/executor/run-issue.test.ts`: PASS, 203 core tests
 - `pnpm --filter @kanban-task-engine/core test -- tests/executor/agent-process.test.ts tests/executor/claude-code-executor.test.ts tests/executor/redaction.test.ts tests/executor/run-artifacts.test.ts tests/executor/worktree.test.ts tests/executor/run-issue.test.ts`: PASS, 199 core tests
 - `pnpm --filter @kanban-task-engine/core test -- tests/executor/agent-process.test.ts tests/executor/codex-runner.test.ts tests/executor/redaction.test.ts`: PASS, 202 core tests
 - `pnpm --filter @kanban-task-engine/core test -- tests/executor/agent-process.test.ts tests/executor/codex-runner.test.ts tests/executor/claude-code-executor.test.ts tests/executor/redaction.test.ts tests/executor/run-artifacts.test.ts tests/executor/worktree.test.ts tests/executor/run-issue.test.ts`: PASS, 203 core tests
 - `pnpm --filter @kanban-task-engine/core build`: PASS
-- `pnpm --filter @kanban-task-engine/cli test -- tests/index.test.ts tests/run-args.test.ts`: PASS, 45 CLI tests
+- `pnpm --filter @kanban-task-engine/cli test -- tests/index.test.ts tests/run-args.test.ts`: PASS, 50 CLI tests
 - `pnpm --silent eval:superpowers --json`: PASS, global overall 100%, AgentRunner/Codex 21/21
 - `pnpm -r build`: PASS
-- `pnpm -r test`: PASS, 313 tests
+- `pnpm -r test`: PASS, 318 tests
 - `pnpm eval:superpowers`: PASS, global overall 100%, AgentRunner/Codex 21/21
 - fake Codex artifact smoke: PASS, `READY -> RUNNING -> REVIEW`, backend `codex`, checkpoint `4bfa9cf -> b7a2c0a`, `.ndjson`/`.log`/`.last-message.md` redaction 확인
 
@@ -371,3 +371,47 @@ GREEN 확인:
 - real Codex dogfood: 이 환경에서 authenticated real `codex` binary로 실행하지 않았다.
 - real Claude dogfood: 이 환경에서 authenticated real `claude` CLI로 실행하지 않았다.
 - `pnpm -r lint`: workspace에 lint script는 있으나 `eslint`가 설치/구성되어 있지 않아 별도 setup 전에는 blocker로 남는다.
+
+## Iteration 20: 최종 리뷰 remediation 반영
+
+대상: AgentRunner + Codex Target, CLI backend resolution
+
+변경:
+
+- `runIssueWithAgent()`가 final issue write 성공 전에는 `run-<n>.json` metadata를 publish하지 않도록 artifact 순서를 조정했다.
+- metadata write 실패로 `FAILED`에 재수렴할 때 이전 `REVIEW` issue log가 남지 않도록 final issue write 전 issue snapshot을 재사용했다.
+- `parseRunArgs()`가 `cliAgent`를 구조화해서 반환하도록 하고, `commandRun()`의 `args.includes('--agent')` raw argv heuristic을 제거했다.
+- `resolveExecuteBackend()`를 추가해 CLI agent override가 issue frontmatter executor보다 우선한다는 contract를 unit test로 고정했다.
+
+RED 확인:
+
+- `pnpm --filter @kanban-task-engine/core test -- tests/executor/run-issue.test.ts`: final issue write 실패 시 `run-1.json`이 이미 존재해 실패.
+- `pnpm --filter @kanban-task-engine/cli test -- tests/run-args.test.ts`: `cliAgent`와 `resolveExecuteBackend()` contract가 없어 실패.
+- `! rg "args\\.includes\\('--agent'\\)" packages/cli/src/commands/run.ts`: 기존 heuristic match 때문에 실패.
+
+GREEN 확인:
+
+- `pnpm --filter @kanban-task-engine/core test -- tests/executor/run-issue.test.ts`: PASS, 203 core tests
+- `pnpm --filter @kanban-task-engine/core test -- tests/executor/run-issue.test.ts tests/executor/run-artifacts.test.ts tests/executor/claude-code-executor.test.ts`: PASS, 203 core tests
+- `pnpm --filter @kanban-task-engine/cli test -- tests/run-args.test.ts`: PASS, 50 CLI tests
+- `pnpm --filter @kanban-task-engine/cli test -- tests/run-args.test.ts tests/index.test.ts`: PASS, 50 CLI tests
+- `! rg "args\\.includes\\('--agent'\\)" packages/cli/src/commands/run.ts`: PASS, match 없음
+
+회귀:
+
+- `pnpm -r build`: PASS
+- `pnpm -r test`: PASS, 318 tests
+- `pnpm eval:superpowers:full`: PASS, global overall 100%, deterministic score 100%, AgentRunner/Codex 21/21, test gate PASS
+- `git diff --check`: PASS
+- LLM judge는 계속 `n/a`. repo-local LLM judge command 또는 credential이 없다.
+
+리뷰:
+
+- 구현 전 계획은 3개 subagent POV에서 재검토했고 P1 lifecycle, P2 CLI parser, TDD/plan sequencing 모두 승인됐다.
+- Task 1은 implementer, spec reviewer, code quality reviewer가 각각 확인했고 blocker 없음.
+- Task 2는 implementer, spec reviewer, code quality reviewer가 각각 확인했고 blocker 없음.
+
+알려진 잔여 위험:
+
+- real Codex/Claude dogfood는 authenticated runtime availability가 확립되지 않아 아직 `PENDING`이다.
+- `pnpm -r lint`는 workspace에 `eslint` 설치/구성이 없어 이번 완료 게이트에서 제외됐다.
