@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createCliContext } from '../src/context';
 import { runCli } from '../src';
-import { parseRunArgs, resolveRunBackend } from '../src/commands/run';
+import { parseRunArgs, resolveExecuteBackend, resolveRunBackend } from '../src/commands/run';
 
 describe('parseRunArgs', () => {
   it('parses inspect-only run', () => {
@@ -12,16 +12,41 @@ describe('parseRunArgs', () => {
   });
 
   it('defaults execute backend to claude-code', () => {
-    expect(parseRunArgs(['VC-001', '--execute'])).toEqual({
+    expect(parseRunArgs(['VC-001', '--execute'])).toStrictEqual({
       ok: true,
-      mode: { kind: 'execute', issueId: 'VC-001', backend: 'claude-code', mockFail: false },
+      mode: {
+        kind: 'execute',
+        issueId: 'VC-001',
+        backend: 'claude-code',
+        cliAgent: undefined,
+        mockFail: false,
+      },
     });
   });
 
   it('parses --execute --agent codex', () => {
-    expect(parseRunArgs(['VC-001', '--execute', '--agent', 'codex'])).toEqual({
+    expect(parseRunArgs(['VC-001', '--execute', '--agent', 'codex'])).toStrictEqual({
       ok: true,
-      mode: { kind: 'execute', issueId: 'VC-001', backend: 'codex', mockFail: false },
+      mode: {
+        kind: 'execute',
+        issueId: 'VC-001',
+        backend: 'codex',
+        cliAgent: 'codex',
+        mockFail: false,
+      },
+    });
+  });
+
+  it('preserves explicit claude-code CLI source', () => {
+    expect(parseRunArgs(['VC-001', '--execute', '--agent', 'claude-code'])).toStrictEqual({
+      ok: true,
+      mode: {
+        kind: 'execute',
+        issueId: 'VC-001',
+        backend: 'claude-code',
+        cliAgent: 'claude-code',
+        mockFail: false,
+      },
     });
   });
 
@@ -47,9 +72,9 @@ describe('parseRunArgs', () => {
   });
 
   it('maps --mock-executor to mock backend without real git', () => {
-    expect(parseRunArgs(['VC-001', '--mock-executor'])).toEqual({
+    expect(parseRunArgs(['VC-001', '--mock-executor'])).toStrictEqual({
       ok: true,
-      mode: { kind: 'execute', issueId: 'VC-001', backend: 'mock', mockFail: false },
+      mode: { kind: 'execute', issueId: 'VC-001', backend: 'mock', cliAgent: undefined, mockFail: false },
     });
   });
 
@@ -78,6 +103,28 @@ describe('parseRunArgs', () => {
       backend: 'codex',
     });
     expect(resolveRunBackend({})).toEqual({
+      ok: true,
+      backend: 'claude-code',
+    });
+  });
+
+  it('resolves execute backend from issue executor when CLI agent is absent', () => {
+    const parsed = parseRunArgs(['VC-001', '--execute']);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok || parsed.mode.kind !== 'execute') return;
+
+    expect(resolveExecuteBackend(parsed.mode, { executor: 'codex' })).toEqual({
+      ok: true,
+      backend: 'codex',
+    });
+  });
+
+  it('resolves execute backend from CLI agent before issue executor', () => {
+    const parsed = parseRunArgs(['VC-001', '--execute', '--agent', 'claude-code']);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok || parsed.mode.kind !== 'execute') return;
+
+    expect(resolveExecuteBackend(parsed.mode, { executor: 'codex' })).toEqual({
       ok: true,
       backend: 'claude-code',
     });

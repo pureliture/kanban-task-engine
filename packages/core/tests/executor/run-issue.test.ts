@@ -333,6 +333,8 @@ describe('runIssueWithAgent', () => {
     })).rejects.toThrow('issue write failed');
 
     expect(appendRunEvent).not.toHaveBeenCalled();
+    const metadataPath = path.join(vaultRoot, 'runs', '2026-04-24', 'VC-001', 'run-1.json');
+    await expect(fs.access(metadataPath)).rejects.toMatchObject({ code: 'ENOENT' });
     await expect(readExecutionLock(path.join(vaultRoot, 'runtime', 'current.lock'))).resolves.toBeNull();
   });
 
@@ -364,6 +366,7 @@ describe('runIssueWithAgent', () => {
     const updatedIssue = await fs.readFile(issuePath, 'utf8');
     expect(updatedIssue).toContain('status: FAILED');
     expect(updatedIssue).toContain('Artifact writing failed: metadata volume readonly');
+    expect(updatedIssue).not.toContain('run -> REVIEW');
     await expect(fs.access(result.metadataPath)).rejects.toMatchObject({ code: 'ENOENT' });
   });
 

@@ -172,7 +172,6 @@ export async function runIssueWithAgent(input: RunIssueWithAgentInput): Promise<
         formatRunLog(finalAgentResult, failureReason),
       );
       metadata = { ...metadata, logPath };
-      metadataPath = await artifacts.writeRunMetadata(input.vaultRoot, date, metadata);
     } catch (error) {
       outcome = 'FAILED';
       failureReason = `Artifact writing failed: ${errorMessage(error)}`;
@@ -188,15 +187,11 @@ export async function runIssueWithAgent(input: RunIssueWithAgentInput): Promise<
       } catch {
         // Keep final issue convergence independent of artifact durability.
       }
-      try {
-        metadataPath = await artifacts.writeRunMetadata(input.vaultRoot, date, metadata);
-      } catch {
-        // The issue log below records the artifact failure when metadata cannot be rewritten.
-      }
     }
 
-    const writeFinalIssueState = async () => {
-      const latest = await readIssueDocument(input.issuePath);
+    const issueBeforeFinalState = await readIssueDocument(input.issuePath);
+    const writeFinalIssueState = async (issue?: Awaited<ReturnType<typeof readIssueDocument>>) => {
+      const latest = issue ?? await readIssueDocument(input.issuePath);
       await writeIssueDocument(input.issuePath, {
         ...latest.frontmatter,
         status: outcome,
@@ -214,6 +209,26 @@ export async function runIssueWithAgent(input: RunIssueWithAgentInput): Promise<
     };
 
     await writeFinalIssueState();
+
+    try {
+      metadataPath = await artifacts.writeRunMetadata(input.vaultRoot, date, metadata);
+    } catch (error) {
+      outcome = 'FAILED';
+      failureReason = `Artifact writing failed: ${errorMessage(error)}`;
+      metadata = { ...metadata, outcome, logPath };
+      try {
+        logPath = await artifacts.writeRunLog(
+          input.vaultRoot,
+          date,
+          metadata,
+          formatRunLog(finalAgentResult, failureReason),
+        );
+        metadata = { ...metadata, logPath };
+      } catch {
+        // The final issue log below records the metadata failure when log rewrite is unavailable.
+      }
+      await writeFinalIssueState(issueBeforeFinalState);
+    }
 
     try {
       await artifacts.appendRunEvent(input.vaultRoot, date, {

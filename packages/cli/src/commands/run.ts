@@ -13,9 +13,11 @@ import { fail, ok, requireIssueId, type CliHandler, type CliResult } from '../in
 import { findIssueById } from '../vault.js';
 import { formatCleanupGuidanceLines } from './cleanup-guidance.js';
 
+export type CliAgentBackend = Exclude<AgentBackend, 'mock'>;
+
 export type RunMode =
   | { kind: 'inspect'; issueId: string }
-  | { kind: 'execute'; issueId: string; backend: AgentBackend; mockFail: boolean };
+  | { kind: 'execute'; issueId: string; backend: AgentBackend; cliAgent?: CliAgentBackend; mockFail: boolean };
 
 export type ParseRunArgsResult =
   | { ok: true; mode: RunMode }
@@ -44,12 +46,7 @@ export const commandRun: CliHandler = async (args, context) => {
 
   const displayWorkingDir = issue.workingDir ?? `~/Projects/${issue.project || issue.space}`;
   if (mode.kind === 'execute') {
-    const backendResult = mode.backend === 'mock'
-      ? { ok: true as const, backend: 'mock' as const }
-      : resolveRunBackend({
-        cliAgent: args.includes('--agent') ? mode.backend : undefined,
-        issueExecutor: issue.executor,
-      });
+    const backendResult = resolveExecuteBackend(mode, issue);
     if (!backendResult.ok) return fail(backendResult.message);
 
     const git = backendResult.backend === 'mock' ? createMockGitRunner() : createNodeGitRunner();
@@ -102,7 +99,7 @@ export function parseRunArgs(args: string[]): ParseRunArgsResult {
   let execute = false;
   let mockExecutor = false;
   let mockFail = false;
-  let agent: AgentBackend | undefined;
+  let agent: CliAgentBackend | undefined;
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
@@ -162,12 +159,29 @@ export function parseRunArgs(args: string[]): ParseRunArgsResult {
       kind: 'execute',
       issueId,
       backend: mockExecutor ? 'mock' : agent ?? 'claude-code',
+      cliAgent: agent,
       mockFail,
     },
   };
 }
 
-export function resolveRunBackend(input: { cliAgent?: AgentBackend; issueExecutor?: string }): ResolveRunBackendResult {
+export function resolveExecuteBackend(
+  mode: Extract<RunMode, { kind: 'execute' }>,
+  issue: { executor?: string },
+): ResolveRunBackendResult {
+  if (mode.backend === 'mock') {
+    return { ok: true, backend: 'mock' };
+  }
+  return resolveRunBackend({
+    cliAgent: mode.cliAgent,
+    issueExecutor: issue.executor,
+  });
+}
+
+export function resolveRunBackend(input: {
+  cliAgent?: CliAgentBackend;
+  issueExecutor?: string;
+}): ResolveRunBackendResult {
   if (input.cliAgent) {
     return { ok: true, backend: input.cliAgent };
   }
@@ -190,7 +204,7 @@ function cliResultToParseError(result: CliResult): ParseRunArgsResult {
   return { ok: false, message: result.stderr.trimEnd() };
 }
 
-function isAgentFlagBackend(value: string): value is Exclude<AgentBackend, 'mock'> {
+function isAgentFlagBackend(value: string): value is CliAgentBackend {
   return value === 'claude-code' || value === 'codex';
 }
 
