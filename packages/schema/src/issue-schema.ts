@@ -20,9 +20,6 @@ export interface IssueFrontmatter {
   working_dir?: string;
   merge_into?: string;
   run_count?: number;
-  syncTarget?: string;
-  jiraProject?: string;
-  jiraKey?: string;
   automation?: Record<string, unknown>;
 }
 
@@ -135,6 +132,12 @@ export function validateIssueFrontmatter(input: unknown): ValidationResult<Issue
 
   if (input.run_count !== undefined && typeof input.run_count !== 'number') {
     errors.push('Invalid field type: run_count must be a number');
+  }
+
+  for (const field of ['syncTarget', 'jiraProject', 'jiraKey'] as const) {
+    if (input[field] !== undefined) {
+      errors.push(`Deprecated field is not supported: ${field}`);
+    }
   }
 
   for (const field of ['epic', 'assignee', 'completed', 'working_dir', 'merge_into'] as const) {

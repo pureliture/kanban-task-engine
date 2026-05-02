@@ -63,6 +63,14 @@ describe('mapper', () => {
       expect(result.classification.issue_type).toBe('Bug');
     });
 
+    it('ignores deprecated issueType fallback', () => {
+      const result = yamlToCanonical(
+        { id: 'VC-002', issueType: 'bug', title: 'Legacy bug' },
+        '/workspace-vibe-coding/issues/VC-002.md',
+      );
+      expect(result.classification.issue_type).toBe('Task');
+    });
+
     it('maps type=epic to canonical Epic', () => {
       const result = yamlToCanonical(
         { id: 'VC-003', type: 'epic', title: 'An epic' },
