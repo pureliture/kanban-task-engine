@@ -3,3 +3,6 @@ dist/
 *.tsbuildinfo
 .vitest/
 .worktrees/
+boards/
+issues/
+codex-eval-loop.md
