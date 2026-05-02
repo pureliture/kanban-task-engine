@@ -13,3 +13,7 @@ policy:
     - startExecution
     - writeEvent
     - gitCommit
+  allowedAdapters:
+    - claude-code
+    - codex
+    - cli

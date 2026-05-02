@@ -2,9 +2,11 @@ import { CanonicalTaskModel, NormalizedStatus, StateTransition, TaskFilter, Task
 import { canonicalToYaml, markdownIssueToCanonical, rawStatusToNormalized } from './mapper';
 import { extractBody, serializeWithFrontmatter } from './frontmatter-utils';
 import { atomicWriteFile } from './fs-utils';
+import { resolveVaultPath } from './vault-path';
 import fs from 'fs/promises';
 import path from 'path';
 import { createHash } from 'crypto';
+import { validateIssueIdSegment } from '@kanban-task-engine/schema';
 
 function deepMerge<T>(target: T, patch: Partial<T>): T {
   const result = { ...target };
@@ -59,7 +61,7 @@ export class MarkdownStore implements TaskStore {
   }
 
   async saveTask(task: CanonicalTaskModel): Promise<void> {
-    const filePath = this.getIssueFilePath(task);
+    const filePath = await this.resolveIssueWritePath(task);
     const yamlData = canonicalToYaml(task);
 
     let body: string;
@@ -134,15 +136,11 @@ export class MarkdownStore implements TaskStore {
   }
 
   private async findIssueFile(issueId: string): Promise<string | null> {
-    for (const wsPath of this.workspacePaths) {
-      const issuesDir = path.join(wsPath, 'issues');
-      try {
-        const files = await fs.readdir(issuesDir);
-        const match = files.find(f => f.startsWith(issueId) && f.endsWith('.md'));
-        if (match) return path.join(issuesDir, match);
-      } catch { continue; }
-    }
-    return null;
+    const files = await this.getAllIssueFiles();
+    return files.find(filePath => {
+      const basename = path.basename(filePath);
+      return basename === `${issueId}.md` || basename.startsWith(`${issueId}-`);
+    }) ?? null;
   }
 
   private async getAllIssueFiles(): Promise<string[]> {
@@ -150,22 +148,56 @@ export class MarkdownStore implements TaskStore {
     for (const wsPath of this.workspacePaths) {
       const issuesDir = path.join(wsPath, 'issues');
       try {
-        const entries = await fs.readdir(issuesDir);
-        for (const entry of entries) {
-          if (entry.endsWith('.md') && !entry.startsWith('.')) {
-            files.push(path.join(issuesDir, entry));
-          }
-        }
+        files.push(...await this.collectIssueFiles(issuesDir));
       } catch { continue; }
     }
     return files;
   }
 
   private getIssueFilePath(task: CanonicalTaskModel): string {
-    const workspaceDir = task.automation.workspace ?? 'workspace';
+    const workspaceDir = this.workspacePaths[0] ?? 'workspace';
     const issuesDir = path.join(workspaceDir, 'issues');
-    const fileName = `${task.task_ref.external_id}-${this.slugify(task.summary)}.md`;
+    const fileName = this.getIssueFileName(task);
     return path.join(issuesDir, fileName);
+  }
+
+  private async resolveIssueWritePath(task: CanonicalTaskModel): Promise<string> {
+    const workspaceDir = this.workspacePaths[0] ?? 'workspace';
+    return resolveVaultPath(workspaceDir, 'issues', this.getIssueFileName(task));
+  }
+
+  private getIssueFileName(task: CanonicalTaskModel): string {
+    const idErrors = validateIssueIdSegment(task.task_ref.external_id);
+    if (idErrors.length > 0) {
+      throw new Error(idErrors.join('; '));
+    }
+    return `${task.task_ref.external_id}-${this.slugify(task.summary)}.md`;
+  }
+
+  private async collectIssueFiles(dirPath: string): Promise<string[]> {
+    const entries = await fs.readdir(dirPath, { withFileTypes: true });
+    const files: string[] = [];
+
+    for (const entry of entries as Array<string | { name: string; isDirectory(): boolean; isFile(): boolean }>) {
+      const name = typeof entry === 'string' ? entry : entry.name;
+      if (name.startsWith('.')) continue;
+
+      const entryPath = path.join(dirPath, name);
+      if (typeof entry !== 'string' && entry.isDirectory()) {
+        files.push(...await this.collectIssueFiles(entryPath));
+        continue;
+      }
+
+      if (typeof entry !== 'string' && !entry.isFile()) {
+        continue;
+      }
+
+      if (name.endsWith('.md')) {
+        files.push(entryPath);
+      }
+    }
+
+    return files;
   }
 
   private slugify(text: string): string {

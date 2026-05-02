@@ -3,6 +3,8 @@ import {
   ExecutionAdapter,
   ExecutionResult,
   ExecutionStatus,
+  assertAdapterAllowed,
+  RuntimePolicy,
   StateTransition,
 } from '@kanban-task-engine/core';
 import { buildExecutionPrompt, PromptOptions } from './prompt-builder';
@@ -22,7 +24,7 @@ export class CliAdapter implements ExecutionAdapter {
   private sessionManager: SessionManager;
   private config: CliAdapterConfig;
 
-  constructor(config: CliAdapterConfig) {
+  constructor(config: CliAdapterConfig, private policy?: RuntimePolicy) {
     this.config = config;
     this.sessionManager = new SessionManager({
       command: config.command,
@@ -34,6 +36,7 @@ export class CliAdapter implements ExecutionAdapter {
   }
 
   async execute(task: CanonicalTaskModel, transition: StateTransition): Promise<ExecutionResult> {
+    this.assertPolicyAllowsExecution();
     const prompt = buildExecutionPrompt(task, transition, this.config.promptOptions);
     const sessionId = `${task.task_ref.external_id}-${transition.to}-${Date.now()}`;
 
@@ -54,5 +57,12 @@ export class CliAdapter implements ExecutionAdapter {
 
   async cancel(sessionId: string): Promise<void> {
     await this.sessionManager.cancelSession(sessionId);
+  }
+
+  private assertPolicyAllowsExecution(): void {
+    if (!this.policy) {
+      throw new Error('CliAdapter requires RuntimePolicy');
+    }
+    assertAdapterAllowed(this.policy, 'cli', 'execute');
   }
 }

@@ -63,6 +63,9 @@ export interface Automation {
   execution_profile: ExecutionProfile;
   workspace?: string;
   useAcp?: boolean;
+  trigger?: string;
+  allowedActions?: string[];
+  extra?: Record<string, unknown>;
 }
 
 // === 동기화 ===
@@ -70,6 +73,11 @@ export interface Sync {
   last_synced_at: string;
   last_source: 'local' | 'github' | 'firebase';
   checksum?: string;
+  jira?: {
+    key?: string;
+    status?: string;
+    exportedAt?: string;
+  };
 }
 
 // === 전체 모델 ===

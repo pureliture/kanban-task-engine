@@ -4,6 +4,8 @@ Date: 2026-04-23
 Status: Draft for review
 Repository: `~/Projects/kanban-task-engine`
 
+> Superseded note (2026-05-02): 최신 runtime contract는 `docs/superpowers/specs/2026-05-02-kanban-system-hardening-spec.md`를 따른다. 이 문서는 vault layout과 Home/Work control-plane 배경으로 유지하되, no-change success는 `FAILED`, bare `kanban next`는 discovery-only, `kanban next --execute`는 execution trigger, Work metadata write-back은 `sync.jira.*`, `config/workspaces.json`은 migration-only legacy config라는 결정을 2026-05-02 spec이 supersede한다.
+
 ## 1. Summary
 
 The kanban system uses Markdown issue documents as the shared operational control plane. The same issue schema is used in Home and Work environments, but the automation policy and external adapters differ by environment.

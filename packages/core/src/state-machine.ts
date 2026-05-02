@@ -63,7 +63,7 @@ export class StateMachine {
         last_source: task.sync.last_source,
       },
       updated: new Date().toISOString(),
-      completed: newStatus === 'DONE' || newStatus === 'FAILED'
+      completed: newStatus === 'DONE'
         ? new Date().toISOString()
         : task.completed,
     };

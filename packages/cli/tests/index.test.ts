@@ -84,6 +84,11 @@ async function writeIssue(vaultRoot: string, relativePath: string, frontmatter: 
   await fs.writeFile(path.join(vaultRoot, relativePath), `---\n${lines.join('\n')}\n---\n\n## 목적\nx\n`);
 }
 
+async function writeActiveRecipe(vaultRoot: string, recipe: string): Promise<void> {
+  await fs.mkdir(path.join(vaultRoot, 'config'), { recursive: true });
+  await fs.writeFile(path.join(vaultRoot, 'config', 'active-recipe.yaml'), recipe, 'utf8');
+}
+
 async function setIssueStatus(vaultRoot: string, issueId: string, status: string): Promise<string> {
   const issuePath = path.join(vaultRoot, 'issues/vibe-coding/kanban-task-engine', `${issueId}.md`);
   const content = await fs.readFile(issuePath, 'utf8');
@@ -203,6 +208,73 @@ describe('cli', () => {
         baseCommit: 'mock-base',
         headCommit: 'mock-head',
       });
+  });
+
+  it('blocks execution before mutation when active Work recipe denies the backend', async () => {
+    const vaultRoot = await createVault();
+    const issuePath = path.join(vaultRoot, 'issues/vibe-coding/kanban-task-engine/VC-001.md');
+    await writeActiveRecipe(vaultRoot, `
+mode: work
+modules:
+  - parser
+  - validator
+policy:
+  allowedSideEffects:
+    - readIssue
+  automationCanMoveIssues: false
+  automationCanStartExecution: false
+  externalSync: atlassian-only
+  allowedAdapters:
+    - jira
+  deniedAdapters:
+    - cli
+    - claude-code
+    - codex
+  writeBack:
+    allowedFields:
+      - sync.jira.key
+    bodyAllowed: false
+`);
+
+    const result = await runCli(['run', 'VC-001', '--mock-executor'], createCliContext({ KANBAN_HOME: vaultRoot }));
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Adapter cli is denied');
+    expect(await fs.readFile(issuePath, 'utf8')).toContain('status: READY');
+    await expect(fs.access(path.join(vaultRoot, 'runs'))).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
+  it('blocks next --execute through the same active Work policy gate', async () => {
+    const vaultRoot = await createVault();
+    const issuePath = path.join(vaultRoot, 'issues/vibe-coding/kanban-task-engine/VC-001.md');
+    await writeActiveRecipe(vaultRoot, `
+mode: work
+modules:
+  - parser
+  - validator
+policy:
+  allowedSideEffects:
+    - readIssue
+  automationCanMoveIssues: false
+  automationCanStartExecution: false
+  externalSync: atlassian-only
+  allowedAdapters:
+    - jira
+  deniedAdapters:
+    - cli
+    - claude-code
+    - codex
+  writeBack:
+    allowedFields:
+      - sync.jira.key
+    bodyAllowed: false
+`);
+
+    const result = await runCli(['next', '--execute'], createCliContext({ KANBAN_HOME: vaultRoot }));
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Adapter claude-code is denied');
+    expect(await fs.readFile(issuePath, 'utf8')).toContain('status: READY');
   });
 
   it('runs mock executor for issue without merge_into using repository default branch', async () => {

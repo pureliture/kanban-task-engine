@@ -4,6 +4,8 @@
 상태: 구현 계획용 초안
 저장소: `~/Projects/kanban-task-engine`
 
+> Superseded note (2026-05-02): AgentRunner와 Codex backend lifecycle 배경은 이 문서가 유지하지만, 최신 runtime policy, adapter guard, CLI preflight, docs/CI gate는 `docs/superpowers/specs/2026-05-02-kanban-system-hardening-spec.md`를 따른다. no-change success가 `FAILED`로 수렴한다는 결정은 2026-05-02 spec에서도 확정되었고, bare `kanban next`와 `kanban next --execute`의 구분은 2026-05-02 spec이 최신 정본이다.
+
 ## 1. 요약
 
 `kanban run <id> --execute`는 현재 실행 backend를 Claude 전용 경로로 다룬다. MVP hardening loop에서는 같은 kanban lifecycle을 Codex 실행 대상으로도 돌릴 수 있어야 하며, 이를 위해 control-plane 의미를 다시 만들지 않고 실행 backend만 일반화한다.

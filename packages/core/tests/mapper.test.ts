@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { yamlToCanonical, canonicalToYaml, rawStatusToNormalized, normalizedToRawStatus } from '../src/store/mapper';
+import { VALID_ISSUE_MARKDOWN } from '@kanban-task-engine/schema';
+import {
+  yamlToCanonical,
+  canonicalToYaml,
+  rawStatusToNormalized,
+  normalizedToRawStatus,
+  markdownIssueToCanonical,
+} from '../src/store/mapper';
 
 describe('mapper', () => {
   describe('rawStatusToNormalized', () => {
@@ -153,6 +160,54 @@ describe('mapper', () => {
       const canonical = yamlToCanonical(original, '/workspace/issues/VC-001.md');
       const yaml = canonicalToYaml(canonical);
       expect(yaml.type).toBe('epic');
+    });
+  });
+
+  describe('markdownIssueToCanonical', () => {
+    it('preserves automation trigger, allowedActions, and extra metadata in canonical mapping', () => {
+      const markdown = VALID_ISSUE_MARKDOWN.replace('run_count: 0', `run_count: 0
+automation:
+  trigger: manual
+  allowedActions:
+    - transition
+    - execute
+  retryLimit: 2`);
+      const canonical = markdownIssueToCanonical(markdown, '/vault/issues/vibe-coding/kanban-task-engine/VC-006.md');
+      expect(canonical.automation).toMatchObject({
+        trigger: 'manual',
+        allowedActions: ['transition', 'execute'],
+        extra: { retryLimit: 2 },
+      });
+    });
+
+    it('roundtrips automation metadata and namespaced Jira metadata back to YAML', () => {
+      const markdown = VALID_ISSUE_MARKDOWN.replace('run_count: 0', `run_count: 0
+automation:
+  trigger: manual
+  allowedActions:
+    - transition
+    - execute
+  retryLimit: 2
+sync:
+  jira:
+    key: AUTH-1
+    status: To Do
+    exportedAt: 2026-05-02T00:00:00.000Z`);
+      const canonical = markdownIssueToCanonical(markdown, '/vault/issues/vibe-coding/kanban-task-engine/VC-006.md');
+      const yaml = canonicalToYaml(canonical);
+
+      expect(yaml.automation).toMatchObject({
+        trigger: 'manual',
+        allowedActions: ['transition', 'execute'],
+        retryLimit: 2,
+      });
+      expect(yaml.sync).toEqual({
+        jira: {
+          key: 'AUTH-1',
+          status: 'To Do',
+          exportedAt: '2026-05-02T00:00:00.000Z',
+        },
+      });
     });
   });
 });

@@ -134,13 +134,22 @@ function planProgress(planFile: string): { checked: number; unchecked: number; s
   return { checked, unchecked, score: total === 0 ? 0 : Math.round((checked / total) * 100) };
 }
 
-const spec = maybeRead('docs/superpowers/specs/2026-04-23-kanban-control-plane-design.md');
+const controlPlaneSpec = maybeRead('docs/superpowers/specs/2026-04-23-kanban-control-plane-design.md');
+const hardeningSpec = maybeRead('docs/superpowers/specs/2026-05-02-kanban-system-hardening-spec.md');
+const spec = controlPlaneSpec;
 const specSection8 = sectionBetween(spec, '## 8. Markdown Issue Schema', '## 9. Status Model');
 const issueSchema = maybeRead('packages/schema/src/issue-schema.ts');
 const mapper = maybeRead('packages/core/src/store/mapper.ts');
 const writeBack = maybeRead('packages/core/src/store/write-back.ts');
 const migrateTickets = maybeRead('scripts/migrate-tickets.ts');
-const packageJson = JSON.parse(read('package.json')) as { scripts?: Record<string, string> };
+const runtimeDocs = maybeRead('docs/kanban-runtime.md');
+const readme = maybeRead('README.md');
+const archiveIndex = maybeRead('docs/archive/README.md');
+const deployChecklist = maybeRead('docs/deploy-checklist.md');
+const ciWorkflow = maybeRead('.github/workflows/ci.yml');
+const gitignore = maybeRead('.gitignore');
+const boardCommand = maybeRead('packages/cli/src/commands/board.ts');
+const packageJson = JSON.parse(read('package.json')) as { packageManager?: string; scripts?: Record<string, string> };
 const corePackage = exists('packages/core/package.json')
   ? JSON.parse(read('packages/core/package.json')) as { dependencies?: Record<string, string>; devDependencies?: Record<string, string> }
   : { dependencies: {}, devDependencies: {} };
@@ -216,9 +225,9 @@ const evals: SuperpowerEval[] = [];
   const checks: Check[] = [
     { name: 'Board generator exists with tests', pass: exists('packages/core/src/boards/board-generator.ts') && exists('packages/core/tests/board-generator.test.ts') },
     { name: 'Jira mapper and adapter exist with tests', pass: exists('packages/adapter-jira/src/jira-mapper.ts') && exists('packages/adapter-jira/src/jira-adapter.ts') && exists('packages/adapter-jira/tests/jira-mapper.test.ts') },
-    { name: 'Runtime docs point to authoritative spec', pass: /authoritative design.*docs\/superpowers\/specs\/2026-04-23-kanban-control-plane-design\.md/i.test(maybeRead('docs/kanban-runtime.md')) },
+    { name: 'Runtime docs point to hardening contract and control-plane background', pass: /2026-05-02-kanban-system-hardening-spec\.md/.test(runtimeDocs) && /2026-04-23-kanban-control-plane-design\.md/.test(runtimeDocs) },
     { name: 'Migration script respects KANBAN_HOME', pass: /KANBAN_HOME/.test(migrateTickets) },
-    { name: 'Generated board files are present', pass: exists('boards/KANBAN.md') && exists('boards/vibe-coding/SPACE-KANBAN.md') },
+    { name: 'Generated board files are runtime artifacts, not committed fixtures', pass: /^boards\/$/m.test(gitignore) && /renderIssueBoard/.test(boardCommand) },
   ];
   evals.push({
     id: 'superpower-4',
@@ -312,6 +321,29 @@ const evals: SuperpowerEval[] = [];
   });
 }
 
+{
+  const checks: Check[] = [
+    { name: 'Hardening spec is loaded as eval input', pass: /Kanban Task Engine System Hardening Spec/.test(hardeningSpec) },
+    { name: 'README exposes operator headings', pass: ['Quick Start', 'Home And Work Modes', 'CLI', 'Recipes', 'Safety Model'].every(heading => new RegExp(`^## ${heading}$`, 'm').test(readme)) },
+    { name: 'Runtime guide documents no-change FAILED', pass: /no-change[\s\S]{0,160}FAILED/i.test(runtimeDocs) },
+    { name: 'Archive index maps older docs to 2026-05-02 spec', pass: /2026-04-23-kanban-control-plane-design\.md/.test(archiveIndex) && /2026-04-30-agent-runner-codex-target-design\.md/.test(archiveIndex) && /2026-05-02-kanban-system-hardening-spec\.md/.test(archiveIndex) },
+    { name: 'Deploy checklist covers rollback triggers and tech debt', pass: /Rollback Triggers/.test(deployChecklist) && /Tech Debt Triage/.test(deployChecklist) && /strict-architecture/.test(deployChecklist) },
+    { name: 'Root package pins pnpm and hardening eval', pass: packageJson.packageManager === 'pnpm@10.32.1' && packageJson.scripts?.['eval:hardening'] === 'node --import tsx scripts/check-hardening.ts' },
+    { name: 'CI runs build, test, superpowers, and hardening gates', pass: /node-version:\s*['"]?22['"]?/.test(ciWorkflow) && /corepack prepare pnpm@10\.32\.1 --activate/.test(ciWorkflow) && /pnpm -r build/.test(ciWorkflow) && /pnpm -r test/.test(ciWorkflow) && /pnpm eval:superpowers/.test(ciWorkflow) && /pnpm eval:hardening/.test(ciWorkflow) },
+    { name: 'Legacy workspace config is migration-only in docs', pass: /config\/workspaces\.json/.test([readme, runtimeDocs, archiveIndex].join('\n')) && /migration-only/i.test([readme, runtimeDocs, archiveIndex].join('\n')) },
+  ];
+  evals.push({
+    id: 'system-hardening-docs-ci',
+    name: 'System Hardening Docs + CI',
+    required: true,
+    dependencyOrder: 7,
+    planProgress: planProgress('docs/superpowers/plans/2026-05-02-kanban-system-hardening-plan.md'),
+    localEvalCommand: 'pnpm eval:hardening',
+    ...score(checks),
+    checks,
+  });
+}
+
 const deterministicScore = Math.round(evals.reduce((sum, item) => sum + item.deterministicScore, 0) / evals.length);
 const testGate = runTestGate(withTests);
 const planFiles = [
@@ -321,6 +353,7 @@ const planFiles = [
   'docs/superpowers/plans/2026-04-23-kanban-boards-work-cleanup-plan.md',
   'docs/superpowers/plans/2026-04-23-kanban-worktree-cli-plan.md',
   'docs/superpowers/plans/2026-04-30-agent-runner-codex-review-remediation-plan.md',
+  'docs/superpowers/plans/2026-05-02-kanban-system-hardening-plan.md',
 ];
 const planProgressScore = Math.round(planFiles.reduce((sum, planFile) => sum + planProgress(planFile).score, 0) / planFiles.length);
 const globalOverall = deterministicScore;

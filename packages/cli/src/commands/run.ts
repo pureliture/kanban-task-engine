@@ -9,8 +9,10 @@ import {
   type AgentRunner,
   type GitRunner,
 } from '@kanban-task-engine/core/executor';
+import { assertAdapterAllowed } from '@kanban-task-engine/core';
 import { fail, ok, requireIssueId, type CliHandler, type CliResult } from '../index.js';
 import { findIssueById } from '../vault.js';
+import { loadActiveRecipePolicy } from '../policy.js';
 import { formatCleanupGuidanceLines } from './cleanup-guidance.js';
 
 export type CliAgentBackend = Exclude<AgentBackend, 'mock'>;
@@ -48,6 +50,13 @@ export const commandRun: CliHandler = async (args, context) => {
   if (mode.kind === 'execute') {
     const backendResult = resolveExecuteBackend(mode, issue);
     if (!backendResult.ok) return fail(backendResult.message);
+
+    const policy = await loadActiveRecipePolicy(context);
+    try {
+      assertAdapterAllowed(policy, adapterIdForBackend(backendResult.backend), 'execute');
+    } catch (error) {
+      return fail(error instanceof Error ? error.message : String(error));
+    }
 
     const git = backendResult.backend === 'mock' ? createMockGitRunner() : createNodeGitRunner();
     let target;
@@ -242,4 +251,9 @@ function createAgentRunner(backend: AgentBackend, mockFail: boolean): AgentRunne
   if (backend === 'mock') return createMockAgentRunner(mockFail);
   if (backend === 'codex') return createCodexCliRunner();
   return adaptClaudeRunnerToAgent(createClaudeCliRunner());
+}
+
+function adapterIdForBackend(backend: AgentBackend): 'claude-code' | 'codex' | 'cli' {
+  if (backend === 'mock') return 'cli';
+  return backend;
 }

@@ -1,4 +1,4 @@
-import type { CanonicalTaskModel } from '@kanban-task-engine/core';
+import { assertAdapterAllowed, type CanonicalTaskModel, type RuntimePolicy } from '@kanban-task-engine/core';
 import type { GatewayCredentials, GatewayCompletionResponse } from './types';
 import { ConfigAdapter, TokenExpiredError } from './config-adapter';
 import { PersistentRateLimitQueue } from './rate-limit-queue';
@@ -21,7 +21,8 @@ export class OpenClawAdapter implements ExecutionAdapter {
     private config: ConfigAdapter,
     private queue: PersistentRateLimitQueue,
     private gatewayUrl: string,
-    private options: OpenClawAdapterOptions = {}
+    private options: OpenClawAdapterOptions = {},
+    private policy?: RuntimePolicy
   ) {
     this.model = options.model ?? 'claude-opus-4-7';
   }
@@ -29,6 +30,7 @@ export class OpenClawAdapter implements ExecutionAdapter {
   private readonly model: string;
 
   async execute(task: CanonicalTaskModel): Promise<GatewayCompletionResponse> {
+    this.assertPolicyAllowsExecution();
     const credentials = await this.config.getCredentials('gateway');
 
     try {
@@ -104,5 +106,12 @@ export class OpenClawAdapter implements ExecutionAdapter {
       'Trivial': 0
     };
     return priorityMap[task.classification.priority] ?? 40;
+  }
+
+  private assertPolicyAllowsExecution(): void {
+    if (!this.policy) {
+      throw new Error('OpenClawAdapter requires RuntimePolicy');
+    }
+    assertAdapterAllowed(this.policy, 'openclaw', 'execute');
   }
 }

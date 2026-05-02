@@ -9,6 +9,48 @@ export interface SessionConfig {
   timeout?: number;
 }
 
+const CHILD_ENV_ALLOWLIST = [
+  'PATH',
+  'HOME',
+  'USER',
+  'SHELL',
+  'TMPDIR',
+  'TEMP',
+  'TMP',
+  'LANG',
+  'LC_ALL',
+  'LC_CTYPE',
+  'TERM',
+  'TZ',
+  'LOGNAME',
+  'XDG_CONFIG_HOME',
+  'XDG_CACHE_HOME',
+  'OPENAI_API_KEY',
+  'ANTHROPIC_API_KEY',
+  'CLAUDE_CONFIG_DIR',
+  'CODEX_HOME',
+] as const;
+
+const CHILD_ENV_ALLOWLIST_SET = new Set<string>(CHILD_ENV_ALLOWLIST);
+
+function buildChildEnv(configEnv: Record<string, string> | undefined): NodeJS.ProcessEnv {
+  const childEnv: NodeJS.ProcessEnv = {};
+  for (const key of CHILD_ENV_ALLOWLIST) {
+    const value = process.env[key];
+    if (typeof value === 'string') {
+      childEnv[key] = value;
+    }
+  }
+
+  for (const [key, value] of Object.entries(configEnv ?? {})) {
+    if (CHILD_ENV_ALLOWLIST_SET.has(key)) {
+      childEnv[key] = value;
+    }
+  }
+
+  return childEnv;
+}
+
 interface ActiveSession {
   id: string;
   process: ChildProcess | null;
@@ -91,7 +133,7 @@ export class SessionManager {
 
       const childProcess = spawn(config.command, config.args ?? [], {
         cwd: config.cwd,
-        env: { ...process.env, ...config.env },
+        env: buildChildEnv(config.env),
         stdio: 'pipe',
       });
 

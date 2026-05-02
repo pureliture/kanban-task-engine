@@ -34,6 +34,7 @@ pnpm -F flow-weaver test로 회귀 확인. 기존 스타일 프리셋 재사용.
 
 ## 로그
 
+초기 작성.
 `;
 
 export const VALID_EPIC_MARKDOWN = `---
@@ -72,6 +73,7 @@ run_count: 0
 
 ## 로그
 
+초기 작성.
 `;
 
 export const INVALID_ISSUE_MISSING_목적 = `---
