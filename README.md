@@ -2,7 +2,24 @@
 
 Markdown issue vault를 source of truth로 두고 Home/Work 환경의 task lifecycle, board rendering, adapter policy, agent execution을 같은 schema로 다루는 TypeScript workspace입니다.
 
+엔진 저장소 자체에는 실제 이슈 상태(live state)가 없습니다. 실제 상태는 별도의 Vault 저장소에 살아있으며, 엔진은 로직, schema, runtime policy, adapter contract를 담당합니다.
+
 최신 runtime contract는 `docs/superpowers/specs/2026-05-02-kanban-system-hardening-spec.md`입니다. 2026-04-23 control-plane spec은 vault layout과 배경 설계 문서로 유지하되, no-change execution, `next --execute`, Work metadata, hardening CI 판단은 2026-05-02 spec을 따릅니다.
+
+## Architecture Overview
+
+![Architecture Overview](docs/design/kanban-task-engine-one-page.svg)
+
+<details>
+<summary>Architecture Detail (Text Version)</summary>
+
+- **Vault**: 별도 Git 저장소입니다. Markdown Issues, Boards, Templates, Recipes를 보관합니다.
+- **Engine**: 이 저장소입니다. `packages/core`, `packages/schema`, adapter packages, CLI, recipe/runtime policy를 제공합니다.
+- **External Systems / Interfaces**: OpenClaw, Jira, GitHub, Firebase, CLI 같은 외부 통합 또는 operator surface입니다.
+- **Data Flow**: Vault Markdown -> Engine parser/store -> Canonical JSON -> Adapter -> External System.
+- **Mode**: recipe의 `modules`와 `policy` 조합으로 결정되는 emergent property입니다. 코드에 hardcoded switch를 두지 않습니다.
+- **Canonical JSON**: 내부 contract입니다. 사람이 직접 편집하는 surface가 아닙니다.
+</details>
 
 ## Quick Start
 
@@ -53,6 +70,30 @@ Runtime recipe는 module ordering과 `RuntimePolicy`를 함께 정의합니다.
 
 Active recipe resolution은 `KANBAN_RECIPE`, `<vaultRoot>/config/active-recipe.yaml`, bundled Home assisted recipe 순서로 이루어져야 합니다.
 
+## Key Concepts
+
+| 개념 | 설명 |
+|---|---|
+| Markdown = SoT | `.md` 파일이 canonical JSON보다 상위의 source of truth입니다. |
+| Vault / Engine 분리 | Engine repo에는 live issue state가 없습니다. 상태는 Vault에 있습니다. |
+| Mode is emergent | recipe YAML의 `modules`와 `policy` 조합이 mode를 결정합니다. |
+| Canonical JSON | engine과 adapter 간 데이터 교환용 내부 contract입니다. |
+| Worktree execution | agent executor는 target repo 내부의 isolated worktree에서 작업합니다. |
+
+## Project Structure
+
+```text
+packages/
+├── core/          # Runtime, State Machine, Policy, Store, Executor
+├── schema/        # Frontmatter schema, Canonical JSON model
+├── adapter-claude-code/
+├── adapter-cli/
+├── adapter-firebase/
+├── adapter-github/
+├── adapter-jira/
+└── adapter-openclaw/
+```
+
 ## Safety Model
 
 Safety gate는 schema validation, registry-aware vault traversal, safe path containment, runtime policy, adapter guard, execution preflight, git checkpoint 순서로 겹쳐져야 합니다.
@@ -62,3 +103,12 @@ Safety gate는 schema validation, registry-aware vault traversal, safe path cont
 - Adapter는 `RuntimePolicy` 없이 permissive하게 동작하면 안 됩니다.
 - CI는 `pnpm -r build`, `pnpm -r test`, `pnpm eval:superpowers`, `pnpm eval:hardening`, `git diff --check`를 실행합니다.
 - 배포 전 확인은 `docs/deploy-checklist.md`를 따릅니다.
+
+## Documentation
+
+- [System Hardening Spec](docs/superpowers/specs/2026-05-02-kanban-system-hardening-spec.md)
+- [System Hardening Plan](docs/superpowers/plans/2026-05-02-kanban-system-hardening-plan.md)
+- [Runtime Guide](docs/kanban-runtime.md)
+- [Deploy Checklist](docs/deploy-checklist.md)
+- [Architecture Visualization Assets](docs/design/)
+- [Archived Design Index](docs/archive/README.md)
