@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 860" width="900" height="860" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <defs>
+    <style>
+      .label { font-size: 13px; font-weight: bold; }
+      .sublabel { font-size: 11px; }
+      .annotation { font-size: 10px; }
+      .panel-title { font-size: 12px; font-weight: bold; }
+      .arrow-label { font-size: 10px; fill: #666; }
+    </style>
+  </defs>
+
+  <!-- ====== VAULT ====== -->
+  <rect x="40" y="40" width="820" height="150" rx="8" fill="#F3E5F5" stroke="#9C27B0" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="60" y="62" class="label" fill="#7B1FA2">🏠 Vault (Live Issue State — separate Git repo)</text>
+
+  <rect x="60" y="85" width="220" height="80" rx="4" fill="#ffffff" stroke="#AB47BC"/>
+  <text x="170" y="115" text-anchor="middle" class="sublabel" fill="#333">Markdown Issues</text>
+  <text x="170" y="135" text-anchor="middle" class="sublabel" fill="#666">(.md + YAML frontmatter)</text>
+
+  <rect x="320" y="85" width="200" height="80" rx="4" fill="#ffffff" stroke="#AB47BC"/>
+  <text x="420" y="115" text-anchor="middle" class="sublabel" fill="#333">Boards & Templates</text>
+  <text x="420" y="135" text-anchor="middle" class="sublabel" fill="#666">kanban board config</text>
+
+  <rect x="560" y="85" width="280" height="80" rx="4" fill="#ffffff" stroke="#AB47BC"/>
+  <text x="700" y="115" text-anchor="middle" class="sublabel" fill="#333">Recipes</text>
+  <text x="700" y="135" text-anchor="middle" class="sublabel" fill="#666">(.yaml: mode label + modules + policy)</text>
+
+  <!-- ====== ENGINE ====== -->
+  <rect x="40" y="240" width="820" height="200" rx="8" fill="#E8F5E9" stroke="#4CAF50" stroke-width="2"/>
+  <text x="60" y="262" class="label" fill="#000000">⚙️ Engine (Logic Only — no live state)</text>
+
+  <rect x="60" y="285" width="220" height="130" rx="4" fill="#ffffff" stroke="#4CAF50"/>
+  <text x="170" y="310" text-anchor="middle" class="sublabel" fill="#333">packages/core</text>
+  <text x="170" y="335" text-anchor="middle" class="sublabel" fill="#666">Runtime, State Machine</text>
+  <text x="170" y="355" text-anchor="middle" class="sublabel" fill="#666">Policy, Store, Executor</text>
+
+  <rect x="320" y="285" width="200" height="130" rx="4" fill="#ffffff" stroke="#4CAF50"/>
+  <text x="420" y="310" text-anchor="middle" class="sublabel" fill="#333">packages/schema</text>
+  <text x="420" y="335" text-anchor="middle" class="sublabel" fill="#666">Frontmatter schema</text>
+  <text x="420" y="355" text-anchor="middle" class="sublabel" fill="#666">Canonical JSON model</text>
+
+  <rect x="560" y="285" width="280" height="130" rx="4" fill="#ffffff" stroke="#4CAF50"/>
+  <text x="700" y="310" text-anchor="middle" class="sublabel" fill="#333">Adapters</text>
+  <text x="700" y="335" text-anchor="middle" class="sublabel" fill="#666">openclaw · claude-code · jira</text>
+  <text x="700" y="355" text-anchor="middle" class="sublabel" fill="#666">cli · github · firebase</text>
+
+  <!-- ====== EXTERNAL ====== -->
+  <rect x="40" y="480" width="820" height="100" rx="8" fill="#E3F2FD" stroke="#2196F3" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="60" y="502" class="label" fill="#000000">🌐 External Systems / Interfaces</text>
+  <text x="80" y="535" class="sublabel" fill="#333">OpenClaw · Jira · GitHub · Firebase</text>
+  <text x="560" y="535" class="sublabel" fill="#333">CLI (User Interface)</text>
+
+  <!-- ====== ARROWS ====== -->
+  <line x1="450" y1="190" x2="450" y2="240" stroke="#666" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="460" y="218" class="arrow-label">parse → canonical JSON</text>
+
+  <line x1="450" y1="440" x2="450" y2="480" stroke="#666" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="460" y="468" class="arrow-label">adapter output</text>
+
+  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+  </marker>
+
+  <!-- ====== ANNOTATIONS ====== -->
+  <rect x="600" y="300" width="260" height="40" rx="4" fill="#FFF3E0" stroke="#FF9800"/>
+  <text x="610" y="325" class="annotation" fill="#BF360C">💡 Modes are emergent: recipe modules + policy</text>
+
+  <rect x="600" y="120" width="210" height="35" rx="4" fill="#FFF3E0" stroke="#FF9800"/>
+  <text x="610" y="143" class="annotation" fill="#BF360C">💡 No live state in engine repo</text>
+
+  <rect x="600" y="420" width="240" height="35" rx="4" fill="#FFF3E0" stroke="#FF9800"/>
+  <text x="610" y="443" class="annotation" fill="#BF360C">💡 Canonical JSON = internal contract</text>
+
+  <!-- ====== PANEL 1: ISSUE LIFECYCLE ====== -->
+  <rect x="40" y="620" width="260" height="220" rx="4" fill="#FAFAFA" stroke="#BDBDBD" stroke-dasharray="4,2"/>
+  <text x="170" y="640" text-anchor="middle" class="panel-title" fill="#333">Panel 1: Issue Lifecycle</text>
+
+  <rect x="60" y="660" width="70" height="30" rx="4" fill="#E0E0E0" stroke="#666"/>
+  <text x="95" y="680" text-anchor="middle" class="sublabel" fill="#333">Template</text>
+
+  <rect x="150" y="660" width="60" height="30" rx="4" fill="#FFF9C4" stroke="#FBC02D"/>
+  <text x="180" y="680" text-anchor="middle" class="sublabel" fill="#333">DRAFT</text>
+
+  <rect x="230" y="660" width="55" height="30" rx="4" fill="#BBDEFB" stroke="#1976D2"/>
+  <text x="257" y="680" text-anchor="middle" class="sublabel" fill="#333">OPEN</text>
+
+  <rect x="100" y="710" width="100" height="30" rx="4" fill="#C8E6C9" stroke="#388E3C"/>
+  <text x="150" y="730" text-anchor="middle" class="sublabel" fill="#333">IN_PROGRESS</text>
+
+  <rect x="80" y="760" width="60" height="30" rx="4" fill="#E8F5E9" stroke="#4CAF50"/>
+  <text x="110" y="780" text-anchor="middle" class="sublabel" fill="#333">DONE</text>
+
+  <rect x="160" y="760" width="60" height="30" rx="4" fill="#FFEBEE" stroke="#F44336"/>
+  <text x="190" y="780" text-anchor="middle" class="sublabel" fill="#333">FAILED</text>
+
+  <rect x="120" y="805" width="60" height="25" rx="4" fill="#E0E0E0" stroke="#666"/>
+  <text x="150" y="822" text-anchor="middle" class="sublabel" fill="#333">Archive</text>
+
+  <!-- Panel 1 arrows -->
+  <polyline points="130,675 150,675" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <polyline points="210,675 230,675" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <polyline points="257,690 257,710 200,710" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <polyline points="150,740 110,760" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <polyline points="150,740 190,760" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <polyline points="110,790 130,805" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <polyline points="190,790 170,805" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+
+  <!-- ====== PANEL 2: RECIPE → EXECUTION ====== -->
+  <rect x="320" y="620" width="260" height="220" rx="4" fill="#FAFAFA" stroke="#BDBDBD" stroke-dasharray="4,2"/>
+  <text x="450" y="640" text-anchor="middle" class="panel-title" fill="#333">Panel 2: Recipe → Execution Loop</text>
+
+  <rect x="340" y="660" width="90" height="50" rx="4" fill="#E0E0E0" stroke="#666"/>
+  <text x="385" y="678" text-anchor="middle" class="sublabel" fill="#333">Recipe YAML</text>
+  <text x="385" y="695" text-anchor="middle" class="sublabel" fill="#666">mode + policy</text>
+
+  <rect x="460" y="660" width="80" height="40" rx="4" fill="#D1C4E9" stroke="#7E57C2"/>
+  <text x="500" y="685" text-anchor="middle" class="sublabel" fill="#333">Module Loader</text>
+
+  <rect x="470" y="720" width="70" height="40" rx="4" fill="#C8E6C9" stroke="#388E3C"/>
+  <text x="505" y="745" text-anchor="middle" class="sublabel" fill="#333">Policy Check</text>
+
+  <rect x="350" y="720" width="90" height="45" rx="4" fill="#BBDEFB" stroke="#1976D2"/>
+  <text x="395" y="740" text-anchor="middle" class="sublabel" fill="#333">claude-code-</text>
+  <text x="395" y="755" text-anchor="middle" class="sublabel" fill="#333">executor</text>
+
+  <rect x="360" y="785" width="70" height="30" rx="4" fill="#FFF9C4" stroke="#FBC02D"/>
+  <text x="395" y="805" text-anchor="middle" class="sublabel" fill="#333">Worktree</text>
+
+  <rect x="480" y="785" width="55" height="22" rx="4" fill="#E8F5E9" stroke="#4CAF50"/>
+  <text x="507" y="800" text-anchor="middle" font-size="9" fill="#333">READY</text>
+
+  <rect x="480" y="812" width="55" height="22" rx="4" fill="#BBDEFB" stroke="#1976D2"/>
+  <text x="507" y="827" text-anchor="middle" font-size="9" fill="#333">RUNNING</text>
+
+  <rect x="480" y="837" width="55" height="22" rx="4" fill="#FFF9C4" stroke="#FBC02D"/>
+  <text x="507" y="852" text-anchor="middle" font-size="9" fill="#333">REVIEW</text>
+
+  <rect x="480" y="862" width="55" height="22" rx="4" fill="#E8F5E9" stroke="#4CAF50"/>
+  <text x="507" y="877" text-anchor="middle" font-size="9" fill="#333">DONE</text>
+
+  <!-- Panel 2 arrows -->
+  <polyline points="430,685 460,685" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <polyline points="500,700 505,720" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <polyline points="470,740 440,742" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <polyline points="395,765 395,785" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <polyline points="507,807 507,785" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <polyline points="507,832 507,812" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <polyline points="507,857 507,837" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+
+  <!-- ====== PANEL 3: WORK SCENARIO ====== -->
+  <rect x="600" y="620" width="260" height="220" rx="4" fill="#FAFAFA" stroke="#BDBDBD" stroke-dasharray="4,2"/>
+  <text x="730" y="640" text-anchor="middle" class="panel-title" fill="#333">Panel 3: Work Scenario (Jira Export)</text>
+
+  <rect x="620" y="665" width="80" height="40" rx="4" fill="#F3E5F5" stroke="#9C27B0"/>
+  <text x="660" y="685" text-anchor="middle" class="sublabel" fill="#333">Vault</text>
+  <text x="660" y="700" text-anchor="middle" class="sublabel" fill="#666">Markdown</text>
+
+  <rect x="730" y="665" width="80" height="40" rx="4" fill="#E8F5E9" stroke="#4CAF50"/>
+  <text x="770" y="685" text-anchor="middle" class="sublabel" fill="#333">Engine</text>
+  <text x="770" y="700" text-anchor="middle" class="sublabel" fill="#666">Parser</text>
+
+  <rect x="680" y="730" width="90" height="35" rx="4" fill="#E3F2FD" stroke="#2196F3"/>
+  <text x="725" y="752" text-anchor="middle" class="sublabel" fill="#333">adapter-jira</text>
+
+  <rect x="680" y="785" width="90" height="35" rx="4" fill="#BBDEFB" stroke="#1976D2"/>
+  <text x="725" y="807" text-anchor="middle" class="sublabel" fill="#333">Jira API</text>
+
+  <text x="790" y="750" class="sublabel" fill="#666" font-style="italic">one-way export</text>
+
+  <!-- Panel 3 arrows -->
+  <polyline points="700,685 730,685" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <polyline points="770,705 725,730" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <polyline points="725,765 725,785" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+</svg>
