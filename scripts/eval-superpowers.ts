@@ -63,6 +63,12 @@ function includesAll(content: string, patterns: RegExp[]): boolean {
   return patterns.every(pattern => pattern.test(content));
 }
 
+function appearsBefore(content: string, first: string, second: string): boolean {
+  const firstIndex = content.indexOf(first);
+  const secondIndex = content.indexOf(second);
+  return firstIndex >= 0 && secondIndex >= 0 && firstIndex < secondIndex;
+}
+
 function maybeReadAny(relPaths: string[]): string {
   return relPaths.map(maybeRead).join('\n');
 }
@@ -329,7 +335,7 @@ const evals: SuperpowerEval[] = [];
     { name: 'Archive index maps older docs to 2026-05-02 spec', pass: /2026-04-23-kanban-control-plane-design\.md/.test(archiveIndex) && /2026-04-30-agent-runner-codex-target-design\.md/.test(archiveIndex) && /2026-05-02-kanban-system-hardening-spec\.md/.test(archiveIndex) },
     { name: 'Deploy checklist covers rollback triggers and tech debt', pass: /Rollback Triggers/.test(deployChecklist) && /Tech Debt Triage/.test(deployChecklist) && /strict-architecture/.test(deployChecklist) },
     { name: 'Root package pins pnpm and hardening eval', pass: packageJson.packageManager === 'pnpm@10.32.1' && packageJson.scripts?.['eval:hardening'] === 'node --import tsx scripts/check-hardening.ts' },
-    { name: 'CI runs build, test, superpowers, and hardening gates', pass: /node-version:\s*['"]?22['"]?/.test(ciWorkflow) && /corepack prepare pnpm@10\.32\.1 --activate/.test(ciWorkflow) && /pnpm -r build/.test(ciWorkflow) && /pnpm -r test/.test(ciWorkflow) && /pnpm eval:superpowers/.test(ciWorkflow) && /pnpm eval:hardening/.test(ciWorkflow) },
+    { name: 'CI runs build, test, superpowers, and hardening gates', pass: /pnpm\/action-setup@v4/.test(ciWorkflow) && appearsBefore(ciWorkflow, 'pnpm/action-setup@v4', 'actions/setup-node@v4') && /node-version:\s*['"]?22['"]?/.test(ciWorkflow) && /pnpm -r build/.test(ciWorkflow) && /pnpm -r test/.test(ciWorkflow) && /pnpm eval:superpowers/.test(ciWorkflow) && /pnpm eval:hardening/.test(ciWorkflow) },
     { name: 'Legacy workspace config is migration-only in docs', pass: /config\/workspaces\.json/.test([readme, runtimeDocs, archiveIndex].join('\n')) && /migration-only/i.test([readme, runtimeDocs, archiveIndex].join('\n')) },
   ];
   evals.push({
