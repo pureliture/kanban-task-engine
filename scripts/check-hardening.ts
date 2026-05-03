@@ -46,6 +46,12 @@ function includesAll(content: string, patterns: RegExp[]): boolean {
   return patterns.every(pattern => pattern.test(content));
 }
 
+function appearsBefore(content: string, first: string, second: string): boolean {
+  const firstIndex = content.indexOf(first);
+  const secondIndex = content.indexOf(second);
+  return firstIndex >= 0 && secondIndex >= 0 && firstIndex < secondIndex;
+}
+
 function headingExists(content: string, heading: string): boolean {
   return new RegExp(`^## ${escapeRegExp(heading)}\\s*$`, 'm').test(content);
 }
@@ -139,8 +145,8 @@ const checks: Check[] = [
       /pull_request:/,
       /push:[\s\S]*branches:[\s\S]*main/,
       /fetch-depth:\s*0/,
+      /pnpm\/action-setup@v4/,
       /node-version:\s*['"]?22['"]?/,
-      /corepack prepare pnpm@10\.32\.1 --activate/,
       /cache:\s*['"]?pnpm['"]?/,
       /pnpm install --frozen-lockfile/,
       /git diff --check origin\/main\.\.\.HEAD/,
@@ -148,7 +154,7 @@ const checks: Check[] = [
       /pnpm -r test/,
       /pnpm eval:superpowers/,
       /pnpm eval:hardening/,
-    ]),
+    ]) && appearsBefore(ci, 'pnpm/action-setup@v4', 'actions/setup-node@v4'),
   },
   {
     name: 'package.json pins pnpm and exposes eval:hardening',
