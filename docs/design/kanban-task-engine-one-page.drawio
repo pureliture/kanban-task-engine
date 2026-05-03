@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mxfile host="app.diagrams.net" modified="2026-05-02T00:00:00.000Z" agent="Mozilla/5.0" version="24.0.0" etag="kanban-one-page" type="device">
-  <diagram name="Page-1" id="kanban-task-engine-one-page">
-    <mxGraphModel dx="0" dy="0" grid="10" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="900" math="0" shadow="0">
+<mxfile host="app.diagrams.net" modified="2026-05-02T00:00:00.000Z" agent="Mozilla/5.0" version="24.0.0" etag="kanban-one-page-v2" type="device">
+  <diagram name="Page-1" id="kanban-task-engine-one-page-v2">
+    <mxGraphModel dx="0" dy="0" grid="10" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
 
+        <!-- ==================== PAGE TITLE ==================== -->
+        <mxCell id="page-title" value="kanban-task-engine — System Map" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=18;" vertex="1" parent="1">
+          <mxGeometry x="40" y="10" width="400" height="30" as="geometry" />
+        </mxCell>
+
         <!-- ==================== VAULT ==================== -->
         <mxCell id="vault-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#9C27B0;strokeWidth=2;dashed=1;arcSize=6;" vertex="1" parent="1">
-          <mxGeometry x="40" y="40" width="820" height="150" as="geometry" />
+          <mxGeometry x="40" y="50" width="500" height="150" as="geometry" />
         </mxCell>
-        <mxCell id="vault-icon" value="🏠" style="text;html=1;align=left;verticalAlign=middle;fontSize=16;" vertex="1" parent="vault-box">
+        <mxCell id="vault-icon" value="🗂" style="text;html=1;align=left;verticalAlign=middle;fontSize=16;" vertex="1" parent="vault-box">
           <mxGeometry x="12" y="10" width="30" height="20" as="geometry" />
         </mxCell>
         <mxCell id="vault-label" value="Vault (Live Issue State — separate Git repo)" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=13;" vertex="1" parent="vault-box">
@@ -20,16 +25,16 @@
         <mxCell id="vault-md" value="Markdown Issues&lt;br/&gt;(.md + YAML frontmatter)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#AB47BC;fontSize=11;" vertex="1" parent="vault-box">
           <mxGeometry x="20" y="45" width="220" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="vault-boards" value="Boards &amp; Templates&lt;br/&gt;&lt;br/&gt;kanban board config" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#AB47BC;fontSize=11;" vertex="1" parent="vault-box">
-          <mxGeometry x="280" y="45" width="200" height="80" as="geometry" />
+        <mxCell id="vault-boards" value="Boards&lt;br/&gt;kanban config" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#AB47BC;fontSize=11;" vertex="1" parent="vault-box">
+          <mxGeometry x="260" y="45" width="100" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="vault-recipes" value="Recipes&lt;br/&gt;(.yaml: mode label +&lt;br/&gt;modules + policy)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#AB47BC;fontSize=11;" vertex="1" parent="vault-box">
-          <mxGeometry x="520" y="45" width="280" height="80" as="geometry" />
+        <mxCell id="vault-templates" value="Templates&lt;br/&gt;issue templates" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#AB47BC;fontSize=11;" vertex="1" parent="vault-box">
+          <mxGeometry x="380" y="45" width="100" height="80" as="geometry" />
         </mxCell>
 
         <!-- ==================== ENGINE ==================== -->
         <mxCell id="engine-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;strokeWidth=2;arcSize=6;" vertex="1" parent="1">
-          <mxGeometry x="40" y="240" width="820" height="200" as="geometry" />
+          <mxGeometry x="580" y="50" width="980" height="200" as="geometry" />
         </mxCell>
         <mxCell id="engine-icon" value="⚙️" style="text;html=1;align=left;verticalAlign=middle;fontSize=16;" vertex="1" parent="engine-box">
           <mxGeometry x="12" y="10" width="30" height="20" as="geometry" />
@@ -38,19 +43,36 @@
           <mxGeometry x="40" y="10" width="400" height="20" as="geometry" />
         </mxCell>
 
-        <mxCell id="engine-core" value="packages/core&lt;br/&gt;&lt;br/&gt;Runtime&lt;br/&gt;State Machine&lt;br/&gt;Policy&lt;br/&gt;Store&lt;br/&gt;Executor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;fontSize=11;" vertex="1" parent="engine-box">
-          <mxGeometry x="20" y="45" width="220" height="130" as="geometry" />
+        <mxCell id="engine-core" value="packages/core&lt;br/&gt;&lt;br/&gt;Runtime&lt;br/&gt;State Machine&lt;br/&gt;Policy, Store&lt;br/&gt;Executor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;fontSize=11;" vertex="1" parent="engine-box">
+          <mxGeometry x="20" y="45" width="180" height="110" as="geometry" />
         </mxCell>
-        <mxCell id="engine-schema" value="packages/schema&lt;br/&gt;&lt;br/&gt;Frontmatter&lt;br/&gt;schema&lt;br/&gt;Canonical JSON&lt;br/&gt;model" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;fontSize=11;" vertex="1" parent="engine-box">
-          <mxGeometry x="280" y="45" width="200" height="130" as="geometry" />
+        <mxCell id="engine-schema" value="packages/schema&lt;br/&gt;&lt;br/&gt;Frontmatter&lt;br/&gt;schema&lt;br/&gt;Canonical JSON" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;fontSize=11;" vertex="1" parent="engine-box">
+          <mxGeometry x="220" y="45" width="160" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="engine-recipes" value="recipes/&lt;br/&gt;&lt;br/&gt;.yaml&lt;br/&gt;mode label +&lt;br/&gt;modules + policy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;fontSize=11;" vertex="1" parent="engine-box">
+          <mxGeometry x="400" y="45" width="140" height="110" as="geometry" />
         </mxCell>
         <mxCell id="engine-adapters" value="Adapters&lt;br/&gt;&lt;br/&gt;openclaw&lt;br/&gt;claude-code&lt;br/&gt;jira · cli&lt;br/&gt;github · firebase" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;fontSize=11;" vertex="1" parent="engine-box">
-          <mxGeometry x="520" y="45" width="280" height="130" as="geometry" />
+          <mxGeometry x="560" y="45" width="160" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="engine-cli" value="packages/cli&lt;br/&gt;&lt;br/&gt;kanban run&lt;br/&gt;kanban sync&lt;br/&gt;kanban status" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;fontSize=11;" vertex="1" parent="engine-box">
+          <mxGeometry x="740" y="45" width="140" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- Engine internal annotation -->
+        <mxCell id="anno-state" value="⚠️ No live state in engine repo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;fontSize=10;" vertex="1" parent="engine-box">
+          <mxGeometry x="900" y="45" width="210" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="anno-mode" value="⚠️ Modes are emergent: recipe modules + policy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;fontSize=10;" vertex="1" parent="engine-box">
+          <mxGeometry x="900" y="90" width="260" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="anno-json" value="⚠️ Canonical JSON = internal contract" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;fontSize=10;" vertex="1" parent="engine-box">
+          <mxGeometry x="900" y="135" width="240" height="35" as="geometry" />
         </mxCell>
 
         <!-- ==================== EXTERNAL ==================== -->
         <mxCell id="ext-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#2196F3;strokeWidth=2;dashed=1;arcSize=6;" vertex="1" parent="1">
-          <mxGeometry x="40" y="480" width="820" height="100" as="geometry" />
+          <mxGeometry x="40" y="280" width="1520" height="80" as="geometry" />
         </mxCell>
         <mxCell id="ext-icon" value="🌐" style="text;html=1;align=left;verticalAlign=middle;fontSize=16;" vertex="1" parent="ext-box">
           <mxGeometry x="12" y="10" width="30" height="20" as="geometry" />
@@ -58,151 +80,148 @@
         <mxCell id="ext-label" value="External Systems / Interfaces" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=13;" vertex="1" parent="ext-box">
           <mxGeometry x="40" y="10" width="400" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="ext-services" value="OpenClaw · Jira · GitHub · Firebase" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;" vertex="1" parent="ext-box">
-          <mxGeometry x="20" y="45" width="400" height="30" as="geometry" />
+        <mxCell id="ext-openclaw" value="OpenClaw" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2196F3;fontSize=11;" vertex="1" parent="ext-box">
+          <mxGeometry x="20" y="40" width="100" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="ext-cli" value="CLI (User Interface)" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;" vertex="1" parent="ext-box">
-          <mxGeometry x="500" y="45" width="280" height="30" as="geometry" />
+        <mxCell id="ext-jira" value="Jira&lt;br/&gt;(Work only)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2196F3;fontSize=11;" vertex="1" parent="ext-box">
+          <mxGeometry x="140" y="40" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ext-github" value="GitHub" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2196F3;fontSize=11;" vertex="1" parent="ext-box">
+          <mxGeometry x="260" y="40" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ext-firebase" value="Firebase" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2196F3;fontSize=11;" vertex="1" parent="ext-box">
+          <mxGeometry x="360" y="40" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ext-cli" value="CLI&lt;br/&gt;(User Interface)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2196F3;fontSize=11;" vertex="1" parent="ext-box">
+          <mxGeometry x="1360" y="40" width="140" height="30" as="geometry" />
         </mxCell>
 
-        <!-- ==================== ARROWS ==================== -->
-        <mxCell id="arrow-v2e" value="parse → canonical JSON" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;" edge="1" parent="1" source="vault-box" target="engine-box">
+        <!-- ==================== ARROWS (Top Section) ==================== -->
+        <mxCell id="arrow-v2e" value="parse → canonical JSON" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;" edge="1" parent="1" source="vault-box" target="engine-box">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="arrow-e2ext" value="adapter output" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;" edge="1" parent="1" source="engine-box" target="ext-box">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- ==================== ANNOTATIONS ==================== -->
-        <mxCell id="anno-mode" value="💡 Modes are emergent: recipe modules + policy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;fontSize=10;" vertex="1" parent="1">
-          <mxGeometry x="600" y="300" width="260" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="anno-state" value="💡 No live state in engine repo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;fontSize=10;" vertex="1" parent="1">
-          <mxGeometry x="600" y="120" width="210" height="35" as="geometry" />
-        </mxCell>
-        <mxCell id="anno-json" value="💡 Canonical JSON = internal contract" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;fontSize=10;" vertex="1" parent="1">
-          <mxGeometry x="600" y="420" width="240" height="35" as="geometry" />
-        </mxCell>
-
         <!-- ==================== PANEL 1: ISSUE LIFECYCLE ==================== -->
         <mxCell id="panel1-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#BDBDBD;strokeWidth=1;arcSize=4;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="40" y="620" width="260" height="220" as="geometry" />
+          <mxGeometry x="40" y="400" width="480" height="220" as="geometry" />
         </mxCell>
-        <mxCell id="panel1-title" value="Panel 1: Issue Lifecycle" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=12;" vertex="1" parent="panel1-bg">
-          <mxGeometry x="10" y="8" width="240" height="18" as="geometry" />
-        </mxCell>
-
-        <mxCell id="p1-template" value="Template" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#666666;fontSize=10;" vertex="1" parent="panel1-bg">
-          <mxGeometry x="20" y="40" width="70" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="p1-draft" value="DRAFT" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#FBC02D;fontSize=10;" vertex="1" parent="panel1-bg">
-          <mxGeometry x="110" y="40" width="60" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="p1-open" value="OPEN" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;" vertex="1" parent="panel1-bg">
-          <mxGeometry x="185" y="40" width="55" height="30" as="geometry" />
+        <mxCell id="panel1-title" value="Panel 1: Issue Lifecycle (Status States)" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=12;" vertex="1" parent="panel1-bg">
+          <mxGeometry x="10" y="8" width="460" height="18" as="geometry" />
         </mxCell>
 
-        <mxCell id="p1-progress" value="IN_PROGRESS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=10;" vertex="1" parent="panel1-bg">
-          <mxGeometry x="80" y="90" width="100" height="30" as="geometry" />
+        <mxCell id="p1-todo" value="TODO" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#FBC02D;fontSize=10;" vertex="1" parent="panel1-bg">
+          <mxGeometry x="20" y="40" width="60" height="30" as="geometry" />
         </mxCell>
+        <mxCell id="p1-ready" value="READY" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;fontSize=10;" vertex="1" parent="panel1-bg">
+          <mxGeometry x="100" y="40" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-running" value="RUNNING" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;" vertex="1" parent="panel1-bg">
+          <mxGeometry x="180" y="40" width="70" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-review" value="REVIEW" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#FBC02D;fontSize=10;" vertex="1" parent="panel1-bg">
+          <mxGeometry x="270" y="40" width="60" height="30" as="geometry" />
+        </mxCell>
+
         <mxCell id="p1-done" value="DONE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;fontSize=10;" vertex="1" parent="panel1-bg">
-          <mxGeometry x="60" y="140" width="60" height="30" as="geometry" />
+          <mxGeometry x="360" y="40" width="50" height="30" as="geometry" />
         </mxCell>
         <mxCell id="p1-failed" value="FAILED" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#F44336;fontSize=10;" vertex="1" parent="panel1-bg">
-          <mxGeometry x="140" y="140" width="60" height="30" as="geometry" />
+          <mxGeometry x="360" y="90" width="50" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="p1-archive" value="Archive" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#666666;fontSize=10;" vertex="1" parent="panel1-bg">
-          <mxGeometry x="100" y="185" width="60" height="25" as="geometry" />
+
+        <mxCell id="p1-terminal-note" value="DONE / FAILED = terminal states" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#666666;" vertex="1" parent="panel1-bg">
+          <mxGeometry x="20" y="140" width="200" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-frontmatter-note" value="All transitions recorded in .md YAML frontmatter" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#666666;" vertex="1" parent="panel1-bg">
+          <mxGeometry x="20" y="165" width="300" height="18" as="geometry" />
         </mxCell>
 
         <!-- Panel 1 arrows -->
-        <mxCell id="p1-a1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel1-bg" source="p1-template" target="p1-draft">
+        <mxCell id="p1-a1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel1-bg" source="p1-todo" target="p1-ready">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="p1-a2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel1-bg" source="p1-draft" target="p1-open">
+        <mxCell id="p1-a2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel1-bg" source="p1-ready" target="p1-running">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="p1-a3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="panel1-bg" source="p1-open" target="p1-progress">
+        <mxCell id="p1-a3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel1-bg" source="p1-running" target="p1-review">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="p1-a4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="panel1-bg" source="p1-progress" target="p1-done">
+        <mxCell id="p1-a4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel1-bg" source="p1-review" target="p1-done">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="p1-a5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="panel1-bg" source="p1-progress" target="p1-failed">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="130" y="130" />
-              <mxPoint x="170" y="130" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="p1-a6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel1-bg" source="p1-done" target="p1-archive">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="p1-a7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel1-bg" source="p1-failed" target="p1-archive">
+        <mxCell id="p1-a5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="panel1-bg" source="p1-running" target="p1-failed">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
         <!-- ==================== PANEL 2: RECIPE → EXECUTION ==================== -->
         <mxCell id="panel2-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#BDBDBD;strokeWidth=1;arcSize=4;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="320" y="620" width="260" height="220" as="geometry" />
+          <mxGeometry x="560" y="400" width="480" height="220" as="geometry" />
         </mxCell>
         <mxCell id="panel2-title" value="Panel 2: Recipe → Execution Loop" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=12;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="10" y="8" width="240" height="18" as="geometry" />
+          <mxGeometry x="10" y="8" width="460" height="18" as="geometry" />
         </mxCell>
 
         <mxCell id="p2-recipe" value="Recipe YAML&lt;br/&gt;(mode + modules +&lt;br/&gt;policy)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#666666;fontSize=10;" vertex="1" parent="panel2-bg">
           <mxGeometry x="20" y="40" width="90" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="p2-loader" value="Module&lt;br/&gt;Loader" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1C4E9;strokeColor=#7E57C2;fontSize=10;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="140" y="40" width="80" height="40" as="geometry" />
+        <mxCell id="p2-modules" value="modules: [parser,&lt;br/&gt;validator, executor,&lt;br/&gt;audit-log, ...]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1C4E9;strokeColor=#7E57C2;fontSize=10;" vertex="1" parent="panel2-bg">
+          <mxGeometry x="140" y="40" width="120" height="50" as="geometry" />
         </mxCell>
         <mxCell id="p2-policy" value="Policy&lt;br/&gt;Check" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=10;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="150" y="100" width="70" height="40" as="geometry" />
+          <mxGeometry x="290" y="40" width="70" height="40" as="geometry" />
         </mxCell>
         <mxCell id="p2-executor" value="claude-code-&lt;br/&gt;executor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="30" y="105" width="90" height="45" as="geometry" />
+          <mxGeometry x="20" y="110" width="90" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="p2-worktree" value="Worktree" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#FBC02D;fontSize=10;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="40" y="165" width="70" height="30" as="geometry" />
+        <mxCell id="p2-worktree" value="Worktree&quot; style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#FBC02D;fontSize=10;" vertex="1" parent="panel2-bg">
+          <mxGeometry x="140" y="115" width="70" height="30" as="geometry" />
         </mxCell>
 
-        <mxCell id="p2-ready" value="READY" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;fontSize=9;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="160" y="165" width="55" height="22" as="geometry" />
+        <mxCell id="p2-ready" value="READY" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;fontSize=10;" vertex="1" parent="panel2-bg">
+          <mxGeometry x="290" y="110" width="55" height="22" as="geometry" />
         </mxCell>
-        <mxCell id="p2-running" value="RUNNING" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=9;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="160" y="192" width="55" height="22" as="geometry" />
+        <mxCell id="p2-running" value="RUNNING" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;" vertex="1" parent="panel2-bg">
+          <mxGeometry x="290" y="137" width="55" height="22" as="geometry" />
         </mxCell>
-        <mxCell id="p2-review" value="REVIEW" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#FBC02D;fontSize=9;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="160" y="219" width="55" height="22" as="geometry" />
+        <mxCell id="p2-review" value="REVIEW" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#FBC02D;fontSize=10;" vertex="1" parent="panel2-bg">
+          <mxGeometry x="290" y="164" width="55" height="22" as="geometry" />
         </mxCell>
-        <mxCell id="p2-done" value="DONE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;fontSize=9;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="160" y="246" width="55" height="22" as="geometry" />
+        <mxCell id="p2-done" value="DONE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;fontSize=10;" vertex="1" parent="panel2-bg">
+          <mxGeometry x="290" y="191" width="55" height="22" as="geometry" />
         </mxCell>
 
         <!-- Panel 2 arrows -->
-        <mxCell id="p2-a1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel2-bg" source="p2-recipe" target="p2-loader">
+        <mxCell id="p2-a1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel2-bg" source="p2-recipe" target="p2-modules">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="p2-a2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="panel2-bg" source="p2-loader" target="p2-policy">
+        <mxCell id="p2-a2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel2-bg" source="p2-modules" target="p2-policy">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="p2-a3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel2-bg" source="p2-policy" target="p2-executor">
+        <mxCell id="p2-a3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="panel2-bg" source="p2-policy" target="p2-executor">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="p2-a4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="panel2-bg" source="p2-executor" target="p2-worktree">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="p2-a5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="panel2-bg" source="p2-ready" target="p2-running">
+        <mxCell id="p2-a5" value="kanban run" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;" edge="1" parent="panel2-bg" source="p2-ready" target="p2-running">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-a6" value="exit 0" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;" edge="1" parent="panel2-bg" source="p2-running" target="p2-review">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-a7" value="kanban approve" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;" edge="1" parent="panel2-bg" source="p2-review" target="p2-done">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
         <!-- ==================== PANEL 3: WORK SCENARIO ==================== -->
         <mxCell id="panel3-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#BDBDBD;strokeWidth=1;arcSize=4;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="600" y="620" width="260" height="220" as="geometry" />
+          <mxGeometry x="1080" y="400" width="480" height="220" as="geometry" />
         </mxCell>
         <mxCell id="panel3-title" value="Panel 3: Work Scenario (Jira Export)" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=12;" vertex="1" parent="panel3-bg">
-          <mxGeometry x="10" y="8" width="240" height="18" as="geometry" />
+          <mxGeometry x="10" y="8" width="460" height="18" as="geometry" />
         </mxCell>
 
         <mxCell id="p3-vault" value="Vault&lt;br/&gt;Markdown" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#9C27B0;fontSize=10;" vertex="1" parent="panel3-bg">
@@ -217,7 +236,7 @@
         <mxCell id="p3-jira" value="Jira API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;" vertex="1" parent="panel3-bg">
           <mxGeometry x="80" y="165" width="90" height="35" as="geometry" />
         </mxCell>
-        <mxCell id="p3-oneway" value="one-way export" style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontStyle=2;fontColor=#666666;" vertex="1" parent="panel3-bg">
+        <mxCell id="p3-oneway" value="one-way export" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#666666;" vertex="1" parent="panel3-bg">
           <mxGeometry x="180" y="110" width="70" height="20" as="geometry" />
         </mxCell>
 
