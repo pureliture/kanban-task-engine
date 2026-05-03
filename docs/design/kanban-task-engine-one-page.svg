@@ -1,208 +1,287 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="&#39;JetBrains Mono&#39;, &#39;Fira Mono&#39;, &#39;Consolas&#39;, monospace">
   <defs>
-    <style>
-      .page-title { font-size: 18px; font-weight: bold; }
-      .label { font-size: 13px; font-weight: bold; }
-      .sublabel { font-size: 11px; }
-      .annotation { font-size: 10px; }
-      .panel-title { font-size: 12px; font-weight: bold; }
-      .arrow-label { font-size: 10px; fill: #666; }
-      .note { font-size: 9px; font-style: italic; fill: #666; }
-    </style>
-    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+    
+    <marker id="arr" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 9 3, 0 6" fill="#555"></polygon>
+    </marker>
+    <marker id="arr-red" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 9 3, 0 6" fill="#c62828"></polygon>
     </marker>
   </defs>
 
-  <!-- ====== PAGE TITLE ====== -->
-  <text x="40" y="28" class="page-title" fill="#333">kanban-task-engine — System Map</text>
+  
+  <text x="20" y="24" class="page-title" fill="#1a1a1a">kanban-task-engine — System Map</text>
+  <text x="20" y="40" font-size="10" fill="#777">packages/schema/src/status.ts 기준 8개 전이 · 2026-05-03</text>
 
-  <!-- ====== VAULT ====== -->
-  <rect x="40" y="50" width="500" height="150" rx="8" fill="#F3E5F5" stroke="#9C27B0" stroke-width="2" stroke-dasharray="8,4"/>
-  <text x="60" y="72" class="label" fill="#7B1FA2">🗂 Vault (Live Issue State — separate Git repo)</text>
+  
+  <rect x="16" y="52" width="460" height="148" rx="8" fill="#F3E5F5" stroke="#9C27B0" stroke-width="2" stroke-dasharray="8,4"></rect>
+  <text x="36" y="72" class="zone-label" fill="#6a1b9a">🗂  Vault — Live Issue State (별도 Git 저장소)</text>
 
-  <rect x="60" y="95" width="220" height="80" rx="4" fill="#ffffff" stroke="#AB47BC"/>
-  <text x="170" y="125" text-anchor="middle" class="sublabel" fill="#333">Markdown Issues</text>
-  <text x="170" y="145" text-anchor="middle" class="sublabel" fill="#666">(.md + YAML frontmatter)</text>
+  <rect x="28" y="82" width="170" height="108" rx="4" fill="#fff" stroke="#AB47BC" stroke-width="1.5"></rect>
+  <text x="113" y="100" text-anchor="middle" class="box-title" fill="#333">Markdown Issues</text>
+  <text x="113" y="115" text-anchor="middle" class="box-sub" fill="#555">.md + YAML frontmatter</text>
+  <text x="113" y="130" text-anchor="middle" class="box-sub" fill="#7a3900" font-style="italic">← SoT</text>
+  <text x="113" y="145" text-anchor="middle" class="box-sub" fill="#555">issues/ · epics/</text>
+  <text x="113" y="160" text-anchor="middle" class="box-sub" fill="#555">registry.yaml</text>
+  <text x="113" y="175" text-anchor="middle" class="box-sub" fill="#555">active-recipe.yaml</text>
 
-  <rect x="320" y="95" width="100" height="80" rx="4" fill="#ffffff" stroke="#AB47BC"/>
-  <text x="370" y="125" text-anchor="middle" class="sublabel" fill="#333">Boards</text>
-  <text x="370" y="145" text-anchor="middle" class="sublabel" fill="#666">kanban config</text>
+  <rect x="212" y="82" width="118" height="108" rx="4" fill="#fff" stroke="#AB47BC" stroke-width="1.5"></rect>
+  <text x="271" y="100" text-anchor="middle" class="box-title" fill="#333">Boards &amp;</text>
+  <text x="271" y="114" text-anchor="middle" class="box-title" fill="#333">Templates</text>
+  <text x="271" y="132" text-anchor="middle" class="box-sub" fill="#555">boards/</text>
+  <text x="271" y="147" text-anchor="middle" class="box-sub" fill="#555">templates/</text>
 
-  <rect x="440" y="95" width="100" height="80" rx="4" fill="#ffffff" stroke="#AB47BC"/>
-  <text x="490" y="125" text-anchor="middle" class="sublabel" fill="#333">Templates</text>
-  <text x="490" y="145" text-anchor="middle" class="sublabel" fill="#666">issue templates</text>
+  <rect x="344" y="82" width="118" height="108" rx="4" fill="#fff" stroke="#AB47BC" stroke-width="1.5"></rect>
+  <text x="403" y="100" text-anchor="middle" class="box-title" fill="#333">Recipes</text>
+  <text x="403" y="115" text-anchor="middle" class="box-sub" fill="#555">recipes/*.yaml</text>
+  <text x="403" y="130" text-anchor="middle" class="box-sub" fill="#555">mode label +</text>
+  <text x="403" y="145" text-anchor="middle" class="box-sub" fill="#555">modules +</text>
+  <text x="403" y="160" text-anchor="middle" class="box-sub" fill="#555">policy</text>
 
-  <!-- ====== ENGINE ====== -->
-  <rect x="580" y="50" width="980" height="200" rx="8" fill="#E8F5E9" stroke="#4CAF50" stroke-width="2"/>
-  <text x="600" y="72" class="label" fill="#000000">⚙️ Engine (Logic Only — no live state)</text>
+  
+  <rect x="492" y="52" width="894" height="148" rx="8" fill="#E8F5E9" stroke="#4CAF50" stroke-width="2"></rect>
+  <text x="512" y="72" class="zone-label" fill="#1b5e20">⚙️  Engine — Logic Only (no live state)</text>
 
-  <rect x="600" y="95" width="180" height="110" rx="4" fill="#ffffff" stroke="#4CAF50"/>
-  <text x="690" y="120" text-anchor="middle" class="sublabel" fill="#333">packages/core</text>
-  <text x="690" y="145" text-anchor="middle" class="sublabel" fill="#666">Runtime, State Machine</text>
-  <text x="690" y="165" text-anchor="middle" class="sublabel" fill="#666">Policy, Store, Executor</text>
+  <rect x="504" y="82" width="162" height="108" rx="4" fill="#fff" stroke="#4CAF50" stroke-width="1.5"></rect>
+  <text x="585" y="100" text-anchor="middle" class="box-title" fill="#333">packages/core</text>
+  <text x="585" y="115" text-anchor="middle" class="box-sub" fill="#555">Runtime · StateMachine</text>
+  <text x="585" y="129" text-anchor="middle" class="box-sub" fill="#555">PolicyEngine · Store</text>
+  <text x="585" y="143" text-anchor="middle" class="box-sub" fill="#555">Executor · ModuleRunner</text>
+  <text x="585" y="157" text-anchor="middle" class="box-sub" fill="#555">EventBus · DeadLetterQ</text>
+  <text x="585" y="171" text-anchor="middle" class="box-sub" fill="#555">IdResolver · Checksum</text>
 
-  <rect x="800" y="95" width="160" height="110" rx="4" fill="#ffffff" stroke="#4CAF50"/>
-  <text x="880" y="120" text-anchor="middle" class="sublabel" fill="#333">packages/schema</text>
-  <text x="880" y="145" text-anchor="middle" class="sublabel" fill="#666">Frontmatter schema</text>
-  <text x="880" y="165" text-anchor="middle" class="sublabel" fill="#666">Canonical JSON model</text>
+  <rect x="680" y="82" width="152" height="108" rx="4" fill="#fff" stroke="#4CAF50" stroke-width="1.5"></rect>
+  <text x="756" y="100" text-anchor="middle" class="box-title" fill="#333">packages/schema</text>
+  <text x="756" y="115" text-anchor="middle" class="box-sub" fill="#555">IssueFrontmatter</text>
+  <text x="756" y="130" text-anchor="middle" class="box-sub" fill="#555">CanonicalIssueModel</text>
+  <text x="756" y="145" text-anchor="middle" class="box-sub" fill="#555">IssueStatus (6)</text>
+  <text x="756" y="160" text-anchor="middle" class="box-sub" fill="#555">VALID_TRANSITIONS (8)</text>
 
-  <rect x="980" y="95" width="140" height="110" rx="4" fill="#ffffff" stroke="#4CAF50"/>
-  <text x="1050" y="120" text-anchor="middle" class="sublabel" fill="#333">recipes/</text>
-  <text x="1050" y="145" text-anchor="middle" class="sublabel" fill="#666">.yaml</text>
-  <text x="1050" y="165" text-anchor="middle" class="sublabel" fill="#666">mode + modules + policy</text>
+  <rect x="846" y="82" width="170" height="108" rx="4" fill="#fff" stroke="#4CAF50" stroke-width="1.5"></rect>
+  <text x="931" y="100" text-anchor="middle" class="box-title" fill="#333">Adapters</text>
+  <text x="931" y="115" text-anchor="middle" class="box-sub" fill="#555">adapter-claude-code</text>
+  <text x="931" y="130" text-anchor="middle" class="box-sub" fill="#555">adapter-codex (codex)</text>
+  <text x="931" y="145" text-anchor="middle" class="box-sub" fill="#555">adapter-jira · adapter-cli</text>
+  <text x="931" y="160" text-anchor="middle" class="box-sub" fill="#555">adapter-github</text>
+  <text x="931" y="175" text-anchor="middle" class="box-sub" fill="#555">adapter-firebase · openclaw</text>
 
-  <rect x="1140" y="95" width="160" height="110" rx="4" fill="#ffffff" stroke="#4CAF50"/>
-  <text x="1220" y="120" text-anchor="middle" class="sublabel" fill="#333">Adapters</text>
-  <text x="1220" y="145" text-anchor="middle" class="sublabel" fill="#666">openclaw · claude-code</text>
-  <text x="1220" y="165" text-anchor="middle" class="sublabel" fill="#666">jira · cli · github · firebase</text>
+  <rect x="1030" y="82" width="162" height="108" rx="4" fill="#fff" stroke="#4CAF50" stroke-width="1.5"></rect>
+  <text x="1111" y="100" text-anchor="middle" class="box-title" fill="#333">packages/cli</text>
+  <text x="1111" y="115" text-anchor="middle" class="box-sub" fill="#555">CLI entry point</text>
+  <text x="1111" y="130" text-anchor="middle" class="box-sub" fill="#555">kanban sync</text>
+  <text x="1111" y="145" text-anchor="middle" class="box-sub" fill="#555">kanban run / next</text>
+  <text x="1111" y="160" text-anchor="middle" class="box-sub" fill="#555">kanban approve</text>
+  <text x="1111" y="175" text-anchor="middle" class="box-sub" fill="#555">kanban board</text>
 
-  <rect x="1320" y="95" width="140" height="110" rx="4" fill="#ffffff" stroke="#4CAF50"/>
-  <text x="1390" y="120" text-anchor="middle" class="sublabel" fill="#333">packages/cli</text>
-  <text x="1390" y="145" text-anchor="middle" class="sublabel" fill="#666">kanban run</text>
-  <text x="1390" y="165" text-anchor="middle" class="sublabel" fill="#666">kanban sync · status</text>
+  <rect x="1206" y="82" width="168" height="108" rx="4" fill="#fff" stroke="#4CAF50" stroke-width="1.5"></rect>
+  <text x="1290" y="100" text-anchor="middle" class="box-title" fill="#333">recipes/</text>
+  <text x="1290" y="115" text-anchor="middle" class="box-sub" fill="#555">home-assisted.yaml</text>
+  <text x="1290" y="130" text-anchor="middle" class="box-sub" fill="#555">validate-only.yaml</text>
+  <text x="1290" y="145" text-anchor="middle" class="box-sub" fill="#555">work-jira-export.yaml</text>
+  <text x="1290" y="160" text-anchor="middle" class="box-sub" fill="#888" font-style="italic">examples/</text>
+  <text x="1290" y="175" text-anchor="middle" class="box-sub" fill="#888" font-style="italic">home-full-auto.yaml</text>
 
-  <!-- Engine annotations -->
-  <rect x="1480" y="95" width="210" height="35" rx="4" fill="#FFF3E0" stroke="#FF9800"/>
-  <text x="1490" y="118" class="annotation" fill="#BF360C">⚠️ No live state in engine repo</text>
+  
+  <rect x="1400" y="52" width="182" height="148" rx="8" fill="#E3F2FD" stroke="#2196F3" stroke-width="2" stroke-dasharray="8,4"></rect>
+  <text x="1416" y="72" class="zone-label" fill="#0d47a1">🌐  External</text>
 
-  <rect x="1480" y="140" width="260" height="35" rx="4" fill="#FFF3E0" stroke="#FF9800"/>
-  <text x="1490" y="163" class="annotation" fill="#BF360C">⚠️ Modes are emergent: recipe modules + policy</text>
+  <rect x="1412" y="82" width="158" height="38" rx="4" fill="#fff" stroke="#2196F3" stroke-width="1.5"></rect>
+  <text x="1491" y="97" text-anchor="middle" class="box-sub" fill="#333" font-weight="bold">OpenClaw</text>
+  <text x="1491" y="112" text-anchor="middle" class="box-sub" fill="#888" font-style="italic">Home only</text>
 
-  <rect x="1480" y="185" width="240" height="35" rx="4" fill="#FFF3E0" stroke="#FF9800"/>
-  <text x="1490" y="208" class="annotation" fill="#BF360C">⚠️ Canonical JSON = internal contract</text>
+  <rect x="1412" y="128" width="72" height="38" rx="4" fill="#fff" stroke="#2196F3" stroke-width="1.5"></rect>
+  <text x="1448" y="143" text-anchor="middle" class="box-sub" fill="#333" font-weight="bold">Jira</text>
+  <text x="1448" y="158" text-anchor="middle" class="box-sub" fill="#888" font-style="italic">Work only</text>
 
-  <!-- ====== EXTERNAL ====== -->
-  <rect x="40" y="280" width="1520" height="80" rx="8" fill="#E3F2FD" stroke="#2196F3" stroke-width="2" stroke-dasharray="8,4"/>
-  <text x="60" y="302" class="label" fill="#000000">🌐 External Systems / Interfaces</text>
+  <rect x="1498" y="128" width="72" height="38" rx="4" fill="#fff" stroke="#2196F3" stroke-width="1.5"></rect>
+  <text x="1534" y="143" text-anchor="middle" class="box-sub" fill="#333" font-weight="bold">GitHub</text>
+  <text x="1534" y="158" text-anchor="middle" class="box-sub" fill="#555">Firebase</text>
 
-  <rect x="60" y="320" width="100" height="30" rx="4" fill="#ffffff" stroke="#2196F3"/>
-  <text x="110" y="340" text-anchor="middle" class="sublabel" fill="#333">OpenClaw</text>
+  
+  <line x1="476" y1="126" x2="490" y2="126" stroke="#555" stroke-width="2" marker-end="url(#arr)"></line>
+  <text x="472" y="119" text-anchor="end" class="arrow-label">parse</text>
+  <text x="472" y="131" text-anchor="end" class="arrow-label">→ JSON</text>
 
-  <rect x="180" y="320" width="100" height="30" rx="4" fill="#ffffff" stroke="#2196F3"/>
-  <text x="230" y="338" text-anchor="middle" class="sublabel" fill="#333">Jira</text>
-  <text x="230" y="350" text-anchor="middle" class="sublabel" fill="#666">(Work only)</text>
+  <line x1="1386" y1="126" x2="1398" y2="126" stroke="#555" stroke-width="2" marker-end="url(#arr)"></line>
+  <text x="1392" y="119" text-anchor="middle" class="arrow-label">adapter</text>
+  <text x="1392" y="131" text-anchor="middle" class="arrow-label">output</text>
 
-  <rect x="300" y="320" width="80" height="30" rx="4" fill="#ffffff" stroke="#2196F3"/>
-  <text x="340" y="340" text-anchor="middle" class="sublabel" fill="#333">GitHub</text>
+  
+  <rect x="492" y="210" width="252" height="32" rx="4" fill="#FFF3E0" stroke="#FF9800" stroke-width="1.5"></rect>
+  <text x="502" y="224" class="anno">💡 Engine repo에 live state 없음</text>
+  <text x="502" y="237" class="anno">   Vault는 별도 Git 저장소</text>
 
-  <rect x="400" y="320" width="80" height="30" rx="4" fill="#ffffff" stroke="#2196F3"/>
-  <text x="440" y="340" text-anchor="middle" class="sublabel" fill="#333">Firebase</text>
+  <rect x="758" y="210" width="290" height="32" rx="4" fill="#FFF3E0" stroke="#FF9800" stroke-width="1.5"></rect>
+  <text x="768" y="224" class="anno">💡 Mode is emergent: recipe modules</text>
+  <text x="768" y="237" class="anno">   + policy 조합 (hardcoded switch 없음)</text>
 
-  <rect x="1400" y="320" width="140" height="30" rx="4" fill="#ffffff" stroke="#2196F3"/>
-  <text x="1470" y="338" text-anchor="middle" class="sublabel" fill="#333">CLI</text>
-  <text x="1470" y="350" text-anchor="middle" class="sublabel" fill="#666">(User Interface)</text>
+  <rect x="1062" y="210" width="260" height="32" rx="4" fill="#FFF3E0" stroke="#FF9800" stroke-width="1.5"></rect>
+  <text x="1072" y="224" class="anno">💡 Canonical JSON = internal contract</text>
+  <text x="1072" y="237" class="anno">   (human editing surface 아님)</text>
 
-  <!-- ====== ARROWS (Top) ====== -->
-  <line x1="540" y1="125" x2="580" y2="125" stroke="#666" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-  <text x="545" y="118" class="arrow-label">parse → canonical JSON</text>
+  
+  <line x1="16" y1="254" x2="1582" y2="254" stroke="#ddd" stroke-width="1" stroke-dasharray="4,3"></line>
 
-  <line x1="1070" y1="250" x2="1070" y2="280" stroke="#666" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-  <text x="1080" y="268" class="arrow-label">adapter output</text>
+  
+  <rect x="16" y="262" width="490" height="330" rx="6" fill="#fafafa" stroke="#ccc" stroke-dasharray="4,2"></rect>
+  <text x="261" y="281" text-anchor="middle" class="panel-title" fill="#222">Panel 1 — Issue Lifecycle (8개 전이)</text>
 
-  <!-- ====== PANEL 1: ISSUE LIFECYCLE ====== -->
-  <rect x="40" y="400" width="480" height="220" rx="4" fill="#FAFAFA" stroke="#BDBDBD" stroke-dasharray="4,2"/>
-  <text x="280" y="420" text-anchor="middle" class="panel-title" fill="#333">Panel 1: Issue Lifecycle (Status States)</text>
+  
+  <rect x="30" y="298" width="62" height="30" rx="4" fill="#FFF9C4" stroke="#F9A825" stroke-width="1.5"></rect>
+  <text x="61" y="318" text-anchor="middle" class="status-text" fill="#333">TODO</text>
 
-  <rect x="60" y="450" width="60" height="30" rx="4" fill="#FFF9C4" stroke="#FBC02D"/>
-  <text x="90" y="470" text-anchor="middle" class="sublabel" fill="#333">TODO</text>
+  <rect x="124" y="298" width="62" height="30" rx="4" fill="#E8F5E9" stroke="#43A047" stroke-width="1.5"></rect>
+  <text x="155" y="318" text-anchor="middle" class="status-text" fill="#2e7d32">READY</text>
 
-  <rect x="140" y="450" width="60" height="30" rx="4" fill="#E8F5E9" stroke="#4CAF50"/>
-  <text x="170" y="470" text-anchor="middle" class="sublabel" fill="#333">READY</text>
+  <rect x="222" y="298" width="68" height="30" rx="4" fill="#BBDEFB" stroke="#1E88E5" stroke-width="2"></rect>
+  <text x="256" y="318" text-anchor="middle" class="status-text" fill="#1565C0">RUNNING</text>
 
-  <rect x="220" y="450" width="70" height="30" rx="4" fill="#BBDEFB" stroke="#1976D2"/>
-  <text x="255" y="470" text-anchor="middle" class="sublabel" fill="#333">RUNNING</text>
+  <rect x="326" y="298" width="62" height="30" rx="4" fill="#FFF9C4" stroke="#F9A825" stroke-width="1.5"></rect>
+  <text x="357" y="318" text-anchor="middle" class="status-text" fill="#333">REVIEW</text>
 
-  <rect x="310" y="450" width="60" height="30" rx="4" fill="#FFF9C4" stroke="#FBC02D"/>
-  <text x="340" y="470" text-anchor="middle" class="sublabel" fill="#333">REVIEW</text>
+  <rect x="420" y="298" width="68" height="30" rx="4" fill="#E8F5E9" stroke="#43A047" stroke-width="2"></rect>
+  <text x="454" y="318" text-anchor="middle" class="status-text" fill="#2e7d32">DONE</text>
 
-  <rect x="400" y="450" width="50" height="30" rx="4" fill="#E8F5E9" stroke="#4CAF50"/>
-  <text x="425" y="470" text-anchor="middle" class="sublabel" fill="#333">DONE</text>
+  
+  <rect x="222" y="380" width="68" height="30" rx="4" fill="#FFEBEE" stroke="#E53935" stroke-width="2"></rect>
+  <text x="256" y="400" text-anchor="middle" class="status-text" fill="#b71c1c">FAILED</text>
 
-  <rect x="400" y="500" width="50" height="30" rx="4" fill="#FFEBEE" stroke="#F44336"/>
-  <text x="425" y="520" text-anchor="middle" class="sublabel" fill="#333">FAILED</text>
+  
+  <line x1="92" y1="313" x2="122" y2="313" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"></line>
+  <line x1="186" y1="313" x2="220" y2="313" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"></line>
+  <line x1="290" y1="313" x2="324" y2="313" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"></line>
+  <line x1="388" y1="313" x2="418" y2="313" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"></line>
+  
+  <line x1="256" y1="328" x2="256" y2="378" stroke="#c62828" stroke-width="1.5" marker-end="url(#arr-red)"></line>
 
-  <text x="60" y="550" class="note" fill="#666">DONE / FAILED = terminal states</text>
-  <text x="60" y="570" class="note" fill="#666">All transitions recorded in .md YAML frontmatter</text>
+  
+  <text x="107" y="309" text-anchor="middle" class="arrow-label">준비</text>
+  <text x="203" y="309" text-anchor="middle" class="arrow-label">실행</text>
+  <text x="307" y="309" text-anchor="middle" class="arrow-label">exit 0</text>
+  <text x="403" y="309" text-anchor="middle" class="arrow-label">approve</text>
+  <text x="272" y="355" class="arrow-label">no-change</text>
+  <text x="272" y="366" class="arrow-label">/exit non-0</text>
 
-  <!-- Panel 1 arrows -->
-  <polyline points="120,465 140,465" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
-  <polyline points="200,465 220,465" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
-  <polyline points="290,465 310,465" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
-  <polyline points="370,465 400,465" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
-  <polyline points="255,480 255,500 425,500" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+  
+  <path d="M 124 300 Q 107 286 92 300" fill="none" stroke="#888" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"></path>
+  <text x="108" y="284" text-anchor="middle" class="note">되돌리기</text>
 
-  <!-- ====== PANEL 2: RECIPE → EXECUTION ====== -->
-  <rect x="560" y="400" width="480" height="220" rx="4" fill="#FAFAFA" stroke="#BDBDBD" stroke-dasharray="4,2"/>
-  <text x="800" y="420" text-anchor="middle" class="panel-title" fill="#333">Panel 2: Recipe → Execution Loop</text>
+  
+  <path d="M 326 300 Q 308 284 290 300" fill="none" stroke="#888" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"></path>
+  <text x="308" y="282" text-anchor="middle" class="note">retry</text>
 
-  <rect x="580" y="450" width="90" height="50" rx="4" fill="#E0E0E0" stroke="#666"/>
-  <text x="625" y="470" text-anchor="middle" class="sublabel" fill="#333">Recipe YAML</text>
-  <text x="625" y="485" text-anchor="middle" class="sublabel" fill="#666">mode + policy</text>
+  
+  <path d="M 222 395 Q 160 420 155 320 Q 152 300 155 313" fill="none" stroke="#888" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"></path>
+  <text x="138" y="420" class="note">retry</text>
 
-  <rect x="700" y="450" width="120" height="50" rx="4" fill="#D1C4E9" stroke="#7E57C2"/>
-  <text x="760" y="470" text-anchor="middle" class="sublabel" fill="#333">modules: [parser,</text>
-  <text x="760" y="485" text-anchor="middle" class="sublabel" fill="#333">validator, executor, ...]</text>
+  
+  <rect x="28" y="428" width="466" height="52" rx="4" fill="#F3E5F5" stroke="#9C27B0" stroke-width="1" stroke-dasharray="4,2"></rect>
+  <text x="38" y="445" class="note" fill="#6a1b9a">Epic: TODO / DONE 상태만 허용 (executor = human 강제)</text>
+  <text x="38" y="460" class="note" fill="#6a1b9a">no-change success (exit 0, file change 없음) → FAILED 수렴</text>
+  <text x="38" y="474" class="note" fill="#6a1b9a">Terminal states: DONE, FAILED (completed 필드는 DONE에만 기록)</text>
 
-  <rect x="850" y="450" width="70" height="40" rx="4" fill="#C8E6C9" stroke="#388E3C"/>
-  <text x="885" y="475" text-anchor="middle" class="sublabel" fill="#333">Policy Check</text>
+  
+  <rect x="520" y="262" width="488" height="330" rx="6" fill="#fafafa" stroke="#ccc" stroke-dasharray="4,2"></rect>
+  <text x="764" y="281" text-anchor="middle" class="panel-title" fill="#222">Panel 2 — Recipe → Execution Loop</text>
 
-  <rect x="580" y="520" width="90" height="45" rx="4" fill="#BBDEFB" stroke="#1976D2"/>
-  <text x="625" y="545" text-anchor="middle" class="sublabel" fill="#333">claude-code-</text>
-  <text x="625" y="555" text-anchor="middle" class="sublabel" fill="#333">executor</text>
+  
+  <text x="534" y="302" class="box-sub" fill="#333" font-weight="bold">Active Recipe Resolution (우선순위 순):</text>
 
-  <rect x="700" y="525" width="70" height="30" rx="4" fill="#FFF9C4" stroke="#FBC02D"/>
-  <text x="735" y="545" text-anchor="middle" class="sublabel" fill="#333">Worktree</text>
+  <rect x="534" y="310" width="196" height="24" rx="3" fill="#E0E0E0" stroke="#9E9E9E" stroke-width="1.5"></rect>
+  <text x="632" y="326" text-anchor="middle" class="box-sub" fill="#333">① KANBAN_RECIPE (env)</text>
 
-  <rect x="850" y="520" width="55" height="22" rx="4" fill="#E8F5E9" stroke="#4CAF50"/>
-  <text x="877" y="535" text-anchor="middle" font-size="10" fill="#333">READY</text>
+  <rect x="534" y="342" width="196" height="24" rx="3" fill="#E0E0E0" stroke="#9E9E9E" stroke-width="1.5"></rect>
+  <text x="632" y="358" text-anchor="middle" class="box-sub" fill="#333">② vault/config/active-recipe.yaml</text>
 
-  <rect x="850" y="547" width="55" height="22" rx="4" fill="#BBDEFB" stroke="#1976D2"/>
-  <text x="877" y="562" text-anchor="middle" font-size="10" fill="#333">RUNNING</text>
+  <rect x="534" y="374" width="196" height="24" rx="3" fill="#E0E0E0" stroke="#9E9E9E" stroke-width="1.5"></rect>
+  <text x="632" y="390" text-anchor="middle" class="box-sub" fill="#333">③ bundled home-assisted.yaml</text>
 
-  <rect x="850" y="574" width="55" height="22" rx="4" fill="#FFF9C4" stroke="#FBC02D"/>
-  <text x="877" y="589" text-anchor="middle" font-size="10" fill="#333">REVIEW</text>
+  <line x1="632" y1="334" x2="632" y2="340" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"></line>
+  <line x1="632" y1="366" x2="632" y2="372" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"></line>
 
-  <rect x="850" y="601" width="55" height="22" rx="4" fill="#E8F5E9" stroke="#4CAF50"/>
-  <text x="877" y="616" text-anchor="middle" font-size="10" fill="#333">DONE</text>
+  
+  <rect x="534" y="410" width="196" height="30" rx="4" fill="#C8E6C9" stroke="#43A047" stroke-width="1.5"></rect>
+  <text x="632" y="423" text-anchor="middle" class="box-sub" fill="#333" font-weight="bold">PolicyEngine</text>
+  <text x="632" y="436" text-anchor="middle" class="box-sub" fill="#555">(fail-closed)</text>
+  <line x1="632" y1="398" x2="632" y2="408" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"></line>
 
-  <!-- Panel 2 arrows -->
-  <polyline points="670,475 700,475" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
-  <polyline points="820,475 850,475" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
-  <polyline points="885,490 885,520 670,520" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
-  <polyline points="625,565 625,525 700,525" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
-  <polyline points="877,542 877,520" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
-  <polyline points="877,569 877,547" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
-  <polyline points="877,596 877,574" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+  
+  <line x1="632" y1="440" x2="632" y2="452" stroke="#555" stroke-width="1.5"></line>
 
-  <!-- labels -->
-  <text x="860" y="540" class="note" fill="#666">kanban run</text>
-  <text x="860" y="567" class="note" fill="#666">exit 0</text>
-  <text x="860" y="594" class="note" fill="#666">kanban approve</text>
+  
+  <line x1="632" y1="452" x2="752" y2="452" stroke="#888" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"></line>
+  <rect x="754" y="440" width="130" height="30" rx="4" fill="#F3E5F5" stroke="#9C27B0" stroke-width="1.5" stroke-dasharray="4,2"></rect>
+  <text x="819" y="453" text-anchor="middle" class="box-sub" fill="#6a1b9a" font-weight="bold">validate-only</text>
+  <text x="819" y="465" text-anchor="middle" class="box-sub" fill="#888">(no mutation)</text>
+  <text x="693" y="448" text-anchor="middle" class="note" fill="#888">validate-only.yaml</text>
 
-  <!-- ====== PANEL 3: WORK SCENARIO ====== -->
-  <rect x="1080" y="400" width="480" height="220" rx="4" fill="#FAFAFA" stroke="#BDBDBD" stroke-dasharray="4,2"/>
-  <text x="1320" y="420" text-anchor="middle" class="panel-title" fill="#333">Panel 3: Work Scenario (Jira Export)</text>
+  
+  <line x1="632" y1="452" x2="534" y2="452" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"></line>
+  <text x="583" y="448" text-anchor="middle" class="arrow-label">--execute</text>
 
-  <rect x="1100" y="450" width="80" height="40" rx="4" fill="#F3E5F5" stroke="#9C27B0"/>
-  <text x="1140" y="470" text-anchor="middle" class="sublabel" fill="#333">Vault</text>
-  <text x="1140" y="485" text-anchor="middle" class="sublabel" fill="#666">Markdown</text>
+  
+  <rect x="534" y="462" width="196" height="36" rx="4" fill="#BBDEFB" stroke="#1E88E5" stroke-width="1.5"></rect>
+  <text x="632" y="476" text-anchor="middle" class="box-sub" fill="#333" font-weight="bold">claude-code-executor</text>
+  <text x="632" y="490" text-anchor="middle" class="box-sub" fill="#555">or codex-runner</text>
 
-  <rect x="1210" y="450" width="80" height="40" rx="4" fill="#E8F5E9" stroke="#4CAF50"/>
-  <text x="1250" y="470" text-anchor="middle" class="sublabel" fill="#333">Engine</text>
-  <text x="1250" y="485" text-anchor="middle" class="sublabel" fill="#666">Parser</text>
+  
+  <rect x="534" y="510" width="196" height="26" rx="4" fill="#fff" stroke="#1E88E5" stroke-width="1.5"></rect>
+  <text x="632" y="527" text-anchor="middle" class="box-sub" fill="#1565C0" font-weight="bold">Isolated Worktree</text>
+  <line x1="632" y1="498" x2="632" y2="508" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"></line>
 
-  <rect x="1160" y="520" width="90" height="35" rx="4" fill="#E3F2FD" stroke="#2196F3"/>
-  <text x="1205" y="542" text-anchor="middle" class="sublabel" fill="#333">adapter-jira</text>
+  
+  <line x1="632" y1="536" x2="632" y2="546" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"></line>
+  <text x="534" y="558" class="note" fill="#555">READY → RUNNING → REVIEW → DONE</text>
+  <text x="620" y="570" class="note" fill="#c62828">└→ FAILED</text>
 
-  <rect x="1160" y="580" width="90" height="35" rx="4" fill="#BBDEFB" stroke="#1976D2"/>
-  <text x="1205" y="602" text-anchor="middle" class="sublabel" fill="#333">Jira API</text>
+  
+  <rect x="1022" y="262" width="560" height="330" rx="6" fill="#fafafa" stroke="#ccc" stroke-dasharray="4,2"></rect>
+  <text x="1302" y="281" text-anchor="middle" class="panel-title" fill="#222">Panel 3 — Work Mode: Jira Export</text>
 
-  <text x="1270" y="542" class="note" fill="#666">one-way export</text>
+  
+  <rect x="1036" y="296" width="128" height="64" rx="4" fill="#F3E5F5" stroke="#9C27B0" stroke-width="1.5"></rect>
+  <text x="1100" y="315" text-anchor="middle" class="box-title" fill="#6a1b9a">Vault</text>
+  <text x="1100" y="330" text-anchor="middle" class="box-sub" fill="#555">Markdown Issues</text>
+  <text x="1100" y="344" text-anchor="middle" class="box-sub" fill="#7a3900" font-style="italic">SoT</text>
 
-  <!-- Panel 3 arrows -->
-  <polyline points="1180,470 1210,470" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
-  <polyline points="1250,490 1205,520" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
-  <polyline points="1205,555 1205,580" fill="none" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <rect x="1036" y="384" width="128" height="52" rx="4" fill="#E8F5E9" stroke="#4CAF50" stroke-width="1.5"></rect>
+  <text x="1100" y="402" text-anchor="middle" class="box-title" fill="#1b5e20">Engine</text>
+  <text x="1100" y="416" text-anchor="middle" class="box-sub" fill="#555">parser + store</text>
+  <text x="1100" y="430" text-anchor="middle" class="box-sub" fill="#555">→ Canonical JSON</text>
 
+  <rect x="1036" y="458" width="128" height="40" rx="4" fill="#E3F2FD" stroke="#2196F3" stroke-width="1.5"></rect>
+  <text x="1100" y="474" text-anchor="middle" class="box-title" fill="#0d47a1">adapter-jira</text>
+  <text x="1100" y="488" text-anchor="middle" class="box-sub" fill="#555">RuntimePolicy check</text>
+
+  <rect x="1036" y="520" width="128" height="40" rx="4" fill="#BBDEFB" stroke="#1565C0" stroke-width="1.5"></rect>
+  <text x="1100" y="536" text-anchor="middle" class="box-title" fill="#0d47a1">Jira API</text>
+  <text x="1100" y="550" text-anchor="middle" class="box-sub" fill="#555">(one-way export)</text>
+
+  
+  <line x1="1100" y1="360" x2="1100" y2="382" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"></line>
+  <line x1="1100" y1="436" x2="1100" y2="456" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"></line>
+  <line x1="1100" y1="498" x2="1100" y2="518" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"></line>
+
+  
+  <rect x="1180" y="296" width="390" height="158" rx="4" fill="#FFF3E0" stroke="#FF9800" stroke-width="1.5"></rect>
+  <text x="1194" y="314" class="box-sub" fill="#7a3900" font-weight="bold">Work mode write-back 제한:</text>
+  <text x="1194" y="330" class="box-sub" fill="#2e7d32">✅ sync.jira.key</text>
+  <text x="1194" y="346" class="box-sub" fill="#2e7d32">✅ sync.jira.status</text>
+  <text x="1194" y="362" class="box-sub" fill="#2e7d32">✅ sync.jira.exportedAt</text>
+  <text x="1194" y="380" class="box-sub" fill="#c62828">❌ body 수정 불가</text>
+  <text x="1194" y="396" class="box-sub" fill="#c62828">❌ Firebase sync</text>
+  <text x="1194" y="412" class="box-sub" fill="#c62828">❌ OpenClaw execution</text>
+  <text x="1194" y="428" class="box-sub" fill="#c62828">❌ mobile real-time sync</text>
+  <text x="1194" y="444" class="box-sub" fill="#888" font-style="italic">ExternalSyncPolicy = &#39;atlassian-only&#39;</text>
+
+  
+  <rect x="1180" y="464" width="390" height="56" rx="4" fill="#fafafa" stroke="#9E9E9E" stroke-width="1" stroke-dasharray="4,2"></rect>
+  <text x="1194" y="482" class="note" fill="#555">assertAdapterAllowed() — policy 없이</text>
+  <text x="1194" y="496" class="note" fill="#555">permissive 동작 금지 (fail-closed)</text>
+  <text x="1194" y="510" class="note" fill="#555">adapter-cli는 CLI adapter layer (packages/cli ≠ adapter-cli)</text>
+
+  
+  <line x1="16" y1="606" x2="1582" y2="606" stroke="#e0e0e0" stroke-width="1"></line>
+  <text x="20" y="620" font-size="10" fill="#aaa">색상: 🟣 Vault(보라/dashed)  🟢 Engine(녹색/solid)  🔵 External(파랑/dashed)  🟠 Annotation(주황)  🔴 FAILED/금지</text>
+  <text x="20" y="634" font-size="10" fill="#aaa">실선 화살표=전진전이 / 점선=후퇴·분기 / draw.io CLI 미설치 → 수동 SVG fallback (docs/design/README.md 참조)</text>
 </svg>
