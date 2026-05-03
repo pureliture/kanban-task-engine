@@ -1,254 +1,336 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mxfile host="app.diagrams.net" modified="2026-05-02T00:00:00.000Z" agent="Mozilla/5.0" version="24.0.0" etag="kanban-one-page-v2" type="device">
-  <diagram name="Page-1" id="kanban-task-engine-one-page-v2">
-    <mxGraphModel dx="0" dy="0" grid="10" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+<mxfile host="app.diagrams.net" modified="2026-05-03" agent="kanban-task-engine-design" version="24.0.0">
+  <diagram name="System Map" id="kanban-one-page-v2">
+    <mxGraphModel dx="0" dy="0" grid="10" gridSize="10" guides="1" tooltips="1"
+                  connect="1" arrows="1" fold="1" page="1" pageScale="1"
+                  pageWidth="1600" pageHeight="900" math="0" shadow="0">
       <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
 
-        <!-- ==================== PAGE TITLE ==================== -->
-        <mxCell id="page-title" value="kanban-task-engine — System Map" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=18;" vertex="1" parent="1">
-          <mxGeometry x="40" y="10" width="400" height="30" as="geometry" />
+        <!-- ════════════════════════════════════════
+             PAGE TITLE
+        ════════════════════════════════════════ -->
+        <mxCell id="page-title" value="kanban-task-engine — System Map"
+                style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=17;fontColor=#1a1a1a;"
+                vertex="1" parent="1">
+          <mxGeometry x="20" y="10" width="600" height="28" as="geometry"/>
         </mxCell>
-
-        <!-- ==================== VAULT ==================== -->
-        <mxCell id="vault-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#9C27B0;strokeWidth=2;dashed=1;arcSize=6;" vertex="1" parent="1">
-          <mxGeometry x="40" y="50" width="500" height="150" as="geometry" />
-        </mxCell>
-        <mxCell id="vault-icon" value="🗂" style="text;html=1;align=left;verticalAlign=middle;fontSize=16;" vertex="1" parent="vault-box">
-          <mxGeometry x="12" y="10" width="30" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="vault-label" value="Vault (Live Issue State — separate Git repo)" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=13;" vertex="1" parent="vault-box">
-          <mxGeometry x="40" y="10" width="400" height="20" as="geometry" />
+        <mxCell id="page-sub" value="packages/schema/src/status.ts 기준 8개 전이 · 2026-05-03"
+                style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#777;"
+                vertex="1" parent="1">
+          <mxGeometry x="20" y="36" width="600" height="16" as="geometry"/>
         </mxCell>
 
-        <mxCell id="vault-md" value="Markdown Issues&lt;br/&gt;(.md + YAML frontmatter)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#AB47BC;fontSize=11;" vertex="1" parent="vault-box">
-          <mxGeometry x="20" y="45" width="220" height="80" as="geometry" />
+        <!-- ════════════════════════════════════════
+             ZONE 1: VAULT
+        ════════════════════════════════════════ -->
+        <mxCell id="vault-zone" value=""
+                style="rounded=1;arcSize=3;fillColor=#F3E5F5;strokeColor=#9C27B0;strokeWidth=2;dashed=1;dashPattern=8 4;"
+                vertex="1" parent="1">
+          <mxGeometry x="16" y="52" width="500" height="148" as="geometry"/>
         </mxCell>
-        <mxCell id="vault-boards" value="Boards&lt;br/&gt;kanban config" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#AB47BC;fontSize=11;" vertex="1" parent="vault-box">
-          <mxGeometry x="260" y="45" width="100" height="80" as="geometry" />
-        </mxCell>
-        <mxCell id="vault-templates" value="Templates&lt;br/&gt;issue templates" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#AB47BC;fontSize=11;" vertex="1" parent="vault-box">
-          <mxGeometry x="380" y="45" width="100" height="80" as="geometry" />
-        </mxCell>
-
-        <!-- ==================== ENGINE ==================== -->
-        <mxCell id="engine-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;strokeWidth=2;arcSize=6;" vertex="1" parent="1">
-          <mxGeometry x="580" y="50" width="980" height="200" as="geometry" />
-        </mxCell>
-        <mxCell id="engine-icon" value="⚙️" style="text;html=1;align=left;verticalAlign=middle;fontSize=16;" vertex="1" parent="engine-box">
-          <mxGeometry x="12" y="10" width="30" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="engine-label" value="Engine (Logic Only — no live state)" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=13;" vertex="1" parent="engine-box">
-          <mxGeometry x="40" y="10" width="400" height="20" as="geometry" />
+        <mxCell id="vault-label" value="🗂  Vault — Live Issue State (별도 Git 저장소)"
+                style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=13;fontColor=#6a1b9a;"
+                vertex="1" parent="vault-zone">
+          <mxGeometry x="20" y="8" width="460" height="20" as="geometry"/>
         </mxCell>
 
-        <mxCell id="engine-core" value="packages/core&lt;br/&gt;&lt;br/&gt;Runtime&lt;br/&gt;State Machine&lt;br/&gt;Policy, Store&lt;br/&gt;Executor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;fontSize=11;" vertex="1" parent="engine-box">
-          <mxGeometry x="20" y="45" width="180" height="110" as="geometry" />
+        <mxCell id="vault-md" value="&lt;b&gt;Markdown Issues&lt;/b&gt;&lt;br/&gt;.md + YAML frontmatter&lt;br/&gt;&lt;i style='color:#7a3900'&gt;← SoT (source of truth)&lt;/i&gt;&lt;br/&gt;issues/ · epics/ · registry.yaml"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#AB47BC;strokeWidth=1.5;fontSize=11;align=center;verticalAlign=middle;"
+                vertex="1" parent="vault-zone">
+          <mxGeometry x="16" y="32" width="190" height="100" as="geometry"/>
         </mxCell>
-        <mxCell id="engine-schema" value="packages/schema&lt;br/&gt;&lt;br/&gt;Frontmatter&lt;br/&gt;schema&lt;br/&gt;Canonical JSON" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;fontSize=11;" vertex="1" parent="engine-box">
-          <mxGeometry x="220" y="45" width="160" height="110" as="geometry" />
+        <mxCell id="vault-boards" value="&lt;b&gt;Boards &amp; Templates&lt;/b&gt;&lt;br/&gt;boards/&lt;br/&gt;templates/"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#AB47BC;strokeWidth=1.5;fontSize=11;align=center;verticalAlign=middle;"
+                vertex="1" parent="vault-zone">
+          <mxGeometry x="220" y="32" width="130" height="100" as="geometry"/>
         </mxCell>
-        <mxCell id="engine-recipes" value="recipes/&lt;br/&gt;&lt;br/&gt;.yaml&lt;br/&gt;mode label +&lt;br/&gt;modules + policy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;fontSize=11;" vertex="1" parent="engine-box">
-          <mxGeometry x="400" y="45" width="140" height="110" as="geometry" />
-        </mxCell>
-        <mxCell id="engine-adapters" value="Adapters&lt;br/&gt;&lt;br/&gt;openclaw&lt;br/&gt;claude-code&lt;br/&gt;jira · cli&lt;br/&gt;github · firebase" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;fontSize=11;" vertex="1" parent="engine-box">
-          <mxGeometry x="560" y="45" width="160" height="110" as="geometry" />
-        </mxCell>
-        <mxCell id="engine-cli" value="packages/cli&lt;br/&gt;&lt;br/&gt;kanban run&lt;br/&gt;kanban sync&lt;br/&gt;kanban status" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;fontSize=11;" vertex="1" parent="engine-box">
-          <mxGeometry x="740" y="45" width="140" height="110" as="geometry" />
-        </mxCell>
-
-        <!-- Engine internal annotation -->
-        <mxCell id="anno-state" value="⚠️ No live state in engine repo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;fontSize=10;" vertex="1" parent="engine-box">
-          <mxGeometry x="900" y="45" width="210" height="35" as="geometry" />
-        </mxCell>
-        <mxCell id="anno-mode" value="⚠️ Modes are emergent: recipe modules + policy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;fontSize=10;" vertex="1" parent="engine-box">
-          <mxGeometry x="900" y="90" width="260" height="35" as="geometry" />
-        </mxCell>
-        <mxCell id="anno-json" value="⚠️ Canonical JSON = internal contract" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;fontSize=10;" vertex="1" parent="engine-box">
-          <mxGeometry x="900" y="135" width="240" height="35" as="geometry" />
+        <mxCell id="vault-recipes" value="&lt;b&gt;Recipes&lt;/b&gt;&lt;br/&gt;recipes/*.yaml&lt;br/&gt;mode label +&lt;br/&gt;modules + policy"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#AB47BC;strokeWidth=1.5;fontSize=11;align=center;verticalAlign=middle;"
+                vertex="1" parent="vault-zone">
+          <mxGeometry x="364" y="32" width="120" height="100" as="geometry"/>
         </mxCell>
 
-        <!-- ==================== EXTERNAL ==================== -->
-        <mxCell id="ext-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#2196F3;strokeWidth=2;dashed=1;arcSize=6;" vertex="1" parent="1">
-          <mxGeometry x="40" y="280" width="1520" height="80" as="geometry" />
+        <!-- ════════════════════════════════════════
+             ZONE 2: ENGINE
+        ════════════════════════════════════════ -->
+        <mxCell id="engine-zone" value=""
+                style="rounded=1;arcSize=3;fillColor=#E8F5E9;strokeColor=#4CAF50;strokeWidth=2;"
+                vertex="1" parent="1">
+          <mxGeometry x="536" y="52" width="820" height="148" as="geometry"/>
         </mxCell>
-        <mxCell id="ext-icon" value="🌐" style="text;html=1;align=left;verticalAlign=middle;fontSize=16;" vertex="1" parent="ext-box">
-          <mxGeometry x="12" y="10" width="30" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="ext-label" value="External Systems / Interfaces" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=13;" vertex="1" parent="ext-box">
-          <mxGeometry x="40" y="10" width="400" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="ext-openclaw" value="OpenClaw" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2196F3;fontSize=11;" vertex="1" parent="ext-box">
-          <mxGeometry x="20" y="40" width="100" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="ext-jira" value="Jira&lt;br/&gt;(Work only)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2196F3;fontSize=11;" vertex="1" parent="ext-box">
-          <mxGeometry x="140" y="40" width="100" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="ext-github" value="GitHub" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2196F3;fontSize=11;" vertex="1" parent="ext-box">
-          <mxGeometry x="260" y="40" width="80" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="ext-firebase" value="Firebase" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2196F3;fontSize=11;" vertex="1" parent="ext-box">
-          <mxGeometry x="360" y="40" width="80" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="ext-cli" value="CLI&lt;br/&gt;(User Interface)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2196F3;fontSize=11;" vertex="1" parent="ext-box">
-          <mxGeometry x="1360" y="40" width="140" height="30" as="geometry" />
+        <mxCell id="engine-label" value="⚙️  Engine — Logic Only (no live state)"
+                style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=13;fontColor=#1b5e20;"
+                vertex="1" parent="engine-zone">
+          <mxGeometry x="20" y="8" width="500" height="20" as="geometry"/>
         </mxCell>
 
-        <!-- ==================== ARROWS (Top Section) ==================== -->
-        <mxCell id="arrow-v2e" value="parse → canonical JSON" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;" edge="1" parent="1" source="vault-box" target="engine-box">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="engine-core" value="&lt;b&gt;packages/core&lt;/b&gt;&lt;br/&gt;Runtime · StateMachine&lt;br/&gt;PolicyEngine · Store&lt;br/&gt;Executor · ModuleRunner&lt;br/&gt;EventBus · DeadLetterQ"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;strokeWidth=1.5;fontSize=11;align=center;verticalAlign=middle;"
+                vertex="1" parent="engine-zone">
+          <mxGeometry x="16" y="32" width="170" height="100" as="geometry"/>
         </mxCell>
-        <mxCell id="arrow-e2ext" value="adapter output" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;" edge="1" parent="1" source="engine-box" target="ext-box">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="engine-schema" value="&lt;b&gt;packages/schema&lt;/b&gt;&lt;br/&gt;IssueFrontmatter&lt;br/&gt;CanonicalIssueModel&lt;br/&gt;IssueStatus (6)&lt;br/&gt;8 valid transitions"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;strokeWidth=1.5;fontSize=11;align=center;verticalAlign=middle;"
+                vertex="1" parent="engine-zone">
+          <mxGeometry x="200" y="32" width="155" height="100" as="geometry"/>
         </mxCell>
-
-        <!-- ==================== PANEL 1: ISSUE LIFECYCLE ==================== -->
-        <mxCell id="panel1-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#BDBDBD;strokeWidth=1;arcSize=4;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="40" y="400" width="480" height="220" as="geometry" />
+        <mxCell id="engine-adapters" value="&lt;b&gt;Adapters&lt;/b&gt;&lt;br/&gt;claude-code · codex&lt;br/&gt;jira · github&lt;br/&gt;firebase · openclaw&lt;br/&gt;adapter-cli"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;strokeWidth=1.5;fontSize=11;align=center;verticalAlign=middle;"
+                vertex="1" parent="engine-zone">
+          <mxGeometry x="369" y="32" width="192" height="100" as="geometry"/>
         </mxCell>
-        <mxCell id="panel1-title" value="Panel 1: Issue Lifecycle (Status States)" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=12;" vertex="1" parent="panel1-bg">
-          <mxGeometry x="10" y="8" width="460" height="18" as="geometry" />
+        <mxCell id="engine-cli" value="&lt;b&gt;packages/cli&lt;/b&gt;&lt;br/&gt;CLI entry point&lt;br/&gt;kanban sync&lt;br/&gt;kanban run&lt;br/&gt;kanban next"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;strokeWidth=1.5;fontSize=11;align=center;verticalAlign=middle;"
+                vertex="1" parent="engine-zone">
+          <mxGeometry x="575" y="32" width="132" height="100" as="geometry"/>
         </mxCell>
-
-        <mxCell id="p1-todo" value="TODO" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#FBC02D;fontSize=10;" vertex="1" parent="panel1-bg">
-          <mxGeometry x="20" y="40" width="60" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="p1-ready" value="READY" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;fontSize=10;" vertex="1" parent="panel1-bg">
-          <mxGeometry x="100" y="40" width="60" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="p1-running" value="RUNNING" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;" vertex="1" parent="panel1-bg">
-          <mxGeometry x="180" y="40" width="70" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="p1-review" value="REVIEW" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#FBC02D;fontSize=10;" vertex="1" parent="panel1-bg">
-          <mxGeometry x="270" y="40" width="60" height="30" as="geometry" />
+        <mxCell id="engine-recipes" value="&lt;b&gt;recipes/&lt;/b&gt;&lt;br/&gt;home-assisted.yaml&lt;br/&gt;validate-only.yaml&lt;br/&gt;work-jira-export.yaml"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;strokeWidth=1.5;fontSize=11;align=center;verticalAlign=middle;"
+                vertex="1" parent="engine-zone">
+          <mxGeometry x="721" y="32" width="83" height="100" as="geometry"/>
         </mxCell>
 
-        <mxCell id="p1-done" value="DONE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;fontSize=10;" vertex="1" parent="panel1-bg">
-          <mxGeometry x="360" y="40" width="50" height="30" as="geometry" />
+        <!-- ════════════════════════════════════════
+             ZONE 3: EXTERNAL
+        ════════════════════════════════════════ -->
+        <mxCell id="ext-zone" value=""
+                style="rounded=1;arcSize=3;fillColor=#E3F2FD;strokeColor=#2196F3;strokeWidth=2;dashed=1;dashPattern=8 4;"
+                vertex="1" parent="1">
+          <mxGeometry x="1376" y="52" width="206" height="148" as="geometry"/>
         </mxCell>
-        <mxCell id="p1-failed" value="FAILED" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#F44336;fontSize=10;" vertex="1" parent="panel1-bg">
-          <mxGeometry x="360" y="90" width="50" height="30" as="geometry" />
+        <mxCell id="ext-label" value="🌐  External"
+                style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=13;fontColor=#0d47a1;"
+                vertex="1" parent="ext-zone">
+          <mxGeometry x="20" y="8" width="180" height="20" as="geometry"/>
         </mxCell>
-
-        <mxCell id="p1-terminal-note" value="DONE / FAILED = terminal states" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#666666;" vertex="1" parent="panel1-bg">
-          <mxGeometry x="20" y="140" width="200" height="18" as="geometry" />
+        <mxCell id="ext-openclaw" value="&lt;b&gt;OpenClaw&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Home only&lt;/i&gt;"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2196F3;strokeWidth=1.5;fontSize=11;"
+                vertex="1" parent="ext-zone">
+          <mxGeometry x="16" y="32" width="174" height="40" as="geometry"/>
         </mxCell>
-        <mxCell id="p1-frontmatter-note" value="All transitions recorded in .md YAML frontmatter" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#666666;" vertex="1" parent="panel1-bg">
-          <mxGeometry x="20" y="165" width="300" height="18" as="geometry" />
+        <mxCell id="ext-jira" value="&lt;b&gt;Jira&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Work only&lt;/i&gt;"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2196F3;strokeWidth=1.5;fontSize=11;"
+                vertex="1" parent="ext-zone">
+          <mxGeometry x="16" y="80" width="80" height="40" as="geometry"/>
         </mxCell>
-
-        <!-- Panel 1 arrows -->
-        <mxCell id="p1-a1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel1-bg" source="p1-todo" target="p1-ready">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="p1-a2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel1-bg" source="p1-ready" target="p1-running">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="p1-a3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel1-bg" source="p1-running" target="p1-review">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="p1-a4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel1-bg" source="p1-review" target="p1-done">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="p1-a5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="panel1-bg" source="p1-running" target="p1-failed">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="ext-github" value="&lt;b&gt;GitHub&lt;/b&gt;&lt;br/&gt;Firebase"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2196F3;strokeWidth=1.5;fontSize=11;"
+                vertex="1" parent="ext-zone">
+          <mxGeometry x="110" y="80" width="80" height="40" as="geometry"/>
         </mxCell>
 
-        <!-- ==================== PANEL 2: RECIPE → EXECUTION ==================== -->
-        <mxCell id="panel2-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#BDBDBD;strokeWidth=1;arcSize=4;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="560" y="400" width="480" height="220" as="geometry" />
+        <!-- ════════════════════════════════════════
+             TOP-LEVEL ARROWS
+        ════════════════════════════════════════ -->
+        <mxCell id="arrow-v2e" value="parse →&lt;br/&gt;canonical JSON"
+                style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#555555;strokeWidth=2;fontSize=10;fontColor=#555;"
+                edge="1" parent="1" source="vault-zone" target="engine-zone">
+          <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="panel2-title" value="Panel 2: Recipe → Execution Loop" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=12;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="10" y="8" width="460" height="18" as="geometry" />
-        </mxCell>
-
-        <mxCell id="p2-recipe" value="Recipe YAML&lt;br/&gt;(mode + modules +&lt;br/&gt;policy)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#666666;fontSize=10;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="20" y="40" width="90" height="50" as="geometry" />
-        </mxCell>
-        <mxCell id="p2-modules" value="modules: [parser,&lt;br/&gt;validator, executor,&lt;br/&gt;audit-log, ...]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1C4E9;strokeColor=#7E57C2;fontSize=10;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="140" y="40" width="120" height="50" as="geometry" />
-        </mxCell>
-        <mxCell id="p2-policy" value="Policy&lt;br/&gt;Check" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=10;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="290" y="40" width="70" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="p2-executor" value="claude-code-&lt;br/&gt;executor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="20" y="110" width="90" height="45" as="geometry" />
-        </mxCell>
-        <mxCell id="p2-worktree" value="Worktree&quot; style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#FBC02D;fontSize=10;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="140" y="115" width="70" height="30" as="geometry" />
+        <mxCell id="arrow-e2ext" value="adapter output"
+                style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#555555;strokeWidth=2;fontSize=10;fontColor=#555;"
+                edge="1" parent="1" source="engine-zone" target="ext-zone">
+          <mxGeometry relative="1" as="geometry"/>
         </mxCell>
 
-        <mxCell id="p2-ready" value="READY" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;fontSize=10;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="290" y="110" width="55" height="22" as="geometry" />
+        <!-- ════════════════════════════════════════
+             ANNOTATIONS
+        ════════════════════════════════════════ -->
+        <mxCell id="anno-state" value="💡 Engine repo에 live state 없음&lt;br/&gt;Vault는 별도 Git 저장소"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;strokeWidth=1.5;fontSize=10;fontColor=#7a3900;align=left;"
+                vertex="1" parent="1">
+          <mxGeometry x="536" y="212" width="268" height="34" as="geometry"/>
         </mxCell>
-        <mxCell id="p2-running" value="RUNNING" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="290" y="137" width="55" height="22" as="geometry" />
+        <mxCell id="anno-mode" value="💡 Mode is emergent: recipe modules + policy 조합&lt;br/&gt;(hardcoded switch 없음)"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;strokeWidth=1.5;fontSize=10;fontColor=#7a3900;align=left;"
+                vertex="1" parent="1">
+          <mxGeometry x="820" y="212" width="298" height="34" as="geometry"/>
         </mxCell>
-        <mxCell id="p2-review" value="REVIEW" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#FBC02D;fontSize=10;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="290" y="164" width="55" height="22" as="geometry" />
-        </mxCell>
-        <mxCell id="p2-done" value="DONE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;fontSize=10;" vertex="1" parent="panel2-bg">
-          <mxGeometry x="290" y="191" width="55" height="22" as="geometry" />
-        </mxCell>
-
-        <!-- Panel 2 arrows -->
-        <mxCell id="p2-a1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel2-bg" source="p2-recipe" target="p2-modules">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="p2-a2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel2-bg" source="p2-modules" target="p2-policy">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="p2-a3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="panel2-bg" source="p2-policy" target="p2-executor">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="p2-a4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="panel2-bg" source="p2-executor" target="p2-worktree">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="p2-a5" value="kanban run" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;" edge="1" parent="panel2-bg" source="p2-ready" target="p2-running">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="p2-a6" value="exit 0" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;" edge="1" parent="panel2-bg" source="p2-running" target="p2-review">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="p2-a7" value="kanban approve" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;" edge="1" parent="panel2-bg" source="p2-review" target="p2-done">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="anno-json" value="💡 Canonical JSON = internal contract&lt;br/&gt;(human editing surface 아님)"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;strokeWidth=1.5;fontSize=10;fontColor=#7a3900;align=left;"
+                vertex="1" parent="1">
+          <mxGeometry x="1134" y="212" width="270" height="34" as="geometry"/>
         </mxCell>
 
-        <!-- ==================== PANEL 3: WORK SCENARIO ==================== -->
-        <mxCell id="panel3-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#BDBDBD;strokeWidth=1;arcSize=4;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="1080" y="400" width="480" height="220" as="geometry" />
+        <!-- ════════════════════════════════════════
+             PANEL 1: ISSUE LIFECYCLE
+        ════════════════════════════════════════ -->
+        <mxCell id="panel1-bg" value=""
+                style="rounded=1;fillColor=#fafafa;strokeColor=#cccccc;dashed=1;"
+                vertex="1" parent="1">
+          <mxGeometry x="16" y="266" width="502" height="322" as="geometry"/>
         </mxCell>
-        <mxCell id="panel3-title" value="Panel 3: Work Scenario (Jira Export)" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=12;" vertex="1" parent="panel3-bg">
-          <mxGeometry x="10" y="8" width="460" height="18" as="geometry" />
-        </mxCell>
-
-        <mxCell id="p3-vault" value="Vault&lt;br/&gt;Markdown" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#9C27B0;fontSize=10;" vertex="1" parent="panel3-bg">
-          <mxGeometry x="20" y="45" width="80" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="p3-engine" value="Engine&lt;br/&gt;Parser" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;fontSize=10;" vertex="1" parent="panel3-bg">
-          <mxGeometry x="130" y="45" width="80" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="p3-adapter" value="adapter-jira" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#2196F3;fontSize=10;" vertex="1" parent="panel3-bg">
-          <mxGeometry x="80" y="110" width="90" height="35" as="geometry" />
-        </mxCell>
-        <mxCell id="p3-jira" value="Jira API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;" vertex="1" parent="panel3-bg">
-          <mxGeometry x="80" y="165" width="90" height="35" as="geometry" />
-        </mxCell>
-        <mxCell id="p3-oneway" value="one-way export" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#666666;" vertex="1" parent="panel3-bg">
-          <mxGeometry x="180" y="110" width="70" height="20" as="geometry" />
+        <mxCell id="panel1-title" value="Panel 1 — Issue Lifecycle (status.ts 기준 8개 전이)"
+                style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=12;"
+                vertex="1" parent="1">
+          <mxGeometry x="16" y="270" width="502" height="20" as="geometry"/>
         </mxCell>
 
-        <!-- Panel 3 arrows -->
-        <mxCell id="p3-a1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="panel3-bg" source="p3-vault" target="p3-engine">
-          <mxGeometry relative="1" as="geometry" />
+        <!-- Status boxes -->
+        <mxCell id="s-todo"    value="TODO"    style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;strokeWidth=1.5;fontStyle=1;fontSize=10;" vertex="1" parent="1"><mxGeometry x="32"  y="304" width="68" height="32" as="geometry"/></mxCell>
+        <mxCell id="s-ready"   value="READY"   style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#43A047;strokeWidth=1.5;fontStyle=1;fontSize=10;" vertex="1" parent="1"><mxGeometry x="136" y="304" width="68" height="32" as="geometry"/></mxCell>
+        <mxCell id="s-running" value="RUNNING" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1E88E5;strokeWidth=2;fontStyle=1;fontSize=10;fontColor=#1565C0;" vertex="1" parent="1"><mxGeometry x="240" y="304" width="72" height="32" as="geometry"/></mxCell>
+        <mxCell id="s-review"  value="REVIEW"  style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;strokeWidth=1.5;fontStyle=1;fontSize=10;" vertex="1" parent="1"><mxGeometry x="348" y="304" width="68" height="32" as="geometry"/></mxCell>
+        <mxCell id="s-done"    value="DONE"    style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#43A047;strokeWidth=2;fontStyle=1;fontSize=10;fontColor=#2e7d32;" vertex="1" parent="1"><mxGeometry x="452" y="304" width="50" height="32" as="geometry"/></mxCell>
+        <mxCell id="s-failed"  value="FAILED"  style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#E53935;strokeWidth=2;fontStyle=1;fontSize=10;fontColor=#b71c1c;" vertex="1" parent="1"><mxGeometry x="240" y="388" width="72" height="32" as="geometry"/></mxCell>
+
+        <!-- Forward transitions -->
+        <mxCell id="t-todo-ready"    value="준비"    style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#555;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="s-todo"    target="s-ready"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="t-ready-running" value="실행"    style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#555;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="s-ready"   target="s-running"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="t-running-review" value="exit 0" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#555;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="s-running"  target="s-review"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="t-review-done"   value="approve" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#555;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="s-review"   target="s-done"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="t-running-failed" value="no-change / exit non-0" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#c62828;strokeWidth=1.5;fontSize=10;fontColor=#c62828;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s-running" target="s-failed"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- Back transitions (dashed) -->
+        <mxCell id="t-ready-todo"     value="되돌리기" style="edgeStyle=elbowEdgeStyle;html=1;strokeColor=#888;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#888;exitX=0;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;elbow=vertical;" edge="1" parent="1" source="s-ready" target="s-todo"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="170" y="296"/><mxPoint x="66" y="296"/></Array></mxGeometry></mxCell>
+        <mxCell id="t-review-running" value="retry"   style="edgeStyle=elbowEdgeStyle;html=1;strokeColor=#888;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#888;exitX=0;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="s-review" target="s-running"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="348" y="296"/><mxPoint x="312" y="296"/></Array></mxGeometry></mxCell>
+        <mxCell id="t-failed-ready"   value="retry"   style="edgeStyle=elbowEdgeStyle;html=1;strokeColor=#888;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#888;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="s-failed" target="s-ready"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="210" y="404"/><mxPoint x="210" y="336"/></Array></mxGeometry></mxCell>
+
+        <!-- Epic / terminal note -->
+        <mxCell id="panel1-note" value="Epic: TODO / DONE 만 허용 (executor = human)&#xa;no-change success (exit 0 + no file change) → FAILED&#xa;Terminal states: DONE, FAILED"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#9C27B0;strokeWidth=1;dashed=1;fontSize=10;fontColor=#6a1b9a;align=left;verticalAlign=middle;"
+                vertex="1" parent="1">
+          <mxGeometry x="32" y="435" width="480" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="p3-a2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="panel3-bg" source="p3-engine" target="p3-adapter">
-          <mxGeometry relative="1" as="geometry" />
+
+        <!-- ════════════════════════════════════════
+             PANEL 2: RECIPE → EXECUTION LOOP
+        ════════════════════════════════════════ -->
+        <mxCell id="panel2-bg" value=""
+                style="rounded=1;fillColor=#fafafa;strokeColor=#cccccc;dashed=1;"
+                vertex="1" parent="1">
+          <mxGeometry x="530" y="266" width="530" height="322" as="geometry"/>
         </mxCell>
-        <mxCell id="p3-a3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="panel3-bg" source="p3-adapter" target="p3-jira">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="panel2-title" value="Panel 2 — Recipe → Execution Loop"
+                style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=12;"
+                vertex="1" parent="1">
+          <mxGeometry x="530" y="270" width="530" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- Recipe resolution steps -->
+        <mxCell id="r-step-label" value="Active Recipe Resolution (우선순위 순):"
+                style="text;html=1;align=left;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="546" y="296" width="300" height="18" as="geometry"/>
+        </mxCell>
+        <mxCell id="r-step1" value="① KANBAN_RECIPE (env)"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#9E9E9E;strokeWidth=1.5;fontSize=11;"
+                vertex="1" parent="1">
+          <mxGeometry x="546" y="316" width="200" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="r-step2" value="② vault/config/active-recipe.yaml"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#9E9E9E;strokeWidth=1.5;fontSize=11;"
+                vertex="1" parent="1">
+          <mxGeometry x="546" y="350" width="200" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="r-step3" value="③ bundled home-assisted.yaml"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#9E9E9E;strokeWidth=1.5;fontSize=11;"
+                vertex="1" parent="1">
+          <mxGeometry x="546" y="384" width="200" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="r-arrow-12" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#555;strokeWidth=1.5;" edge="1" parent="1" source="r-step1" target="r-step2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="r-arrow-23" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#555;strokeWidth=1.5;" edge="1" parent="1" source="r-step2" target="r-step3"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- PolicyEngine -->
+        <mxCell id="r-policy" value="&lt;b&gt;PolicyEngine&lt;/b&gt;&lt;br/&gt;(fail-closed)"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#43A047;strokeWidth=1.5;fontSize=11;"
+                vertex="1" parent="1">
+          <mxGeometry x="546" y="422" width="200" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="r-arrow-step3-policy" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#555;strokeWidth=1.5;" edge="1" parent="1" source="r-step3" target="r-policy"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- Fork: validate-only -->
+        <mxCell id="r-validate" value="&lt;b&gt;validate-only&lt;/b&gt;&lt;br/&gt;(no mutation)"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#9C27B0;strokeWidth=1.5;dashed=1;fontSize=11;fontColor=#6a1b9a;"
+                vertex="1" parent="1">
+          <mxGeometry x="762" y="424" width="130" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="r-arrow-policy-validate" value="recipes/validate-only.yaml"
+                style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#888;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#888;"
+                edge="1" parent="1" source="r-policy" target="r-validate">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Executor -->
+        <mxCell id="r-executor" value="&lt;b&gt;claude-code-executor&lt;/b&gt;&lt;br/&gt;or codex-runner"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1E88E5;strokeWidth=1.5;fontSize=11;"
+                vertex="1" parent="1">
+          <mxGeometry x="546" y="474" width="200" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="r-arrow-policy-exec" value="--execute"
+                style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#555;strokeWidth=1.5;fontSize=10;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;"
+                edge="1" parent="1" source="r-policy" target="r-executor">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Worktree -->
+        <mxCell id="r-worktree" value="Isolated Worktree"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1E88E5;strokeWidth=1.5;fontSize=11;fontColor=#1565C0;"
+                vertex="1" parent="1">
+          <mxGeometry x="546" y="526" width="200" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="r-arrow-exec-wt" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#555;strokeWidth=1.5;" edge="1" parent="1" source="r-executor" target="r-worktree"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- Status mini note -->
+        <mxCell id="r-status-note" value="READY → RUNNING → REVIEW → DONE&#xa;                          └→ FAILED"
+                style="text;html=1;align=left;fontSize=10;fontColor=#555;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="546" y="560" width="300" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- ════════════════════════════════════════
+             PANEL 3: WORK / JIRA EXPORT
+        ════════════════════════════════════════ -->
+        <mxCell id="panel3-bg" value=""
+                style="rounded=1;fillColor=#fafafa;strokeColor=#cccccc;dashed=1;"
+                vertex="1" parent="1">
+          <mxGeometry x="1072" y="266" width="510" height="322" as="geometry"/>
+        </mxCell>
+        <mxCell id="panel3-title" value="Panel 3 — Work Mode: Jira Export"
+                style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=12;"
+                vertex="1" parent="1">
+          <mxGeometry x="1072" y="270" width="510" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- Flow boxes -->
+        <mxCell id="p3-vault" value="&lt;b&gt;Vault&lt;/b&gt;&lt;br/&gt;Markdown Issues&lt;br/&gt;&lt;i style='color:#7a3900'&gt;SoT&lt;/i&gt;"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#9C27B0;strokeWidth=1.5;fontSize=11;"
+                vertex="1" parent="1">
+          <mxGeometry x="1090" y="304" width="130" height="68" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3-engine" value="&lt;b&gt;Engine&lt;/b&gt;&lt;br/&gt;parser + store&lt;br/&gt;→ Canonical JSON"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;strokeWidth=1.5;fontSize=11;"
+                vertex="1" parent="1">
+          <mxGeometry x="1090" y="398" width="130" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3-jira-adapter" value="&lt;b&gt;adapter-jira&lt;/b&gt;&lt;br/&gt;RuntimePolicy check"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#2196F3;strokeWidth=1.5;fontSize=11;"
+                vertex="1" parent="1">
+          <mxGeometry x="1090" y="480" width="130" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3-jira-api" value="&lt;b&gt;Jira API&lt;/b&gt;&lt;br/&gt;(one-way export)"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1565C0;strokeWidth=1.5;fontSize=11;"
+                vertex="1" parent="1">
+          <mxGeometry x="1090" y="550" width="130" height="44" as="geometry"/>
+        </mxCell>
+
+        <!-- Flow arrows -->
+        <mxCell id="p3-a1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#555;strokeWidth=1.5;" edge="1" parent="1" source="p3-vault"        target="p3-engine"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="p3-a2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#555;strokeWidth=1.5;" edge="1" parent="1" source="p3-engine"       target="p3-jira-adapter"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="p3-a3" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#555;strokeWidth=1.5;" edge="1" parent="1" source="p3-jira-adapter" target="p3-jira-api"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- Write-back callout -->
+        <mxCell id="p3-writeback" value="&lt;b&gt;Work mode write-back 제한:&lt;/b&gt;&lt;br/&gt;✅ sync.jira.key&lt;br/&gt;✅ sync.jira.status&lt;br/&gt;✅ sync.jira.exportedAt&lt;br/&gt;❌ body 수정 불가&lt;br/&gt;❌ Firebase sync&lt;br/&gt;❌ OpenClaw execution&lt;br/&gt;❌ mobile real-time sync"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;strokeWidth=1.5;fontSize=11;fontColor=#7a3900;align=left;verticalAlign=top;"
+                vertex="1" parent="1">
+          <mxGeometry x="1244" y="304" width="320" height="160" as="geometry"/>
+        </mxCell>
+
+        <!-- Policy note -->
+        <mxCell id="p3-policy-note" value="assertAdapterAllowed() — policy 없이 permissive 동작 금지 (fail-closed)&#xa;ExternalSyncPolicy = 'atlassian-only'"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#9E9E9E;strokeWidth=1;dashed=1;fontSize=10;fontColor=#555;align=left;verticalAlign=middle;"
+                vertex="1" parent="1">
+          <mxGeometry x="1244" y="480" width="320" height="60" as="geometry"/>
         </mxCell>
 
       </root>
