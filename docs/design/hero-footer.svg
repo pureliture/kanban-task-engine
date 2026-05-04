@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 110" width="1400" height="110">
+  <defs>
+    <linearGradient id="f-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#091525"/>
+      <stop offset="100%" stop-color="#0d0d20"/>
+    </linearGradient>
+    <linearGradient id="f-stripe" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="35%" stop-color="#8b5cf6"/>
+      <stop offset="65%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Top wave (continues from GitHub dark bg #0d1117) -->
+  <path d="M0 0 C230 24 470 6 700 18 C930 30 1170 10 1400 22 L1400 0 Z"
+        fill="#0d1117"/>
+
+  <!-- Background fill -->
+  <rect y="14" width="1400" height="96" fill="url(#f-bg)"/>
+
+  <!-- Bottom accent stripe -->
+  <rect y="107" width="1400" height="3" fill="url(#f-stripe)"/>
+</svg>

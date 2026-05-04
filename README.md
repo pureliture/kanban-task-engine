@@ -1,7 +1,7 @@
 <!-- ──────────────── HERO ──────────────── -->
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6&height=220&section=header&text=kanban-task-engine&fontSize=52&fontColor=ffffff&animation=fadeIn&fontAlignY=36&desc=Markdown-native%20task%20lifecycle%20engine%20for%20Home%20%26%20Work&descSize=15&descAlignY=58&descAlign=50" alt="kanban-task-engine" width="100%" />
+<img src="docs/design/hero-header.svg" alt="kanban-task-engine" width="100%" />
 
 <br/>
 
@@ -37,7 +37,7 @@
 
 <br/>
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=gradient&customColorList=6&height=3" width="100%" />
+<img src="docs/design/divider.svg" alt="" width="100%" />
 
 <br/>
 
@@ -106,7 +106,7 @@ agent executor는 target repo 내부의 **isolated worktree**에서 작업합니
 
 <br/>
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=gradient&customColorList=6&height=3" width="100%" />
+<img src="docs/design/divider.svg" alt="" width="100%" />
 
 <br/>
 
@@ -187,7 +187,7 @@ mutation 없이 schema·policy validation만 수행합니다.
 
 <br/>
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=gradient&customColorList=6&height=3" width="100%" />
+<img src="docs/design/divider.svg" alt="" width="100%" />
 
 <br/>
 
@@ -212,7 +212,7 @@ KANBAN_HOME=$HOME/.openclaw/workspace-kanban/kanban \
 
 <br/>
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=gradient&customColorList=6&height=3" width="100%" />
+<img src="docs/design/divider.svg" alt="" width="100%" />
 
 <br/>
 
@@ -274,7 +274,7 @@ KANBAN_HOME=$HOME/.openclaw/workspace-kanban/kanban \
 
 <br/>
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=gradient&customColorList=6&height=3" width="100%" />
+<img src="docs/design/divider.svg" alt="" width="100%" />
 
 <br/>
 
@@ -318,7 +318,7 @@ issue id의 path traversal, slash, NUL, leading dash는 거부합니다.
 
 <br/>
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=gradient&customColorList=6&height=3" width="100%" />
+<img src="docs/design/divider.svg" alt="" width="100%" />
 
 <br/>
 
@@ -339,7 +339,7 @@ packages/
 
 <br/>
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=gradient&customColorList=6&height=3" width="100%" />
+<img src="docs/design/divider.svg" alt="" width="100%" />
 
 <br/>
 
@@ -447,7 +447,7 @@ issue 상태 변경 없음.<br/>schema 오류·policy 위반만 리포트.
 
 <br/>
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=gradient&customColorList=6&height=3" width="100%" />
+<img src="docs/design/divider.svg" alt="" width="100%" />
 
 <br/>
 
@@ -473,7 +473,7 @@ pnpm eval:hardening -- --strict-architecture
 
 <br/>
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=gradient&customColorList=6&height=3" width="100%" />
+<img src="docs/design/divider.svg" alt="" width="100%" />
 
 <br/>
 
@@ -518,7 +518,7 @@ pnpm eval:hardening -- --strict-architecture
 <!-- ──────────────── FOOTER ──────────────── -->
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6&height=120&section=footer" width="100%" />
+<img src="docs/design/hero-footer.svg" alt="" width="100%" />
 
 <sub>
   <a href="https://github.com/pureliture">@pureliture</a> ·
