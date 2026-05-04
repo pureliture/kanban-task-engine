@@ -44,10 +44,12 @@
 ## 🏛️ 아키텍처 개요
 
 <p align="center">
-  <img src="docs/design/kanban-task-engine-one-page.svg" alt="Architecture Overview" width="100%" />
+  <a href="docs/design/kanban-task-engine-one-page.svg">
+    <img src="docs/design/kanban-task-engine-one-page.svg" alt="Architecture Overview — click to view full size" width="100%" />
+  </a>
 </p>
 
-> 📌 로컬에서 상세하게 보려면 [`docs/design/kanban-task-engine-one-page.html`](docs/design/kanban-task-engine-one-page.html)을 브라우저로 열어주세요.
+> 💡 이미지를 클릭하면 full-size 다이어그램을 볼 수 있습니다. 로컬 인터랙티브 버전은 [`docs/design/kanban-task-engine-one-page.html`](docs/design/kanban-task-engine-one-page.html)을 브라우저로 열어주세요.
 
 <details>
 <summary><b>Architecture Detail (Text Version)</b></summary>
