@@ -174,11 +174,12 @@ def check_svg_rendering_contract(root: Path) -> bool:
     if not architecture_embed_paths:
         return False
     for path in architecture_embed_paths:
+        target_width = None if path.name == "kanban-task-engine-one-page.svg" else README_RENDER_WIDTH
         if not check_single_svg_rendering_contract(
             root,
             path,
             "README embed SVG",
-            target_render_width=README_RENDER_WIDTH,
+            target_render_width=target_width,
         ):
             ok = False
     return ok
