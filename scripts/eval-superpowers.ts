@@ -80,6 +80,11 @@ function sectionBetween(content: string, start: string, end: string): string {
   return endAt < 0 ? content.slice(startAt) : content.slice(startAt, endAt);
 }
 
+function markdownHeadingExists(content: string, heading: string): boolean {
+  const escapedHeading = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`^#{2,4}\\s+(?:[^\\p{L}\\p{N}]+\\s+)?${escapedHeading}\\s*$`, 'mu').test(content);
+}
+
 function score(checks: Check[]): Pick<SuperpowerEval, 'deterministicScore' | 'passed' | 'total'> {
   const total = checks.length;
   const passed = checks.filter(check => check.pass).length;
@@ -156,6 +161,8 @@ const ciWorkflow = maybeRead('.github/workflows/ci.yml');
 const gitignore = maybeRead('.gitignore');
 const boardCommand = maybeRead('packages/cli/src/commands/board.ts');
 const packageJson = JSON.parse(read('package.json')) as { packageManager?: string; scripts?: Record<string, string> };
+const docsVerificationScriptsConfigured = packageJson.scripts?.['docs:verify'] === 'python3 scripts/verify-docs.py'
+  && packageJson.scripts?.['test:docs'] === 'vitest run scripts/verify-docs.test.ts && pnpm docs:verify';
 const corePackage = exists('packages/core/package.json')
   ? JSON.parse(read('packages/core/package.json')) as { dependencies?: Record<string, string>; devDependencies?: Record<string, string> }
   : { dependencies: {}, devDependencies: {} };
@@ -330,12 +337,12 @@ const evals: SuperpowerEval[] = [];
 {
   const checks: Check[] = [
     { name: 'Hardening spec is loaded as eval input', pass: /Kanban Task Engine System Hardening Spec/.test(hardeningSpec) },
-    { name: 'README exposes operator headings', pass: ['Quick Start', 'Home And Work Modes', 'CLI', 'Recipes', 'Safety Model'].every(heading => new RegExp(`^## ${heading}$`, 'm').test(readme)) },
+    { name: 'README exposes operator headings', pass: ['Quick Start', 'Home And Work Modes', 'CLI', 'Recipes', 'Safety Model'].every(heading => markdownHeadingExists(readme, heading)) },
     { name: 'Runtime guide documents no-change FAILED', pass: /no-change[\s\S]{0,160}FAILED/i.test(runtimeDocs) },
     { name: 'Archive index maps older docs to 2026-05-02 spec', pass: /2026-04-23-kanban-control-plane-design\.md/.test(archiveIndex) && /2026-04-30-agent-runner-codex-target-design\.md/.test(archiveIndex) && /2026-05-02-kanban-system-hardening-spec\.md/.test(archiveIndex) },
     { name: 'Deploy checklist covers rollback triggers and tech debt', pass: /Rollback Triggers/.test(deployChecklist) && /Tech Debt Triage/.test(deployChecklist) && /strict-architecture/.test(deployChecklist) },
-    { name: 'Root package pins pnpm and hardening eval', pass: packageJson.packageManager === 'pnpm@10.32.1' && packageJson.scripts?.['eval:hardening'] === 'node --import tsx scripts/check-hardening.ts' },
-    { name: 'CI runs build, test, superpowers, and hardening gates', pass: /pnpm\/action-setup@v4/.test(ciWorkflow) && appearsBefore(ciWorkflow, 'pnpm/action-setup@v4', 'actions/setup-node@v4') && /node-version:\s*['"]?22['"]?/.test(ciWorkflow) && /pnpm -r build/.test(ciWorkflow) && /pnpm -r test/.test(ciWorkflow) && /pnpm eval:superpowers/.test(ciWorkflow) && /pnpm eval:hardening/.test(ciWorkflow) },
+    { name: 'Root package pins pnpm and hardening/docs eval', pass: packageJson.packageManager === 'pnpm@10.32.1' && packageJson.scripts?.['eval:hardening'] === 'node --import tsx scripts/check-hardening.ts' && docsVerificationScriptsConfigured },
+    { name: 'CI runs build, test, docs, superpowers, and hardening gates in order', pass: /pnpm\/action-setup@v4/.test(ciWorkflow) && appearsBefore(ciWorkflow, 'pnpm/action-setup@v4', 'actions/setup-node@v4') && /node-version:\s*['"]?22['"]?/.test(ciWorkflow) && /pnpm -r build/.test(ciWorkflow) && /pnpm -r test/.test(ciWorkflow) && /pnpm test:docs/.test(ciWorkflow) && /pnpm eval:superpowers/.test(ciWorkflow) && /pnpm eval:hardening/.test(ciWorkflow) && appearsBefore(ciWorkflow, 'pnpm -r build', 'pnpm -r test') && appearsBefore(ciWorkflow, 'pnpm -r test', 'pnpm test:docs') && appearsBefore(ciWorkflow, 'pnpm test:docs', 'pnpm eval:superpowers') && appearsBefore(ciWorkflow, 'pnpm eval:superpowers', 'pnpm eval:hardening') },
     { name: 'Legacy workspace config is migration-only in docs', pass: /config\/workspaces\.json/.test([readme, runtimeDocs, archiveIndex].join('\n')) && /migration-only/i.test([readme, runtimeDocs, archiveIndex].join('\n')) },
   ];
   evals.push({

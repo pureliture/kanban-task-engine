@@ -7,6 +7,8 @@
   "scripts": {
     "build": "pnpm -r build",
     "test": "pnpm -r test",
+    "docs:verify": "python3 scripts/verify-docs.py",
+    "test:docs": "vitest run scripts/verify-docs.test.ts && pnpm docs:verify",
     "eval:hardening": "node --import tsx scripts/check-hardening.ts",
     "eval:superpowers": "node --import tsx scripts/eval-superpowers.ts",
     "eval:superpowers:full": "node --import tsx scripts/eval-superpowers.ts --with-tests",

@@ -1,6 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" font-family="&#39;Segoe UI&#39;,&#39;Helvetica Neue&#39;,Arial,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" font-family="&#39;Segoe UI&#39;,&#39;Helvetica Neue&#39;,Arial,sans-serif" role="img" aria-labelledby="title desc">
+  <title id="title">kanban-task-engine system map</title>
+  <desc id="desc">Full one-page architecture diagram showing the separate Vault source of truth, Engine packages, executor flow, issue lifecycle with IssueStatus and VALID_ISSUE_TRANSITIONS, and Work mode Jira export boundaries.</desc>
   <defs>
-    
+    <style>
+      text { font-family: &#39;Segoe UI&#39;, &#39;Helvetica Neue&#39;, Arial, sans-serif; }
+      .ttl { font-size: 17px; font-weight: 700; }
+      .zone { font-size: 13px; font-weight: 700; }
+      .bh { font-size: 11px; font-weight: 700; }
+      .bs { font-size: 10px; }
+      .al { font-size: 10px; fill: #555; }
+      .ann { font-size: 10px; fill: #7a3900; }
+      .ptl { font-size: 12px; font-weight: 700; }
+      .stxt { font-size: 10px; font-weight: 700; }
+      .nt { font-size: 10px; }
+    </style>
     <marker id="ar" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
       <polygon points="0 0,7 2.5,0 5" fill="#555"></polygon>
     </marker>
@@ -12,9 +25,10 @@
     </marker>
   </defs>
 
+  <rect x="0" y="0" width="1600" height="900" fill="#ffffff"></rect>
   
   <text x="16" y="22" class="ttl" fill="#1a1a1a">kanban-task-engine — System Map</text>
-  <text x="16" y="36" font-size="10" fill="#888">packages/schema/src/status.ts 기준 8개 전이 · 2026-05-03</text>
+  <text x="16" y="36" font-size="10" fill="#666">packages/schema/src/status.ts 기준 IssueStatus (6) · VALID_ISSUE_TRANSITIONS (8) · 2026-05-06</text>
 
   
   <rect x="8" y="44" width="268" height="172" rx="6" fill="#F3E5F5" stroke="#9C27B0" stroke-width="1.8" stroke-dasharray="7,3"></rect>
@@ -67,13 +81,13 @@
   <text x="614" y="100" text-anchor="middle" class="bs" fill="#555">IssueFrontmatter</text>
   <text x="614" y="112" text-anchor="middle" class="bs" fill="#555">CanonicalIssueModel</text>
   <text x="614" y="124" text-anchor="middle" class="bs" fill="#555">IssueStatus (6)</text>
-  <text x="614" y="136" text-anchor="middle" class="bs" fill="#555">VALID_TRANSITIONS (8)</text>
+  <text x="614" y="136" text-anchor="middle" class="bs" fill="#555">VALID_ISSUE_TRANSITIONS (8)</text>
 
   
   <rect x="734" y="72" width="200" height="136" rx="3" fill="#fff" stroke="#4CAF50" stroke-width="1.2"></rect>
-  <text x="834" y="87" text-anchor="middle" class="bh" fill="#333">Adapters</text>
+  <text x="834" y="87" text-anchor="middle" class="bh" fill="#333">Adapters + Executor</text>
   <text x="834" y="100" text-anchor="middle" class="bs" fill="#555">adapter-claude-code</text>
-  <text x="834" y="112" text-anchor="middle" class="bs" fill="#555">adapter-codex</text>
+  <text x="834" y="112" text-anchor="middle" class="bs" fill="#555">codex-runner</text>
   <text x="834" y="124" text-anchor="middle" class="bs" fill="#555">adapter-jira</text>
   <text x="834" y="136" text-anchor="middle" class="bs" fill="#555">adapter-firebase</text>
   <text x="834" y="148" text-anchor="middle" class="bs" fill="#555">adapter-openclaw</text>

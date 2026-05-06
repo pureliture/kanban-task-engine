@@ -38,6 +38,9 @@ jobs:
       - name: Test
         run: pnpm -r test
 
+      - name: Docs verification
+        run: pnpm test:docs
+
       - name: Superpowers eval
         run: pnpm eval:superpowers
 
