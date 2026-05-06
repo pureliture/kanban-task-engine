@@ -174,15 +174,33 @@ describe('verify-docs SVG rendering contract', () => {
     expect(result.output).toContain('full-viewBox background');
   });
 
-  it('fails when README effective body font is too small at 900px', async () => {
+  it('fails when an alternate README embed SVG has too-small effective body font at 900px', async () => {
     const root = await makeFixture({
-      svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+      readmeImage: 'docs/design/kanban-task-engine-architecture-overview.svg',
+      svg: validSvg(),
+    });
+    await writeFile(
+      join(root, 'docs/design/kanban-task-engine-architecture-overview.svg'),
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
         <title>Architecture fixture</title>
         <desc>Fixture SVG for docs verification tests.</desc>
         <rect x="0" y="0" width="1600" height="900" fill="#f8fafc"></rect>
         <text x="20" y="40" font-size="10">Vault Engine Markdown Canonical Recipe TODO READY RUNNING REVIEW DONE FAILED Jira Worktree codex-runner validate-only SoT IssueStatus (6) VALID_ISSUE_TRANSITIONS (8)</text>
       </svg>`,
-    });
+      'utf8',
+    );
+    await writeFile(
+      join(root, 'docs/design/README.md'),
+      [
+        '# docs/design',
+        '',
+        '`kanban-task-engine-one-page.drawio`',
+        '`kanban-task-engine-one-page.svg`',
+        '`kanban-task-engine-architecture-overview.svg`',
+        '',
+      ].join('\n'),
+      'utf8',
+    );
 
     const result = runVerify(root);
 
@@ -199,6 +217,15 @@ describe('verify-docs SVG rendering contract', () => {
 
     expect(result.status).not.toBe(0);
     expect(result.output).toContain('external SVG reference');
+  });
+
+  it('passes when README embeds the full one-page SVG directly', async () => {
+    const root = await makeFixture({ svg: validSvg() });
+
+    const result = runVerify(root);
+
+    expect(result.status).toBe(0);
+    expect(result.output).toContain('README embed SVG SVG rendering contract is satisfied');
   });
 
   it('fails on false package labels not backed by repo packages', async () => {

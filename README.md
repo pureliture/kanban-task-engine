@@ -45,11 +45,11 @@
 
 <p align="center">
   <a href="docs/design/kanban-task-engine-one-page.svg">
-    <img src="docs/design/kanban-task-engine-architecture-overview.svg" alt="kanban-task-engine architecture overview showing Vault, Engine, executor, and external integration boundaries" width="100%" />
+    <img src="docs/design/kanban-task-engine-one-page.svg" alt="kanban-task-engine one-page system map showing Vault, Engine, issue lifecycle, execution loop, and Work mode Jira export boundaries" width="100%" />
   </a>
 </p>
 
-> 💡 이미지를 클릭하면 full-size one-page 다이어그램을 볼 수 있습니다. 로컬 인터랙티브 버전은 [`docs/design/kanban-task-engine-one-page.html`](docs/design/kanban-task-engine-one-page.html)을 브라우저로 열어주세요.
+> 💡 GitHub에서 이미지가 작게 보이면 클릭해서 full-size one-page 다이어그램으로 확인할 수 있습니다. 로컬 인터랙티브 버전은 [`docs/design/kanban-task-engine-one-page.html`](docs/design/kanban-task-engine-one-page.html)을 브라우저로 열어주세요.
 
 <details>
 <summary><b>Architecture Detail (Text Version)</b></summary>

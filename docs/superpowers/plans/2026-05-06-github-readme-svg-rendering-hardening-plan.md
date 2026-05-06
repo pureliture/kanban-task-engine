@@ -4,11 +4,13 @@
 
 **Goal:** GitHub README에서 architecture SVG가 깨지지 않고 읽히도록 asset, verifier, docs, CI gate를 TDD로 고친다.
 
-**Architecture:** `docs/design/kanban-task-engine-one-page.drawio`는 semantic editing source이고, `docs/design/kanban-task-engine-one-page.svg`는 README/raw display production render다. README embed에는 900px 폭 가독성을 보장하는 compact overview SVG를 사용하고, one-page SVG는 full-size link와 raw view에서 self-contained rendering contract를 만족시킨다. `scripts/verify-docs.py --root <path>`가 fixture와 real repo를 모두 검증하며 CI에서 자동 실행된다.
+**Architecture:** `docs/design/kanban-task-engine-one-page.drawio`는 semantic editing source이고, `docs/design/kanban-task-engine-one-page.svg`는 README/raw display production render다. README embed는 원본 one-page SVG를 직접 사용하고, compact overview SVG는 보조 asset으로만 유지한다. `scripts/verify-docs.py --root <path>`가 fixture와 real repo를 모두 검증하며 CI에서 자동 실행된다.
 
 **Tech Stack:** Python 3 stdlib (`argparse`, `xml.etree.ElementTree`, `re`, `pathlib`), TypeScript Vitest, SVG, Markdown, GitHub Actions, Browser Use screenshot QA.
 
 **Execution Status (2026-05-06):** Implemented locally. The Python verifier is split behind `scripts/verify-docs.py` into `scripts/verify_docs/*`, the docs verifier has fixture-based regression tests, and local `pnpm -r build`, `pnpm -r test`, `pnpm test:docs`, `pnpm eval:superpowers`, `pnpm eval:hardening -- --strict-architecture`, and `git diff --check HEAD` passed.
+
+**Correction Note:** A compact overview was initially used as the README image fallback, but the accepted behavior is to show the original `kanban-task-engine-one-page.svg` in `README.md`. Plan tasks that describe compact README replacement are preserved as historical implementation notes and are superseded by this correction.
 
 ---
 
@@ -18,7 +20,7 @@
 |---|---|---|
 | Requirements refresh | `context7`, `architecture`, `system-design` | GitHub README image and SVG self-contained rendering contract 근거 확인 |
 | Test design | `testing-strategy`, `superpowers:test-driven-development` | RED fixture tests, verifier integration, CI gate 구성 |
-| Asset design | `frontend-design`, `architecture`, `system-design` | README-safe compact SVG와 one-page raw SVG visual contract |
+| Asset design | `frontend-design`, `architecture`, `system-design` | README-safe one-page raw SVG visual contract와 보조 compact SVG |
 | Documentation | `documentation`, `skill-creator` | repo-local authoring rules 문서화; global skill은 만들지 않는 결정 기록 |
 | Tech debt control | `tech-debt`, `code-simplifier` | regex debt, dependency debt, source/render drift 최소화 |
 | Deployment | `deploy-checklist`, `superpowers:verification-before-completion` | local/CI/hosted GitHub 완료 기준 분리 |
@@ -34,8 +36,8 @@
 | `scripts/verify-docs.test.ts` | Create | Fixture-based RED/GREEN tests for docs verifier. |
 | `scripts/verify-docs.py` | Modify | Add `--root`, XML-based SVG contract checks, runtime-truth checks. |
 | `docs/design/kanban-task-engine-one-page.svg` | Modify | Add self-contained styles/background, remove false runtime labels, pass raw SVG contract. |
-| `docs/design/kanban-task-engine-architecture-overview.svg` | Create | Compact README-safe overview asset, `720`-wide viewBox. |
-| `README.md` | Modify | Embed compact overview; keep full-size one-page link and text detail. |
+| `docs/design/kanban-task-engine-architecture-overview.svg` | Create | Auxiliary compact overview asset, `720`-wide viewBox. |
+| `README.md` | Modify | Embed original one-page SVG and keep text detail/full-size click path. |
 | `docs/design/README.md` | Modify | Document GitHub README SVG contract and post-export hardening rule. |
 | `docs/design/HANDOFF-2026-05-06.md` | Create | Record follow-up cause, changed assets, verification evidence, hosted-readiness caveat. |
 | `package.json` | Modify | Add `docs:verify` and `test:docs` scripts. |
