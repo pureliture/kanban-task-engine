@@ -53,11 +53,15 @@ function appearsBefore(content: string, first: string, second: string): boolean 
 }
 
 function headingExists(content: string, heading: string): boolean {
-  return new RegExp(`^## ${escapeRegExp(heading)}\\s*$`, 'm').test(content);
+  return new RegExp(`^#{2,4}\\s+(?:[^\\p{L}\\p{N}]+\\s+)?${escapeRegExp(heading)}\\s*$`, 'mu').test(content);
 }
 
 function escapeRegExp(input: string): string {
   return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function toPosix(relPath: string): string {
+  return relPath.split(path.sep).join('/');
 }
 
 function walk(relRoot: string): string[] {
@@ -92,13 +96,14 @@ function scanGuard(guard: ArchitectureGuard): { unapproved: string[]; allowed: s
   const allowed: string[] = [];
 
   for (const relPath of files) {
+    const normalizedRelPath = toPosix(relPath);
     const lines = maybeRead(relPath).split('\n');
     lines.forEach((line, index) => {
       guard.match.lastIndex = 0;
       if (!guard.match.test(line)) return;
-      const hit = `${relPath}:${index + 1}`;
-      if (allowedFiles.has(relPath)) {
-        allowed.push(`${hit} (${allowedFiles.get(relPath)})`);
+      const hit = `${normalizedRelPath}:${index + 1}`;
+      if (allowedFiles.has(normalizedRelPath)) {
+        allowed.push(`${hit} (${allowedFiles.get(normalizedRelPath)})`);
       } else {
         unapproved.push(hit);
       }
@@ -115,6 +120,8 @@ const archive = maybeRead('docs/archive/README.md');
 const ci = maybeRead('.github/workflows/ci.yml');
 const evalSuperpowers = maybeRead('scripts/eval-superpowers.ts');
 const combinedDocs = [readme, runtime, archive].join('\n');
+const docsVerificationScriptsConfigured = pkg.scripts?.['docs:verify'] === 'python3 scripts/verify-docs.py'
+  && pkg.scripts?.['test:docs'] === 'vitest run scripts/verify-docs.test.ts && pnpm docs:verify';
 
 const checks: Check[] = [
   {
@@ -152,14 +159,21 @@ const checks: Check[] = [
       /git diff --check origin\/main\.\.\.HEAD/,
       /pnpm -r build/,
       /pnpm -r test/,
+      /pnpm test:docs/,
       /pnpm eval:superpowers/,
       /pnpm eval:hardening/,
-    ]) && appearsBefore(ci, 'pnpm/action-setup@v4', 'actions/setup-node@v4'),
+    ])
+      && appearsBefore(ci, 'pnpm/action-setup@v4', 'actions/setup-node@v4')
+      && appearsBefore(ci, 'pnpm -r build', 'pnpm -r test')
+      && appearsBefore(ci, 'pnpm -r test', 'pnpm test:docs')
+      && appearsBefore(ci, 'pnpm test:docs', 'pnpm eval:superpowers')
+      && appearsBefore(ci, 'pnpm eval:superpowers', 'pnpm eval:hardening'),
   },
   {
-    name: 'package.json pins pnpm and exposes eval:hardening',
+    name: 'package.json pins pnpm and exposes eval/docs scripts',
     pass: pkg.packageManager === 'pnpm@10.32.1'
-      && pkg.scripts?.['eval:hardening'] === 'node --import tsx scripts/check-hardening.ts',
+      && pkg.scripts?.['eval:hardening'] === 'node --import tsx scripts/check-hardening.ts'
+      && docsVerificationScriptsConfigured,
   },
   {
     name: 'Superpowers eval includes 2026-05-02 hardening spec input',

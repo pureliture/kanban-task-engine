@@ -45,11 +45,11 @@
 
 <p align="center">
   <a href="docs/design/kanban-task-engine-one-page.svg">
-    <img src="docs/design/kanban-task-engine-one-page.svg" alt="Architecture Overview — click to view full size" width="100%" />
+    <img src="docs/design/kanban-task-engine-architecture-overview.svg" alt="kanban-task-engine architecture overview showing Vault, Engine, executor, and external integration boundaries" width="100%" />
   </a>
 </p>
 
-> 💡 이미지를 클릭하면 full-size 다이어그램을 볼 수 있습니다. 로컬 인터랙티브 버전은 [`docs/design/kanban-task-engine-one-page.html`](docs/design/kanban-task-engine-one-page.html)을 브라우저로 열어주세요.
+> 💡 이미지를 클릭하면 full-size one-page 다이어그램을 볼 수 있습니다. 로컬 인터랙티브 버전은 [`docs/design/kanban-task-engine-one-page.html`](docs/design/kanban-task-engine-one-page.html)을 브라우저로 열어주세요.
 
 <details>
 <summary><b>Architecture Detail (Text Version)</b></summary>
@@ -57,7 +57,7 @@
 <br/>
 
 - **Vault** (별도 Git 저장소): Markdown Issues (`.md` + YAML frontmatter), Boards & Templates, Recipes (`.yaml`)
-- **Engine** (이 저장소): `packages/core` (Runtime, State Machine, Policy, Store, Executor), `packages/schema` (Frontmatter schema, Canonical JSON model), Adapters (openclaw, claude-code, codex, jira, cli, github, firebase)
+- **Engine** (이 저장소): `packages/core` (Runtime, State Machine, Policy, Store, Executor), `packages/schema` (Frontmatter schema, Canonical JSON model), adapter packages (openclaw, claude-code, jira, cli, github, firebase)
 - **External Systems**: OpenClaw, Jira, GitHub, Firebase, CLI
 - **Data Flow**: Vault Markdown → Engine parser/store → Canonical JSON → Adapter → External System
 - **Mode**: recipe의 `modules` + `policy` 조합으로 결정되는 emergent property. 코드에 hardcoded switch 없음.
@@ -186,6 +186,16 @@ mutation 없이 schema·policy validation만 수행합니다.
 ② <vaultRoot>/config/active-recipe.yaml
 ③ bundled recipes/home-assisted.yaml
 ```
+
+## 🍳 Recipes
+
+`recipes/*.yaml`은 mode를 hardcoded switch가 아니라 modules + policy 조합으로 결정하는 실행 contract입니다.
+
+| Recipe | Primary mode | Mutation surface |
+|---|---|---|
+| `recipes/home-assisted.yaml` | Home | agent execution, audit log, git checkpoint |
+| `recipes/work-jira-export.yaml` | Work | Jira export write-back only |
+| `recipes/validate-only.yaml` | Validation | no mutation |
 
 <br/>
 
