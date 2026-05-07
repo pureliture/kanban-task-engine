@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 600" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="ucTitle ucDesc">
+  <title id="ucTitle">kanban-task-engine — Use Case (Home Assisted)</title>
+  <desc id="ucDesc">Vault 이슈가 AI CLI에 의해 처리되고 사람이 최종 승인하는 칸반 흐름. 5컬럼 (TODO/READY/RUNNING/REVIEW/DONE) + FAILED 행. RUNNING/REVIEW/DONE/FAILED 카드에 session ID와 CLI 명령 매핑.</desc>
+  <defs>
+    <style>
+      .body{font-family:'Segoe UI',Helvetica,Arial,sans-serif;}
+      .title{font-size:24px;font-weight:700;fill:#1a1a1a;}
+      .sub{font-size:15px;fill:#888;}
+      .head{font-size:16px;font-weight:700;}
+      .card{font-size:16px;fill:#1a1a1a;}
+      .card-meta{font-size:15px;fill:#666;}
+      .ses{font-size:15px;fill:#1565C0;font-weight:700;}
+      .cli{font-size:15px;fill:#444;font-family:Menlo,Consolas,monospace;}
+      .flow{font-size:15px;fill:#555;}
+    </style>
+  </defs>
+
+  <rect width="1600" height="600" fill="#ffffff"/>
+
+  <text x="40" y="46" class="body title">kanban-task-engine — Use Case (Home Assisted)</text>
+  <text x="40" y="68" class="body sub">Vault의 이슈가 AI CLI에 의해 처리되고, 사람이 최종 승인하는 흐름 · executor: codex</text>
+
+  <!-- column headers -->
+  <rect x="40" y="100" width="280" height="32" rx="4" fill="#FFF3CD" stroke="#E6A817" stroke-width="2"/>
+  <text x="180" y="121" class="body head" fill="#5c3d00" text-anchor="middle">TODO</text>
+  <rect x="340" y="100" width="280" height="32" rx="4" fill="#E8F5E9" stroke="#43A047" stroke-width="2"/>
+  <text x="480" y="121" class="body head" fill="#2e7d32" text-anchor="middle">READY</text>
+  <rect x="640" y="100" width="280" height="32" rx="4" fill="#BBDEFB" stroke="#1E88E5" stroke-width="2"/>
+  <text x="780" y="121" class="body head" fill="#1565C0" text-anchor="middle">RUNNING</text>
+  <rect x="940" y="100" width="280" height="32" rx="4" fill="#FFF3CD" stroke="#E6A817" stroke-width="2"/>
+  <text x="1080" y="121" class="body head" fill="#5c3d00" text-anchor="middle">REVIEW</text>
+  <rect x="1240" y="100" width="280" height="32" rx="4" fill="#E8F5E9" stroke="#43A047" stroke-width="2"/>
+  <text x="1380" y="121" class="body head" fill="#2e7d32" text-anchor="middle">DONE</text>
+
+  <!-- column bodies -->
+  <rect x="40" y="132" width="280" height="200" fill="#fffdf0" stroke="#E6A817" stroke-width="1.5"/>
+  <rect x="340" y="132" width="280" height="200" fill="#f5fbf5" stroke="#43A047" stroke-width="1.5"/>
+  <rect x="640" y="132" width="280" height="200" fill="#f0f7ff" stroke="#1E88E5" stroke-width="1.5"/>
+  <rect x="940" y="132" width="280" height="200" fill="#fffdf0" stroke="#E6A817" stroke-width="1.5"/>
+  <rect x="1240" y="132" width="280" height="200" fill="#f5fbf5" stroke="#43A047" stroke-width="1.5"/>
+
+  <!-- TODO card -->
+  <rect x="55" y="148" width="250" height="70" fill="#fff" stroke="#ddd"/>
+  <text x="65" y="166" class="body card">#42 캐시 레이어 추가</text>
+  <text x="65" y="184" class="body card-meta">executor: codex</text>
+  <text x="65" y="200" class="body card-meta">priority: high</text>
+
+  <!-- READY card -->
+  <rect x="355" y="148" width="250" height="70" fill="#fff" stroke="#ddd"/>
+  <text x="365" y="166" class="body card">#38 API 타임아웃 수정</text>
+  <text x="365" y="184" class="body card-meta">executor: codex</text>
+  <text x="365" y="200" class="body card-meta">↑ frontmatter status: READY</text>
+
+  <!-- RUNNING card -->
+  <rect x="655" y="148" width="250" height="150" fill="#fff" stroke="#1E88E5" stroke-width="1.5"/>
+  <text x="665" y="166" class="body card">#35 로그 포맷 통일</text>
+  <text x="665" y="184" class="body card-meta" fill="#1565C0">▶ AI CLI 실행 중</text>
+  <text x="665" y="200" class="body card-meta">isolated worktree</text>
+  <text x="665" y="222" class="body ses">session: run-20260507-a3f2</text>
+  <text x="665" y="240" class="body cli" textLength="230" lengthAdjust="spacingAndGlyphs">kanban run #35 --execute --agent codex</text>
+
+  <!-- REVIEW card -->
+  <rect x="955" y="148" width="250" height="150" fill="#fff" stroke="#ddd"/>
+  <text x="965" y="166" class="body card">#31 에러 메시지 개선</text>
+  <text x="965" y="184" class="body card-meta">AI CLI 완료 · exit 0</text>
+  <text x="965" y="200" class="body card-meta" fill="#7a5c00">→ 사람이 approve 대기</text>
+  <text x="965" y="222" class="body ses" fill="#7a5c00">session: run-20260507-b1c9</text>
+  <text x="965" y="240" class="body cli">kanban approve #31</text>
+
+  <!-- DONE card -->
+  <rect x="1255" y="148" width="250" height="120" fill="#fff" stroke="#ddd"/>
+  <text x="1265" y="166" class="body card">#28 README 업데이트</text>
+  <text x="1265" y="184" class="body card-meta" fill="#2e7d32">✅ 완료</text>
+  <text x="1265" y="206" class="body ses" fill="#2e7d32">session: run-20260506-d7e1</text>
+  <text x="1265" y="224" class="body cli">completed: 2026-05-06</text>
+
+  <!-- FAILED row -->
+  <rect x="40" y="370" width="120" height="32" rx="4" fill="#FFEBEE" stroke="#E53935" stroke-width="2"/>
+  <text x="100" y="391" class="body head" fill="#b71c1c" text-anchor="middle">FAILED</text>
+  <rect x="180" y="365" width="290" height="60" fill="#fff" stroke="#E53935"/>
+  <text x="195" y="384" class="body card">#33 DB 마이그레이션</text>
+  <text x="195" y="402" class="body card-meta" fill="#b71c1c">exit non-0 — 변경사항 없음</text>
+  <text x="195" y="418" class="body ses" fill="#c62828">session: run-20260507-f9a0</text>
+  <text x="490" y="394" class="body sub" font-style="italic">kanban retry #33 → READY로 복귀</text>
+
+  <!-- flow summary -->
+  <rect x="40" y="450" width="1480" height="125" rx="4" fill="#f0f4ff" stroke="#b0c4f0"/>
+  <text x="60" y="475" class="body head" fill="#334">흐름 요약</text>
+  <text x="60" y="498" class="body flow">1️⃣ status: TODO → READY (frontmatter 편집)</text>
+  <text x="60" y="518" class="body flow">2️⃣ kanban run #N --execute --agent codex — session 생성, AI CLI 실행</text>
+  <text x="60" y="538" class="body flow">3️⃣ exit 0 + 변경 → REVIEW (session ID 기록)</text>
+  <text x="60" y="558" class="body flow">4️⃣ kanban approve #N → DONE (session 완료)  /  실패 시 kanban retry #N → READY 복귀</text>
+</svg>
