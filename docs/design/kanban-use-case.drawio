@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-05-07" agent="kanban-task-engine-design" version="24.0.0">
+  <diagram name="Use Case - Home Assisted" id="kanban-use-case-home-assisted">
+    <mxGraphModel dx="0" dy="0" grid="10" gridSize="10" guides="1" tooltips="1"
+                  connect="1" arrows="1" fold="1" page="1" pageScale="1"
+                  pageWidth="1500" pageHeight="760" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- PAGE TITLE -->
+        <mxCell id="page-title" value="kanban-task-engine — Use Case (Home Assisted)"
+                style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=22;fontColor=#1a1a1a;"
+                vertex="1" parent="1">
+          <mxGeometry x="24" y="18" width="760" height="32" as="geometry"/>
+        </mxCell>
+        <mxCell id="page-subtitle" value="Vault의 이슈가 AI CLI에 의해 처리되고, 사람이 최종 승인하는 흐름 · executor: codex"
+                style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontColor=#777777;"
+                vertex="1" parent="1">
+          <mxGeometry x="24" y="50" width="820" height="22" as="geometry"/>
+        </mxCell>
+
+        <!-- BOARD COLUMNS -->
+        <mxCell id="todo-col" value=""
+                style="rounded=1;arcSize=4;fillColor=#fffdf0;strokeColor=#E6A817;strokeWidth=1.5;"
+                vertex="1" parent="1">
+          <mxGeometry x="24" y="104" width="236" height="228" as="geometry"/>
+        </mxCell>
+        <mxCell id="todo-head" value="TODO"
+                style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FFF3CD;strokeColor=#E6A817;strokeWidth=2;fontStyle=1;fontSize=15;fontColor=#5c3d00;align=center;verticalAlign=middle;"
+                vertex="1" parent="todo-col">
+          <mxGeometry x="0" y="0" width="236" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="todo-card" value="&lt;b&gt;#42 캐시 레이어 추가&lt;/b&gt;&#10;executor: codex&#10;priority: high"
+                style="rounded=1;arcSize=3;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dddddd;strokeWidth=1.2;fontSize=12;fontColor=#1a1a1a;align=left;verticalAlign=top;spacing=12;"
+                vertex="1" parent="todo-col">
+          <mxGeometry x="16" y="64" width="204" height="112" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ready-col" value=""
+                style="rounded=1;arcSize=4;fillColor=#f5fbf5;strokeColor=#43A047;strokeWidth=1.5;"
+                vertex="1" parent="1">
+          <mxGeometry x="306" y="104" width="236" height="228" as="geometry"/>
+        </mxCell>
+        <mxCell id="ready-head" value="READY"
+                style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#43A047;strokeWidth=2;fontStyle=1;fontSize=15;fontColor=#2e7d32;align=center;verticalAlign=middle;"
+                vertex="1" parent="ready-col">
+          <mxGeometry x="0" y="0" width="236" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="ready-card" value="&lt;b&gt;#38 API 타임아웃 수정&lt;/b&gt;&#10;executor: codex&#10;frontmatter status: READY"
+                style="rounded=1;arcSize=3;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dddddd;strokeWidth=1.2;fontSize=12;fontColor=#1a1a1a;align=left;verticalAlign=top;spacing=12;"
+                vertex="1" parent="ready-col">
+          <mxGeometry x="16" y="64" width="204" height="112" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="running-col" value=""
+                style="rounded=1;arcSize=4;fillColor=#f0f7ff;strokeColor=#1E88E5;strokeWidth=1.5;"
+                vertex="1" parent="1">
+          <mxGeometry x="588" y="104" width="236" height="228" as="geometry"/>
+        </mxCell>
+        <mxCell id="running-head" value="RUNNING"
+                style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1E88E5;strokeWidth=2;fontStyle=1;fontSize=15;fontColor=#1565C0;align=center;verticalAlign=middle;"
+                vertex="1" parent="running-col">
+          <mxGeometry x="0" y="0" width="236" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="running-card" value="&lt;b&gt;#35 로그 포맷 통일&lt;/b&gt;&#10;AI CLI 실행 중&#10;isolated worktree&#10;session: run-20260507-a3f2&#10;kanban run #35 --execute --agent codex"
+                style="rounded=1;arcSize=3;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1E88E5;strokeWidth=2;fontSize=12;fontColor=#1a1a1a;align=left;verticalAlign=top;spacing=12;"
+                vertex="1" parent="running-col">
+          <mxGeometry x="16" y="64" width="204" height="140" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="review-col" value=""
+                style="rounded=1;arcSize=4;fillColor=#fffdf0;strokeColor=#E6A817;strokeWidth=1.5;"
+                vertex="1" parent="1">
+          <mxGeometry x="870" y="104" width="236" height="228" as="geometry"/>
+        </mxCell>
+        <mxCell id="review-head" value="REVIEW"
+                style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FFF3CD;strokeColor=#E6A817;strokeWidth=2;fontStyle=1;fontSize=15;fontColor=#5c3d00;align=center;verticalAlign=middle;"
+                vertex="1" parent="review-col">
+          <mxGeometry x="0" y="0" width="236" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="review-card" value="&lt;b&gt;#31 에러 메시지 개선&lt;/b&gt;&#10;AI CLI 완료 · exit 0&#10;사람이 approve 대기&#10;session: run-20260507-b1c9&#10;kanban approve #31"
+                style="rounded=1;arcSize=3;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dddddd;strokeWidth=1.2;fontSize=12;fontColor=#1a1a1a;align=left;verticalAlign=top;spacing=12;"
+                vertex="1" parent="review-col">
+          <mxGeometry x="16" y="64" width="204" height="140" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="done-col" value=""
+                style="rounded=1;arcSize=4;fillColor=#f5fbf5;strokeColor=#43A047;strokeWidth=1.5;"
+                vertex="1" parent="1">
+          <mxGeometry x="1152" y="104" width="236" height="228" as="geometry"/>
+        </mxCell>
+        <mxCell id="done-head" value="DONE"
+                style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#43A047;strokeWidth=2;fontStyle=1;fontSize=15;fontColor=#2e7d32;align=center;verticalAlign=middle;"
+                vertex="1" parent="done-col">
+          <mxGeometry x="0" y="0" width="236" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="done-card" value="&lt;b&gt;#28 README 업데이트&lt;/b&gt;&#10;완료&#10;session: run-20260506-d7e1&#10;completed: 2026-05-06"
+                style="rounded=1;arcSize=3;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dddddd;strokeWidth=1.2;fontSize=12;fontColor=#1a1a1a;align=left;verticalAlign=top;spacing=12;opacity=85;"
+                vertex="1" parent="done-col">
+          <mxGeometry x="16" y="64" width="204" height="126" as="geometry"/>
+        </mxCell>
+
+        <!-- BOARD FLOW ARROWS -->
+        <mxCell id="arrow-todo-ready" value=""
+                style="endArrow=block;html=1;rounded=0;strokeColor=#999999;strokeWidth=2;"
+                edge="1" parent="1" source="todo-col" target="ready-col">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="arrow-ready-running" value=""
+                style="endArrow=block;html=1;rounded=0;strokeColor=#999999;strokeWidth=2;"
+                edge="1" parent="1" source="ready-col" target="running-col">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="arrow-running-review" value=""
+                style="endArrow=block;html=1;rounded=0;strokeColor=#999999;strokeWidth=2;"
+                edge="1" parent="1" source="running-col" target="review-col">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="arrow-review-done" value=""
+                style="endArrow=block;html=1;rounded=0;strokeColor=#999999;strokeWidth=2;"
+                edge="1" parent="1" source="review-col" target="done-col">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- FAILED ROW -->
+        <mxCell id="failed-label" value="FAILED"
+                style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#E53935;strokeWidth=2;fontStyle=1;fontSize=15;fontColor=#b71c1c;align=center;verticalAlign=middle;"
+                vertex="1" parent="1">
+          <mxGeometry x="24" y="372" width="126" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="failed-card" value="&lt;b&gt;#33 DB 마이그레이션&lt;/b&gt;&#10;exit non-0 — 변경사항 없음&#10;session: run-20260507-f9a0&#10;kanban retry #33 → READY로 복귀"
+                style="rounded=1;arcSize=3;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#E53935;strokeWidth=1.5;fontSize=12;fontColor=#1a1a1a;align=left;verticalAlign=top;spacing=12;"
+                vertex="1" parent="1">
+          <mxGeometry x="170" y="362" width="422" height="78" as="geometry"/>
+        </mxCell>
+        <mxCell id="arrow-failed-ready" value="retry"
+                style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;rounded=0;strokeColor=#E53935;strokeWidth=1.5;dashed=1;fontSize=11;fontColor=#b71c1c;"
+                edge="1" parent="1" source="failed-card" target="ready-col">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="420" y="460"/>
+              <mxPoint x="420" y="332"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- FLOW SUMMARY -->
+        <mxCell id="flow-summary-bg" value=""
+                style="rounded=1;arcSize=4;fillColor=#f0f4ff;strokeColor=#b0c4f0;strokeWidth=1.5;"
+                vertex="1" parent="1">
+          <mxGeometry x="24" y="492" width="1364" height="154" as="geometry"/>
+        </mxCell>
+        <mxCell id="flow-summary-title" value="흐름 요약"
+                style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=15;fontColor=#333344;"
+                vertex="1" parent="flow-summary-bg">
+          <mxGeometry x="22" y="14" width="180" height="22" as="geometry"/>
+        </mxCell>
+        <mxCell id="flow-summary-body" value="1. status: TODO → READY (frontmatter 편집)&#10;2. kanban run #N --execute --agent codex — session 생성, AI CLI 실행&#10;3. exit 0 + 변경 → REVIEW (session ID 기록)&#10;4. kanban approve #N → DONE (session 완료)&#10;실패 시: kanban retry #N → READY 복귀"
+                style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;fontSize=13;fontColor=#555555;align=left;verticalAlign=top;spacing=0;"
+                vertex="1" parent="flow-summary-bg">
+          <mxGeometry x="22" y="44" width="1318" height="94" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="asset-note" value="Source: docs/design/kanban-use-case.html · Render target: docs/design/kanban-use-case.svg"
+                style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#aaaaaa;"
+                vertex="1" parent="1">
+          <mxGeometry x="24" y="686" width="680" height="20" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
