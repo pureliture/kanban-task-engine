@@ -63,7 +63,7 @@
                 vertex="1" parent="running-col">
           <mxGeometry x="0" y="0" width="236" height="42" as="geometry"/>
         </mxCell>
-        <mxCell id="running-card" value="&lt;b&gt;#35 로그 포맷 통일&lt;/b&gt;&#10;AI CLI 실행 중&#10;isolated worktree&#10;session: run-20260507-a3f2&#10;kanban run #35 --execute --agent codex"
+        <mxCell id="running-card" value="&lt;b&gt;VC-035 로그 포맷 통일&lt;/b&gt;&#10;AI CLI 실행 중&#10;isolated worktree&#10;session: run-20260507-a3f2&#10;kanban run VC-035 --execute --agent codex"
                 style="rounded=1;arcSize=3;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1E88E5;strokeWidth=2;fontSize=12;fontColor=#1a1a1a;align=left;verticalAlign=top;spacing=12;"
                 vertex="1" parent="running-col">
           <mxGeometry x="16" y="64" width="204" height="140" as="geometry"/>
@@ -79,7 +79,7 @@
                 vertex="1" parent="review-col">
           <mxGeometry x="0" y="0" width="236" height="42" as="geometry"/>
         </mxCell>
-        <mxCell id="review-card" value="&lt;b&gt;#31 에러 메시지 개선&lt;/b&gt;&#10;AI CLI 완료 · exit 0&#10;사람이 approve 대기&#10;session: run-20260507-b1c9&#10;kanban approve #31"
+        <mxCell id="review-card" value="&lt;b&gt;VC-031 에러 메시지 개선&lt;/b&gt;&#10;AI CLI 완료 · exit 0&#10;사람이 approve 대기&#10;session: run-20260507-b1c9&#10;kanban approve VC-031"
                 style="rounded=1;arcSize=3;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dddddd;strokeWidth=1.2;fontSize=12;fontColor=#1a1a1a;align=left;verticalAlign=top;spacing=12;"
                 vertex="1" parent="review-col">
           <mxGeometry x="16" y="64" width="204" height="140" as="geometry"/>
@@ -95,7 +95,7 @@
                 vertex="1" parent="done-col">
           <mxGeometry x="0" y="0" width="236" height="42" as="geometry"/>
         </mxCell>
-        <mxCell id="done-card" value="&lt;b&gt;#28 README 업데이트&lt;/b&gt;&#10;완료&#10;session: run-20260506-d7e1&#10;completed: 2026-05-06"
+        <mxCell id="done-card" value="&lt;b&gt;VC-028 README 업데이트&lt;/b&gt;&#10;완료&#10;session: run-20260506-d7e1&#10;completed: 2026-05-06"
                 style="rounded=1;arcSize=3;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dddddd;strokeWidth=1.2;fontSize=12;fontColor=#1a1a1a;align=left;verticalAlign=top;spacing=12;opacity=85;"
                 vertex="1" parent="done-col">
           <mxGeometry x="16" y="64" width="204" height="126" as="geometry"/>
@@ -129,7 +129,7 @@
                 vertex="1" parent="1">
           <mxGeometry x="24" y="372" width="126" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="failed-card" value="&lt;b&gt;#33 DB 마이그레이션&lt;/b&gt;&#10;exit non-0 — 변경사항 없음&#10;session: run-20260507-f9a0&#10;kanban retry #33 → READY로 복귀"
+        <mxCell id="failed-card" value="&lt;b&gt;VC-033 DB 마이그레이션&lt;/b&gt;&#10;exit non-0 — 변경사항 없음&#10;session: run-20260507-f9a0&#10;kanban retry VC-033 → READY로 복귀"
                 style="rounded=1;arcSize=3;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#E53935;strokeWidth=1.5;fontSize=12;fontColor=#1a1a1a;align=left;verticalAlign=top;spacing=12;"
                 vertex="1" parent="1">
           <mxGeometry x="170" y="362" width="422" height="78" as="geometry"/>
@@ -156,7 +156,7 @@
                 vertex="1" parent="flow-summary-bg">
           <mxGeometry x="22" y="14" width="180" height="22" as="geometry"/>
         </mxCell>
-        <mxCell id="flow-summary-body" value="1. status: TODO → READY (frontmatter 편집)&#10;2. kanban run #N --execute --agent codex — session 생성, AI CLI 실행&#10;3. exit 0 + 변경 → REVIEW (session ID 기록)&#10;4. kanban approve #N → DONE (session 완료)&#10;실패 시: kanban retry #N → READY 복귀"
+        <mxCell id="flow-summary-body" value="1. status: TODO → READY (frontmatter 편집)&#10;2. kanban run VC-001 --execute --agent codex — session 생성, AI CLI 실행&#10;3. exit 0 + 변경 → REVIEW (session ID 기록)&#10;4. kanban approve VC-001 → DONE (session 완료)&#10;실패 시: kanban retry VC-001 → READY 복귀"
                 style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;fontSize=13;fontColor=#555555;align=left;verticalAlign=top;spacing=0;"
                 vertex="1" parent="flow-summary-bg">
           <mxGeometry x="22" y="44" width="1318" height="94" as="geometry"/>

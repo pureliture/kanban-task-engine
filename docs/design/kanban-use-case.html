@@ -137,13 +137,13 @@ body { background:#fff; font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif
     <div class="col-head">RUNNING</div>
     <div class="col-body">
       <div class="card active">
-        <div class="card-title">#35 로그 포맷 통일</div>
+        <div class="card-title">VC-035 로그 포맷 통일</div>
         <div class="card-action running">▶ AI CLI 실행 중</div>
         <div class="card-meta">isolated worktree</div>
         <div class="session session-running">
           <div class="ses-label">session</div>
           <code class="ses-id">run-20260507-a3f2</code>
-          <div class="ses-cli"><code>kanban run #35 --execute --agent codex</code></div>
+          <div class="ses-cli"><code>kanban run VC-035 --execute --agent codex</code></div>
         </div>
       </div>
     </div>
@@ -155,13 +155,13 @@ body { background:#fff; font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif
     <div class="col-head">REVIEW</div>
     <div class="col-body">
       <div class="card">
-        <div class="card-title">#31 에러 메시지 개선</div>
+        <div class="card-title">VC-031 에러 메시지 개선</div>
         <div class="card-meta">AI CLI 완료 · exit 0</div>
         <div class="card-action pending">→ 사람이 approve 대기</div>
         <div class="session session-review">
           <div class="ses-label">session</div>
           <code class="ses-id">run-20260507-b1c9</code>
-          <div class="ses-cli"><code>kanban approve #31</code></div>
+          <div class="ses-cli"><code>kanban approve VC-031</code></div>
         </div>
       </div>
     </div>
@@ -173,7 +173,7 @@ body { background:#fff; font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif
     <div class="col-head">DONE</div>
     <div class="col-body">
       <div class="card muted">
-        <div class="card-title">#28 README 업데이트</div>
+        <div class="card-title">VC-028 README 업데이트</div>
         <div class="card-action done">✅ 완료</div>
         <div class="session session-done">
           <div class="ses-label">session</div>
@@ -190,14 +190,14 @@ body { background:#fff; font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif
 <div class="failed-row">
   <div class="failed-tag">FAILED</div>
   <div class="failed-card">
-    <div class="card-title">#33 DB 마이그레이션</div>
+    <div class="card-title">VC-033 DB 마이그레이션</div>
     <div class="card-action failed">exit non-0 — 변경사항 없음</div>
     <div class="session session-failed">
       <div class="ses-label">session</div>
       <code class="ses-id">run-20260507-f9a0</code>
     </div>
   </div>
-  <div class="failed-note"><code>kanban retry #33</code> → READY로 복귀</div>
+  <div class="failed-note"><code>kanban retry VC-033</code> → READY로 복귀</div>
 </div>
 
 <!-- ══ FLOW SUMMARY ══ -->
@@ -205,10 +205,10 @@ body { background:#fff; font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif
   <div class="flow-summary-title">흐름 요약</div>
   <div class="flow-steps">
     <div>1️⃣ <code>status: TODO → READY</code> (frontmatter 편집)</div>
-    <div>2️⃣ <code>kanban run #N --execute --agent codex</code> — session 생성 · AI CLI 실행</div>
+    <div>2️⃣ <code>kanban run VC-001 --execute --agent codex</code> — session 생성 · AI CLI 실행</div>
     <div>3️⃣ exit 0 + 변경 → REVIEW (session ID 기록)</div>
-    <div>4️⃣ <code>kanban approve #N</code> → DONE (session 완료)</div>
-    <div>실패 시: <code>kanban retry #N</code> → READY 복귀</div>
+    <div>4️⃣ <code>kanban approve VC-001</code> → DONE (session 완료)</div>
+    <div>실패 시: <code>kanban retry VC-001</code> → READY 복귀</div>
   </div>
 </div>
 
