@@ -23,31 +23,23 @@ body { background:#fff; width:100%; font-family:'Segoe UI','Helvetica Neue',Aria
 
 /* VAULT */
 .zone-vault {
-  flex:0 0 18em;
+  flex:0 0 14em;
   border:2px dashed #9C27B0;
   background:#F3E5F5;
   border-radius:8px;
   padding:0.8em;
 }
 .zone-vault .zone-title { color:#6a1b9a; }
-.vault-inner { display:flex; gap:0.5em; margin-top:0.5em; }
-.vault-md {
-  flex:0 0 9.5em;
+.vault-stack { display:flex; flex-direction:column; gap:0.4em; }
+.vault-card {
   background:#fff;
   border:1.5px solid #AB47BC;
   border-radius:4px;
-  padding:0.6em 0.7em;
+  padding:0.5em 0.7em;
 }
-.vault-right { flex:1; display:flex; flex-direction:column; gap:0.5em; }
-.vault-boards, .vault-recipes {
-  background:#fff;
-  border:1.5px solid #AB47BC;
-  border-radius:4px;
-  padding:0.6em 0.7em;
-  flex:1;
-}
+.vault-card .ext { font-weight:400; color:#AB47BC; font-size:0.85em; }
 
-/* ENGINE */
+/* ENGINE — 가로 4칸 */
 .zone-engine {
   flex:1;
   border:2px solid #4CAF50;
@@ -57,42 +49,38 @@ body { background:#fff; width:100%; font-family:'Segoe UI','Helvetica Neue',Aria
   min-width:0;
 }
 .zone-engine .zone-title { color:#1b5e20; }
-.engine-inner { display:flex; gap:0.6em; margin-top:0.5em; }
+.engine-inner { display:flex; gap:0.5em; }
 .engine-box {
   flex:1;
   background:#fff;
-  border:1.5px solid #4CAF50;
+  border:1px solid #4CAF50;
   border-radius:4px;
-  padding:0.6em 0.7em;
+  padding:0.5em 0.7em;
   min-width:0;
-  overflow:hidden;
 }
-.engine-box .box-text { word-break:keep-all; }
+.engine-box .box-title { color:#1a1a1a; }
+.engine-box .box-text { color:#555; }
+.engine-box code { background:#f0f0f0; padding:1px 4px; border-radius:2px; font-size:0.85em; }
 
 /* EXTERNAL */
 .zone-external {
-  flex:0 0 11em;
+  flex:0 0 9em;
   border:2px dashed #2196F3;
   background:#E3F2FD;
   border-radius:8px;
   padding:0.8em;
 }
 .zone-external .zone-title { color:#0d47a1; }
-.ext-inner { display:flex; flex-direction:column; gap:0.5em; margin-top:0.5em; }
-.ext-openclaw {
-  background:#fff; border:1.5px solid #2196F3;
-  border-radius:4px; padding:0.5em 0.6em; text-align:center;
+.ext-inner { display:flex; flex-direction:column; gap:0.4em; }
+.ext-card {
+  background:#fff;
+  border:1px solid #2196F3;
+  border-radius:4px;
+  padding:0.5em 0.7em;
+  text-align:center;
 }
-.ext-row { display:flex; gap:0.5em; }
-.ext-jira, .ext-github {
-  flex:1; background:#fff; border:1.5px solid #2196F3;
-  border-radius:4px; padding:0.5em 0.3em; text-align:center;
-}
-.ext-note {
-  background:#fafafa; border:1px dashed #2196F3;
-  border-radius:4px; padding:0.5em 0.6em;
-  font-size:0.9em; color:#555; line-height:1.5;
-}
+.ext-card .box-title { color:#1a1a1a; }
+.ext-card .box-text { color:#555; font-size:0.85em; }
 
 /* ── arrows between zones ── */
 .arch-arrows { display:flex; flex-direction:column; justify-content:center; align-items:center; gap:0.15em; font-size:0.85em; color:#555; flex:0 0 2em; }
@@ -225,27 +213,21 @@ body { background:#fff; width:100%; font-family:'Segoe UI','Helvetica Neue',Aria
   <!-- VAULT -->
   <div class="zone-vault">
     <div class="zone-title">🗂 Vault</div>
-    <div style="font-size:9.5px;color:#9C27B0;font-style:italic;margin-bottom:6px;">Live Issue State — 별도 Git 저장소</div>
-    <div class="vault-inner">
-      <div class="vault-md">
-        <div class="box-title">Markdown Issues</div>
-        <div class="box-text">.md + YAML frontmatter</div>
-        <div class="sot">← SoT</div>
-        <div class="box-text">issues/ · epics/</div>
-        <div class="box-text">registry.yaml</div>
-        <div class="box-text">active-recipe.yaml</div>
-        <div class="box-text">runs/ · events/</div>
+    <div style="font-size:9.5px;color:#9C27B0;font-style:italic;margin-bottom:8px;">별도 Git 저장소</div>
+    <div class="vault-stack">
+      <div class="vault-card">
+        <div class="box-title">Markdown Issues <span class="ext">.md</span></div>
+        <div class="sot">← Source of Truth</div>
+        <div class="box-text">사람이 직접 읽고 쓰는 파일</div>
       </div>
-      <div class="vault-right">
-        <div class="vault-boards">
-          <div class="box-title">Boards &amp; Templates</div>
-          <div class="box-text">boards/ · templates/</div>
-        </div>
-        <div class="vault-recipes">
-          <div class="box-title">Recipes</div>
-          <div class="box-text">recipes/*.yaml</div>
-          <div class="box-text">mode + modules + policy</div>
-        </div>
+      <div class="vault-card">
+        <div class="box-title">Boards <span class="ext">.md</span></div>
+        <div class="box-text">어떤 이슈가 어느 컬럼에 있는지</div>
+      </div>
+      <div class="vault-card">
+        <div class="box-title">Recipes <span class="ext">.yaml</span></div>
+        <div class="box-text">누가 어떤 도구로 실행할지</div>
+        <div class="box-italic">예: Codex로 실행 / Jira export만</div>
       </div>
     </div>
   </div>
@@ -253,56 +235,30 @@ body { background:#fff; width:100%; font-family:'Segoe UI','Helvetica Neue',Aria
   <!-- arrow Vault→Engine -->
   <div class="arch-arrows">
     <span style="font-size:1.4em;">→</span>
-    <span>parse</span>
-    <span>→JSON</span>
+    <span>읽어서</span>
+    <span>JSON화</span>
   </div>
 
   <!-- ENGINE -->
   <div class="zone-engine">
-    <div class="zone-title">⚙️ Engine — Logic Only (no live state)</div>
+    <div class="zone-title">⚙️ Engine</div>
+    <div style="font-size:9.5px;color:#4CAF50;font-style:italic;margin-bottom:8px;">로직만 · 데이터 없음</div>
     <div class="engine-inner">
       <div class="engine-box">
-        <div class="box-title">packages/core</div>
-        <div class="box-text">Runtime</div>
-        <div class="box-text">StateMachine</div>
-        <div class="box-text">PolicyEngine</div>
-        <div class="box-text">Store · Executor</div>
-        <div class="box-text">ModuleRunner</div>
-        <div class="box-text">EventBus</div>
-        <div class="box-text">DeadLetterQ</div>
+        <div class="box-title">Core</div>
+        <div class="box-text">상태 전이 · 실행 루프</div>
       </div>
       <div class="engine-box">
-        <div class="box-title">packages/schema</div>
-        <div class="box-text">IssueFrontmatter</div>
-        <div class="box-text">CanonicalIssueModel</div>
-        <div class="box-text">IssueStatus (6)</div>
-        <div class="box-text">VALID_ISSUE_TRANSITIONS (8)</div>
+        <div class="box-title">Schema</div>
+        <div class="box-text">.md ↔ JSON 계약</div>
       </div>
       <div class="engine-box">
-        <div class="box-title">Adapters + Executor</div>
-        <div class="box-text">adapter-claude-code</div>
-        <div class="box-text">codex-runner</div>
-        <div class="box-text">adapter-jira</div>
-        <div class="box-text">adapter-firebase</div>
-        <div class="box-text">adapter-openclaw</div>
-        <div class="box-text">adapter-github</div>
-        <div class="box-text">adapter-cli</div>
+        <div class="box-title">Adapters</div>
+        <div class="box-text">Jira · GitHub · Codex 연결</div>
       </div>
       <div class="engine-box">
-        <div class="box-title">packages/cli</div>
-        <div class="box-text">CLI entry point</div>
-        <div class="box-text">kanban sync · board</div>
-        <div class="box-text">kanban run · next</div>
-        <div class="box-text">kanban approve</div>
-        <div class="box-text">retry · abort</div>
-      </div>
-      <div class="engine-box">
-        <div class="box-title">recipes/</div>
-        <div class="box-text">home-assisted.yaml</div>
-        <div class="box-text">validate-only.yaml</div>
-        <div class="box-text">work-jira-export.yaml</div>
-        <div class="box-italic">examples/</div>
-        <div class="box-italic">home-full-auto.yaml</div>
+        <div class="box-title">CLI</div>
+        <div class="box-text"><code>kanban run</code> 진입점</div>
       </div>
     </div>
   </div>
@@ -311,31 +267,21 @@ body { background:#fff; width:100%; font-family:'Segoe UI','Helvetica Neue',Aria
   <div class="arch-arrows">
     <span style="font-size:1.4em;">→</span>
     <span>adapter</span>
-    <span>output</span>
+    <span>경유</span>
   </div>
 
   <!-- EXTERNAL -->
   <div class="zone-external">
     <div class="zone-title" style="color:#0d47a1;">🌐 External</div>
+    <div style="font-size:9.5px;color:#1565C0;font-style:italic;margin-bottom:8px;">외부 시스템</div>
     <div class="ext-inner">
-      <div class="ext-openclaw">
-        <div class="box-title">OpenClaw</div>
-        <div class="box-italic">Home only</div>
+      <div class="ext-card">
+        <div class="box-title">Codex</div>
+        <div class="box-text">Home 실행기</div>
       </div>
-      <div class="ext-row">
-        <div class="ext-jira">
-          <div class="box-title">Jira</div>
-          <div class="box-italic">Work only</div>
-        </div>
-        <div class="ext-github">
-          <div class="box-title">GitHub</div>
-          <div class="box-text">Firebase</div>
-        </div>
-      </div>
-      <div class="ext-note">
-        <b>Home:</b> OpenClaw · Firebase<br/>
-        <b>Work:</b> Jira export only<br/>
-        <span style="font-style:italic;color:#888;">CLI (user interface)</span>
+      <div class="ext-card">
+        <div class="box-title">Jira · GitHub</div>
+        <div class="box-text">Work 연동</div>
       </div>
     </div>
   </div>
