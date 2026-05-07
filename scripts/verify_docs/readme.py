@@ -12,6 +12,10 @@ def check_readme_links(root: Path) -> bool:
 
     if "kanban-task-engine-one-page.svg" not in readme:
         issues.append("README must reference kanban-task-engine-one-page.svg")
+    if "kanban-use-case.svg" not in readme:
+        issues.append("README must reference Home Assisted use-case SVG: kanban-use-case.svg")
+    if "kanban-use-case.html" not in readme:
+        issues.append("README must link Home Assisted use-case HTML: kanban-use-case.html")
     if "docs/design" not in readme:
         issues.append("README must link to docs/design/")
     if "validate-only" not in readme:
@@ -38,6 +42,12 @@ def check_internal_links(root: Path) -> bool:
         issues.append("docs/design/README.md must reference .drawio source")
     if "kanban-task-engine-one-page.svg" not in content:
         issues.append("docs/design/README.md must reference one-page SVG")
+    if "kanban-use-case.drawio" not in content:
+        issues.append("docs/design/README.md must reference Home Assisted use-case drawio source: kanban-use-case.drawio")
+    if "kanban-use-case.svg" not in content:
+        issues.append("docs/design/README.md must reference Home Assisted use-case SVG: kanban-use-case.svg")
+    if "kanban-use-case.html" not in content:
+        issues.append("docs/design/README.md must reference Home Assisted use-case HTML: kanban-use-case.html")
     compact = root / "docs/design/kanban-task-engine-architecture-overview.svg"
     if compact.exists() and "kanban-task-engine-architecture-overview.svg" not in content:
         issues.append("docs/design/README.md must reference compact architecture overview SVG")
@@ -78,6 +88,39 @@ def readme_architecture_svg_paths(root: Path) -> list[Path] | None:
 
     if not path.exists():
         print(f"FAIL: architecture README embed SVG does not exist: {path}")
+        return None
+    return [path]
+
+
+def readme_use_case_svg_paths(root: Path) -> list[Path] | None:
+    readme = read(root, "README.md")
+    block_match = re.search(
+        r'<a\s+href="docs/design/kanban-use-case\.svg"[\s\S]*?</a>',
+        readme,
+    )
+    if not block_match:
+        print("FAIL: README use-case full-size link block is missing")
+        return None
+
+    src_match = re.search(r'<img[^>]+src="([^"]+\.svg)"', block_match.group(0))
+    if not src_match:
+        print("FAIL: README use-case image is missing inside use-case link block")
+        return None
+
+    src = src_match.group(1)
+    if Path(src).is_absolute():
+        print(f"FAIL: use-case README embed SVG path must be repository-relative: {src}")
+        return None
+
+    path = (root / src).resolve()
+    try:
+        path.relative_to(root.resolve())
+    except ValueError:
+        print(f"FAIL: use-case README embed SVG path must stay inside repository: {src}")
+        return None
+
+    if not path.exists():
+        print(f"FAIL: use-case README embed SVG does not exist: {path}")
         return None
     return [path]
 
