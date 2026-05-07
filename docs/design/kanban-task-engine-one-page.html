@@ -97,14 +97,6 @@ body { background:#fff; width:100%; font-family:'Segoe UI','Helvetica Neue',Aria
 /* ── DIVIDER ── */
 .divider { border:none; border-top:1px dashed #ddd; margin:1em 0; }
 
-/* ── PANELS ── */
-.panel-row { display:flex; gap:0.8em; }
-.panel {
-  background:#fafafa; border:1.5px dashed #ccc;
-  border-radius:6px; padding:0.9em;
-}
-.panel-title { font-size:1.05em; font-weight:700; color:#222; margin-bottom:0.8em; text-align:center; }
-
 /* ── LIFECYCLE PANEL ── */
 .lifecycle-panel {
   background:#fafafa; border:1.5px dashed #ccc;
@@ -136,10 +128,7 @@ body { background:#fff; width:100%; font-family:'Segoe UI','Helvetica Neue',Aria
 }
 .lc-note code { background:#f0f0f0; padding:1px 5px; border-radius:2px; font-size:0.95em; }
 
-/* Panel 1 */
-.p1 { flex:0 0 30em; }
-.status-row { display:flex; gap:0.4em; align-items:center; margin-bottom:0.5em; flex-wrap:nowrap; }
-.status-row .lbl { font-size:0.85em; color:#888; font-style:italic; }
+/* ── STATUS BADGES ── */
 .st {
   padding:0.3em 0.7em; border-radius:4px;
   font-size:0.9em; font-weight:700;
@@ -152,85 +141,10 @@ body { background:#fff; width:100%; font-family:'Segoe UI','Helvetica Neue',Aria
 .st-done    { background:#E8F5E9; border:2px solid #43A047; color:#2e7d32; }
 .st-failed  { background:#FFEBEE; border:2px solid #E53935; color:#b71c1c; }
 
-.arrow-lbl  { font-size:0.8em; color:#555; text-align:center; white-space:nowrap; }
-.arrow-fwd  { font-size:1.2em; color:#555; line-height:1; }
-.arrow-back { font-size:0.8em; color:#888; font-style:italic; display:flex; flex-direction:column; align-items:center; }
-
-.transitions-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.3em 1em; margin:0.7em 0; }
-.tr { font-size:0.88em; color:#555; display:flex; gap:0.3em; align-items:baseline; }
-.tr code { font-size:0.85em; background:#f0f0f0; padding:0.1em 0.35em; border-radius:2px; }
-.tr .dir  { font-size:0.8em; color:#888; }
-
-.p1-note {
-  background:#F3E5F5; border:1px dashed #9C27B0;
-  border-radius:4px; padding:0.6em 0.7em; margin-top:0.7em;
-}
-.p1-note p { font-size:0.88em; color:#6a1b9a; font-style:italic; line-height:1.6; }
-
-/* Panel 2 */
-.p2 { flex:0 0 26em; }
-.recipe-step {
-  background:#E0E0E0; border:1.5px solid #9E9E9E;
-  border-radius:3px; padding:0.4em 0.8em; margin-bottom:0.3em;
-  font-size:0.9em; color:#333; text-align:center;
-}
-.recipe-arrow { text-align:center; font-size:1em; color:#555; margin:0.15em 0; }
-.policy-box {
-  background:#C8E6C9; border:1.5px solid #43A047;
-  border-radius:4px; padding:0.5em 0.8em; text-align:center;
-  font-size:0.9em; font-weight:700; color:#333; margin:0.5em 0;
-}
-.fork-row { display:flex; gap:0.6em; align-items:flex-start; margin-top:0.3em; }
-.exec-box {
-  flex:1;
-  background:#BBDEFB; border:1.5px solid #1E88E5;
-  border-radius:4px; padding:0.6em 0.7em; text-align:center;
-}
-.worktree-box {
-  background:#fff; border:1.5px solid #1E88E5;
-  border-radius:4px; padding:0.4em 0.6em; text-align:center;
-  font-size:0.9em; font-weight:700; color:#1565C0;
-  margin-top:0.5em;
-}
-.validate-box {
-  flex:0 0 8em;
-  background:#F3E5F5; border:1.5px dashed #9C27B0;
-  border-radius:4px; padding:0.6em 0.6em; text-align:center;
-}
-.flow-note { font-size:0.85em; color:#555; font-style:italic; margin-top:0.6em; }
-.flow-fail { color:#c62828; }
-
-/* Panel 3 */
-.p3 { flex:1; }
-.p3-inner { display:flex; gap:0.9em; }
-.p3-flow { display:flex; flex-direction:column; gap:0; align-items:center; flex:0 0 8.5em; }
-.p3-box {
-  width:8.5em; text-align:center; border-radius:4px; padding:0.6em 0.5em;
-}
-.p3-vault  { background:#F3E5F5; border:1.5px solid #9C27B0; }
-.p3-engine { background:#E8F5E9; border:1.5px solid #4CAF50; }
-.p3-adapter{ background:#E3F2FD; border:1.5px solid #2196F3; }
-.p3-jira   { background:#BBDEFB; border:1.5px solid #1565C0; }
-.p3-arrow  { font-size:1.3em; color:#555; line-height:1.3; text-align:center; }
-.p3-right  { flex:1; display:flex; flex-direction:column; gap:0.6em; }
-.writeback-box {
-  background:#FFF3E0; border:1.5px solid #FF9800;
-  border-radius:4px; padding:0.8em 0.9em;
-}
-.wb-title { font-size:0.9em; font-weight:700; color:#7a3900; margin-bottom:0.5em; }
-.wb-item  { font-size:0.9em; line-height:1.7; }
-.wb-ok    { color:#2e7d32; }
-.wb-no    { color:#c62828; }
-.wb-note  { font-size:0.82em; color:#888; font-style:italic; margin-top:0.35em; }
-.policy-note {
-  background:#fafafa; border:1px dashed #9E9E9E;
-  border-radius:4px; padding:0.7em 0.8em;
-  font-size:0.85em; color:#555; line-height:1.6; font-style:italic;
-}
-
 /* ── FOOTER ── */
 .footer { margin-top:1em; border-top:1px solid #eee; padding-top:0.7em; }
 .footer p { font-size:0.85em; color:#aaa; line-height:1.7; }
+.footer a { color:#888; }
 </style>
 </head>
 <body>
@@ -377,8 +291,12 @@ body { background:#fff; width:100%; font-family:'Segoe UI','Helvetica Neue',Aria
 
 <!-- ══ FOOTER ══ -->
 <div class="footer">
-  <p>색상: 🟣 Vault(보라/dashed)  🟢 Engine(녹색/solid)  🔵 External(파랑/dashed)  🟠 Annotation  🔴 FAILED/금지</p>
-  <p>draw.io CLI 미설치 → HTML fallback 사용 · draw.io Desktop에서 .drawio 파일 열어 SVG export 가능 (docs/design/README.md 참조)</p>
+  <p>
+    📦 자산: <a href="kanban-task-engine-one-page.drawio">.drawio</a> ·
+    <a href="kanban-task-engine-one-page.svg">.svg</a> ·
+    <a href="kanban-use-case.html">use-case</a>
+  </p>
+  <p>색상 규칙은 <a href="README.md">docs/design/README.md</a> 참조.</p>
 </div>
 
 </body>
