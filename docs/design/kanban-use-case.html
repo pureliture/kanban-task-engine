@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=1200"/>
+<title>kanban-task-engine — Use Case (Home Assisted)</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html { font-size:clamp(8px, 0.85vw, 12px); }
+body { background:#fff; font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; padding:1.5em; min-width:1100px; }
+
+.page-title { font-size:1.5em; font-weight:700; color:#1a1a1a; }
+.page-sub   { font-size:0.95em; color:#888; margin-top:0.3em; }
+
+/* ── BOARD ── */
+.board { display:flex; gap:0.6em; margin-top:1em; align-items:flex-start; }
+.col { flex:1; min-width:0; }
+.col-head { padding:0.4em 0.7em; text-align:center; font-weight:700; font-size:0.95em; border-radius:6px 6px 0 0; }
+.col-body { border-style:solid; border-width:1.5px; border-top:none; border-radius:0 0 6px 6px; padding:0.5em; min-height:9em; }
+
+.col-todo    .col-head { background:#FFF3CD; border:2px solid #E6A817; color:#5c3d00; }
+.col-todo    .col-body { background:#fffdf0; border-color:#E6A817; }
+.col-ready   .col-head { background:#E8F5E9; border:2px solid #43A047; color:#2e7d32; }
+.col-ready   .col-body { background:#f5fbf5; border-color:#43A047; }
+.col-running .col-head { background:#BBDEFB; border:2px solid #1E88E5; color:#1565C0; }
+.col-running .col-body { background:#f0f7ff; border-color:#1E88E5; }
+.col-review  .col-head { background:#FFF3CD; border:2px solid #E6A817; color:#5c3d00; }
+.col-review  .col-body { background:#fffdf0; border-color:#E6A817; }
+.col-done    .col-head { background:#E8F5E9; border:2px solid #43A047; color:#2e7d32; }
+.col-done    .col-body { background:#f5fbf5; border-color:#43A047; }
+
+.flow-arrow { padding-top:1.7em; color:#aaa; font-size:1.1em; }
+
+/* ── CARD ── */
+.card {
+  background:#fff; border:1px solid #ddd; border-radius:4px;
+  padding:0.55em 0.7em; box-shadow:0 1px 3px rgba(0,0,0,0.07);
+  font-size:0.85em;
+}
+.card.active { border:1.5px solid #1E88E5; box-shadow:0 1px 3px rgba(0,0,0,0.12); }
+.card.muted { opacity:0.85; }
+.card-title { font-weight:700; color:#1a1a1a; }
+.card-meta { font-size:0.88em; color:#888; margin-top:0.3em; }
+.card-action { font-size:0.88em; font-weight:600; margin-top:0.3em; }
+.card-action.running { color:#1565C0; }
+.card-action.pending { color:#7a5c00; }
+.card-action.done { color:#2e7d32; }
+.card-action.failed { color:#b71c1c; }
+.card-italic { font-size:0.85em; color:#888; font-style:italic; }
+
+.session {
+  margin-top:0.45em; padding:0.35em 0.55em; border-radius:3px;
+  border:1px solid; font-size:0.83em;
+}
+.session-running { background:#f0f7ff; border-color:#90CAF9; }
+.session-running .ses-id { color:#1565C0; font-weight:600; }
+.session-running code { background:#e3f0ff; }
+.session-review { background:#fffbea; border-color:#f0c36d; }
+.session-review .ses-id { color:#7a5c00; font-weight:600; }
+.session-review code { background:#fff0cc; }
+.session-done { background:#f0fbf0; border-color:#a5d6a7; }
+.session-done .ses-id { color:#2e7d32; font-weight:600; }
+.session-failed { background:#fff5f5; border-color:#ffcdd2; }
+.session-failed .ses-id { color:#c62828; font-weight:600; }
+
+.session .ses-label { font-size:0.85em; color:#888; }
+.session code { padding:1px 4px; border-radius:2px; font-size:0.95em; }
+.session .ses-cli { font-size:0.85em; color:#888; margin-top:0.2em; }
+
+/* ── FAILED ROW ── */
+.failed-row {
+  display:flex; align-items:center; gap:0.6em;
+  margin-top:0.7em; flex-wrap:wrap;
+}
+.failed-tag {
+  background:#FFEBEE; border:2px solid #E53935; border-radius:6px;
+  padding:0.35em 0.8em; font-weight:700; color:#b71c1c; font-size:0.9em;
+  flex:0 0 auto;
+}
+.failed-card {
+  background:#fff; border:1px solid #E53935; border-radius:4px;
+  padding:0.45em 0.7em; font-size:0.83em;
+}
+.failed-note { font-size:0.85em; color:#888; font-style:italic; }
+.failed-note code { background:#f0f0f0; padding:1px 5px; border-radius:2px; font-size:0.95em; }
+
+/* ── FLOW SUMMARY ── */
+.flow-summary {
+  margin-top:1em; background:#f0f4ff; border:1px solid #b0c4f0;
+  border-radius:6px; padding:0.7em 1em;
+}
+.flow-summary-title { font-weight:700; color:#334; margin-bottom:0.4em; font-size:0.92em; }
+.flow-steps { display:flex; gap:1em; flex-wrap:wrap; color:#555; font-size:0.86em; line-height:1.7; }
+.flow-steps code { background:#f0f0f0; padding:1px 5px; border-radius:2px; font-size:0.95em; }
+
+/* ── FOOTER ── */
+.footer { margin-top:1em; border-top:1px solid #eee; padding-top:0.6em; }
+.footer p { font-size:0.82em; color:#aaa; line-height:1.7; }
+.footer a { color:#888; }
+</style>
+</head>
+<body>
+
+<p class="page-title">kanban-task-engine — Use Case (Home Assisted)</p>
+<p class="page-sub">Vault의 이슈가 AI CLI에 의해 처리되고, 사람이 최종 승인하는 흐름 · executor: codex</p>
+
+<!-- ══ KANBAN BOARD ══ -->
+<div class="board">
+
+  <div class="col col-todo">
+    <div class="col-head">TODO</div>
+    <div class="col-body">
+      <div class="card">
+        <div class="card-title">#42 캐시 레이어 추가</div>
+        <div class="card-meta">executor: codex</div>
+        <div class="card-meta">priority: high</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow">→</div>
+
+  <div class="col col-ready">
+    <div class="col-head">READY</div>
+    <div class="col-body">
+      <div class="card">
+        <div class="card-title">#38 API 타임아웃 수정</div>
+        <div class="card-meta">executor: codex</div>
+        <div class="card-italic">↑ frontmatter status: READY 편집</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow">→</div>
+
+  <div class="col col-running">
+    <div class="col-head">RUNNING</div>
+    <div class="col-body">
+      <div class="card active">
+        <div class="card-title">#35 로그 포맷 통일</div>
+        <div class="card-action running">▶ AI CLI 실행 중</div>
+        <div class="card-meta">isolated worktree</div>
+        <div class="session session-running">
+          <div class="ses-label">session</div>
+          <code class="ses-id">run-20260507-a3f2</code>
+          <div class="ses-cli"><code>kanban run #35 --execute --agent codex</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow">→</div>
+
+  <div class="col col-review">
+    <div class="col-head">REVIEW</div>
+    <div class="col-body">
+      <div class="card">
+        <div class="card-title">#31 에러 메시지 개선</div>
+        <div class="card-meta">AI CLI 완료 · exit 0</div>
+        <div class="card-action pending">→ 사람이 approve 대기</div>
+        <div class="session session-review">
+          <div class="ses-label">session</div>
+          <code class="ses-id">run-20260507-b1c9</code>
+          <div class="ses-cli"><code>kanban approve #31</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow">→</div>
+
+  <div class="col col-done">
+    <div class="col-head">DONE</div>
+    <div class="col-body">
+      <div class="card muted">
+        <div class="card-title">#28 README 업데이트</div>
+        <div class="card-action done">✅ 완료</div>
+        <div class="session session-done">
+          <div class="ses-label">session</div>
+          <code class="ses-id">run-20260506-d7e1</code>
+          <div class="ses-cli">completed: 2026-05-06</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /board -->
+
+<!-- ══ FAILED ROW ══ -->
+<div class="failed-row">
+  <div class="failed-tag">FAILED</div>
+  <div class="failed-card">
+    <div class="card-title">#33 DB 마이그레이션</div>
+    <div class="card-action failed">exit non-0 — 변경사항 없음</div>
+    <div class="session session-failed">
+      <div class="ses-label">session</div>
+      <code class="ses-id">run-20260507-f9a0</code>
+    </div>
+  </div>
+  <div class="failed-note"><code>kanban retry #33</code> → READY로 복귀</div>
+</div>
+
+<!-- ══ FLOW SUMMARY ══ -->
+<div class="flow-summary">
+  <div class="flow-summary-title">흐름 요약</div>
+  <div class="flow-steps">
+    <div>1️⃣ <code>status: TODO → READY</code> (frontmatter 편집)</div>
+    <div>2️⃣ <code>kanban run #N --execute --agent codex</code> — session 생성 · AI CLI 실행</div>
+    <div>3️⃣ exit 0 + 변경 → REVIEW (session ID 기록)</div>
+    <div>4️⃣ <code>kanban approve #N</code> → DONE (session 완료)</div>
+    <div>실패 시: <code>kanban retry #N</code> → READY 복귀</div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>
+    📦 자산: <a href="kanban-use-case.drawio">.drawio</a> ·
+    <a href="kanban-use-case.svg">.svg</a> ·
+    <a href="kanban-task-engine-one-page.html">one-page</a>
+  </p>
+  <p>색상 규칙은 <a href="README.md">docs/design/README.md</a> 참조.</p>
+</div>
+
+</body>
+</html>
