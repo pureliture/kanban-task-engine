@@ -105,21 +105,52 @@ body { background:#fff; width:100%; font-family:'Segoe UI','Helvetica Neue',Aria
 }
 .panel-title { font-size:1.05em; font-weight:700; color:#222; margin-bottom:0.8em; text-align:center; }
 
+/* ── LIFECYCLE PANEL ── */
+.lifecycle-panel {
+  background:#fafafa; border:1.5px dashed #ccc;
+  border-radius:6px; padding:1em 1.2em;
+  margin-top:0.7em;
+}
+.lifecycle-title {
+  font-size:1.05em; font-weight:700; color:#222;
+  text-align:center; margin-bottom:0.7em;
+}
+.lifecycle-meta { font-weight:400; color:#888; font-size:0.85em; }
+
+.lc-row { display:flex; gap:0.5em; align-items:center; justify-content:center; flex-wrap:wrap; }
+.lc-stage { display:flex; flex-direction:column; align-items:center; gap:0.25em; }
+.lc-rev { font-size:0.78em; color:#888; font-style:italic; white-space:nowrap; }
+.lc-arrow { display:flex; flex-direction:column; align-items:center; gap:0.1em; }
+.lc-fwd { font-size:1.2em; color:#555; line-height:1; }
+.lc-lbl { font-size:0.78em; color:#555; white-space:nowrap; }
+
+.lc-failed-row {
+  display:flex; gap:0.7em; align-items:center; justify-content:center;
+  margin-top:0.8em;
+}
+.lc-fail-arrow { font-size:0.8em; color:#c62828; font-style:italic; }
+
+.lc-note {
+  margin-top:0.8em; text-align:center;
+  font-size:0.82em; color:#888; font-style:italic;
+}
+.lc-note code { background:#f0f0f0; padding:1px 5px; border-radius:2px; font-size:0.95em; }
+
 /* Panel 1 */
 .p1 { flex:0 0 30em; }
 .status-row { display:flex; gap:0.4em; align-items:center; margin-bottom:0.5em; flex-wrap:nowrap; }
 .status-row .lbl { font-size:0.85em; color:#888; font-style:italic; }
 .st {
-  padding:0.3em 0.6em; border-radius:4px;
+  padding:0.3em 0.7em; border-radius:4px;
   font-size:0.9em; font-weight:700;
   white-space:nowrap;
 }
-.st-todo    { background:#FFF9C4; border:1.5px solid #F9A825; color:#333; }
-.st-ready   { background:#E8F5E9; border:1.5px solid #43A047; color:#2e7d32; }
-.st-running { background:#BBDEFB; border:2px   solid #1E88E5; color:#1565C0; }
-.st-review  { background:#FFF9C4; border:1.5px solid #F9A825; color:#333; }
-.st-done    { background:#E8F5E9; border:2px   solid #43A047; color:#2e7d32; }
-.st-failed  { background:#FFEBEE; border:2px   solid #E53935; color:#b71c1c; }
+.st-todo    { background:#FFF3CD; border:2px solid #E6A817; color:#5c3d00; }
+.st-ready   { background:#E8F5E9; border:2px solid #43A047; color:#2e7d32; }
+.st-running { background:#BBDEFB; border:2px solid #1E88E5; color:#1565C0; }
+.st-review  { background:#FFF3CD; border:2px solid #E6A817; color:#5c3d00; }
+.st-done    { background:#E8F5E9; border:2px solid #43A047; color:#2e7d32; }
+.st-failed  { background:#FFEBEE; border:2px solid #E53935; color:#b71c1c; }
 
 .arrow-lbl  { font-size:0.8em; color:#555; text-align:center; white-space:nowrap; }
 .arrow-fwd  { font-size:1.2em; color:#555; line-height:1; }
@@ -297,152 +328,52 @@ body { background:#fff; width:100%; font-family:'Segoe UI','Helvetica Neue',Aria
 
 <hr class="divider"/>
 
-<!-- ══ PANELS ══ -->
-<div class="panel-row">
+<!-- ══ ISSUE LIFECYCLE ══ -->
+<div class="lifecycle-panel">
+  <div class="lifecycle-title">Issue Lifecycle <span class="lifecycle-meta">— IssueStatus (6) · VALID_ISSUE_TRANSITIONS (8)</span></div>
 
-  <!-- PANEL 1 -->
-  <div class="panel p1">
-    <div class="panel-title">Panel 1 — Issue Lifecycle (8개 전이)</div>
-
-    <!-- forward flow -->
-    <div class="status-row">
+  <!-- forward + reverse top row -->
+  <div class="lc-row">
+    <div class="lc-stage">
       <span class="st st-todo">TODO</span>
-      <div style="display:flex;flex-direction:column;align-items:center">
-        <span style="font-size:0.75em;color:#888;font-style:italic;">되돌리기↩</span>
-        <span class="arrow-fwd">→</span>
-        <span class="arrow-lbl">준비</span>
-      </div>
-      <span class="st st-ready">READY</span>
-      <div style="display:flex;flex-direction:column;align-items:center">
-        <span class="arrow-fwd">→</span>
-        <span class="arrow-lbl">실행</span>
-      </div>
-      <span class="st st-running">RUNNING</span>
-      <div style="display:flex;flex-direction:column;align-items:center">
-        <span class="arrow-fwd">→</span>
-        <span class="arrow-lbl">exit 0</span>
-      </div>
+      <span class="lc-rev">↺ READY → TODO</span>
+    </div>
+    <div class="lc-arrow">
+      <span class="lc-fwd">→</span>
+      <span class="lc-lbl">prep</span>
+    </div>
+    <span class="st st-ready">READY</span>
+    <div class="lc-arrow">
+      <span class="lc-fwd">→</span>
+      <span class="lc-lbl">--execute</span>
+    </div>
+    <span class="st st-running">RUNNING</span>
+    <div class="lc-arrow">
+      <span class="lc-fwd">→</span>
+      <span class="lc-lbl">exit 0 + 변경</span>
+    </div>
+    <div class="lc-stage">
       <span class="st st-review">REVIEW</span>
-      <div style="display:flex;flex-direction:column;align-items:center">
-        <span style="font-size:0.75em;color:#888;font-style:italic;">retry↩</span>
-        <span class="arrow-fwd">→</span>
-        <span class="arrow-lbl">approve</span>
-      </div>
-      <span class="st st-done">DONE</span>
+      <span class="lc-rev">↺ REVIEW → RUNNING (retry)</span>
     </div>
-
-    <!-- FAILED branch -->
-    <div style="display:flex;align-items:center;gap:0.5em;margin:4px 0 4px 148px;">
-      <div style="display:flex;flex-direction:column;align-items:center;">
-        <span style="font-size:0.85em;color:#c62828;">↓ no-change / exit non-0</span>
-      </div>
+    <div class="lc-arrow">
+      <span class="lc-fwd">→</span>
+      <span class="lc-lbl">approve</span>
     </div>
-    <div style="display:flex;align-items:center;gap:0.5em;margin-left:11.5em;">
-      <span class="st st-failed">FAILED</span>
-      <span style="font-size:0.85em;color:#888;font-style:italic;">↺ retry → READY</span>
-    </div>
-
-    <!-- transitions table -->
-    <div class="transitions-grid" style="margin-top:1em;">
-      <div class="tr"><code>TODO → READY</code><span class="dir">전진 · 준비</span></div>
-      <div class="tr"><code>READY → TODO</code><span class="dir">후퇴 · 되돌리기</span></div>
-      <div class="tr"><code>READY → RUNNING</code><span class="dir">전진 · --execute</span></div>
-      <div class="tr"><code>RUNNING → REVIEW</code><span class="dir">전진 · exit 0+변경</span></div>
-      <div class="tr"><code>RUNNING → FAILED</code><span class="dir">전진 · no-change</span></div>
-      <div class="tr"><code>REVIEW → DONE</code><span class="dir">전진 · approve</span></div>
-      <div class="tr"><code>REVIEW → RUNNING</code><span class="dir">후퇴 · retry</span></div>
-      <div class="tr"><code>FAILED → READY</code><span class="dir">후퇴 · retry</span></div>
-    </div>
-
-    <div class="p1-note">
-      <p>Epic: TODO / DONE 상태만 허용 (executor = human 강제)</p>
-      <p>no-change success (exit 0, file change 없음) → FAILED 수렴</p>
-      <p>Terminal states: DONE, FAILED (completed 필드는 DONE에만)</p>
-    </div>
+    <span class="st st-done">DONE</span>
   </div>
 
-  <!-- PANEL 2 -->
-  <div class="panel p2">
-    <div class="panel-title">Panel 2 — Recipe → Execution Loop</div>
-
-    <div style="font-size:10px;font-weight:700;color:#333;margin-bottom:6px;">Active Recipe Resolution (우선순위 순):</div>
-    <div class="recipe-step">① KANBAN_RECIPE (env)</div>
-    <div class="recipe-arrow">↓</div>
-    <div class="recipe-step">② vault/config/active-recipe.yaml</div>
-    <div class="recipe-arrow">↓</div>
-    <div class="recipe-step">③ bundled home-assisted.yaml</div>
-    <div class="recipe-arrow">↓</div>
-    <div class="policy-box">PolicyEngine<br/><span style="font-weight:400;font-size:9.5px;">(fail-closed)</span></div>
-
-    <div class="fork-row">
-      <div style="flex:1;">
-        <div style="font-size:0.85em;color:#555;text-align:center;margin-bottom:0.35em;">--execute ↓</div>
-        <div class="exec-box">
-          <div class="box-title">claude-code-executor</div>
-          <div class="box-text">or codex-runner</div>
-        </div>
-        <div class="worktree-box">Isolated Worktree</div>
-        <div class="flow-note">READY → RUNNING → REVIEW → DONE<br/><span class="flow-fail">└→ FAILED</span></div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:0;gap:0.35em;">
-        <div style="font-size:0.85em;color:#888;font-style:italic;margin-bottom:0.2em;">validate-only.yaml →</div>
-        <div class="validate-box">
-          <div class="box-title" style="color:#6a1b9a;">validate-only</div>
-          <div class="box-text" style="color:#888;">(no mutation)</div>
-        </div>
-      </div>
-    </div>
+  <!-- failed branch row -->
+  <div class="lc-failed-row">
+    <span class="lc-fail-arrow">↓ exit non-0 / 변경 없음</span>
+    <span class="st st-failed">FAILED</span>
+    <span class="lc-rev">↺ retry → READY</span>
   </div>
 
-  <!-- PANEL 3 -->
-  <div class="panel p3">
-    <div class="panel-title">Panel 3 — Work Mode: Jira Export</div>
-    <div class="p3-inner">
-      <div class="p3-flow">
-        <div class="p3-box p3-vault">
-          <div class="box-title" style="color:#6a1b9a;">Vault</div>
-          <div class="box-text">Markdown Issues</div>
-          <div class="sot">SoT</div>
-        </div>
-        <div class="p3-arrow">↓</div>
-        <div class="p3-box p3-engine">
-          <div class="box-title" style="color:#1b5e20;">Engine</div>
-          <div class="box-text">parser + store</div>
-          <div class="box-text">→ Canonical JSON</div>
-        </div>
-        <div class="p3-arrow">↓</div>
-        <div class="p3-box p3-adapter">
-          <div class="box-title" style="color:#0d47a1;">adapter-jira</div>
-          <div class="box-text">RuntimePolicy check</div>
-        </div>
-        <div class="p3-arrow">↓</div>
-        <div class="p3-box p3-jira">
-          <div class="box-title" style="color:#0d47a1;">Jira API</div>
-          <div class="box-text">(one-way export)</div>
-        </div>
-      </div>
-      <div class="p3-right">
-        <div class="writeback-box">
-          <div class="wb-title">Work mode write-back 제한:</div>
-          <div class="wb-item wb-ok">✅  sync.jira.key</div>
-          <div class="wb-item wb-ok">✅  sync.jira.status</div>
-          <div class="wb-item wb-ok">✅  sync.jira.exportedAt</div>
-          <div class="wb-item wb-no">❌  body 수정 불가</div>
-          <div class="wb-item wb-no">❌  Firebase sync 불가</div>
-          <div class="wb-item wb-no">❌  OpenClaw execution 불가</div>
-          <div class="wb-item wb-no">❌  mobile real-time sync 불가</div>
-          <div class="wb-note">ExternalSyncPolicy = 'atlassian-only'</div>
-        </div>
-        <div class="policy-note">
-          assertAdapterAllowed() — policy 없이 permissive 동작 금지 (fail-closed)<br/>
-          packages/cli ≠ adapter-cli (CLI entry point vs adapter layer)<br/>
-          adapter guard는 모든 외부 요청 전에 RuntimePolicy를 확인합니다.
-        </div>
-      </div>
-    </div>
+  <div class="lc-note">
+    상세 전이 규칙은 <a href="../../packages/schema/src/status.ts"><code>packages/schema/src/status.ts</code></a> 참조
   </div>
-
-</div><!-- /panel-row -->
+</div>
 
 <!-- ══ FOOTER ══ -->
 <div class="footer">
