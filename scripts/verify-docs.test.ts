@@ -42,7 +42,7 @@ async function makeFixture(options: {
       '',
       '<p align="center">',
       '  <a href="docs/design/kanban-use-case.svg">',
-      `    <img src="${useCaseImage}" alt="Home Assisted use case" width="100%" />`,
+      `    <img src="${useCaseImage}" alt="AI CLI use case" width="100%" />`,
       '  </a>',
       '</p>',
       '',
@@ -139,7 +139,7 @@ function validSvg(extra = ''): string {
 
 function validUseCaseHtml(command = 'kanban run VC-035 --execute --agent codex'): string {
   return `<main>
-    <h1>Home Assisted</h1>
+    <h1>AI CLI use case</h1>
     <section>TODO READY RUNNING REVIEW DONE FAILED codex session isolated worktree</section>
     <code>${command}</code>
     <code>kanban approve VC-031</code>
@@ -158,7 +158,7 @@ function validUseCaseDrawio(command = 'kanban run VC-035 --execute --agent codex
 
 function validUseCaseSvg(command = 'kanban run VC-035 --execute --agent codex'): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 360">
-    <title>Home Assisted use case</title>
+    <title>AI CLI use case</title>
     <desc>Use-case fixture for docs verification tests.</desc>
     <defs>
       <style>
@@ -167,7 +167,7 @@ function validUseCaseSvg(command = 'kanban run VC-035 --execute --agent codex'):
       </style>
     </defs>
     <rect x="0" y="0" width="900" height="360" fill="#ffffff"></rect>
-    <text x="32" y="44" class="title">Home Assisted Use Case</text>
+    <text x="32" y="44" class="title">AI CLI Use Case</text>
     <text x="32" y="84" class="body">TODO READY RUNNING REVIEW DONE FAILED</text>
     <text x="32" y="124" class="body">codex session isolated worktree</text>
     <text x="32" y="164" class="body">VC-035 VC-031 VC-033 VC-001</text>
@@ -335,7 +335,7 @@ describe('verify-docs SVG rendering contract', () => {
         '',
         '<p align="center">',
         '  <a href="docs/design/kanban-use-case.svg">',
-        '    <img src="docs/design/kanban-use-case.svg" alt="Home Assisted use case" width="100%" />',
+        '    <img src="docs/design/kanban-use-case.svg" alt="AI CLI use case" width="100%" />',
         '  </a>',
         '</p>',
         '',
