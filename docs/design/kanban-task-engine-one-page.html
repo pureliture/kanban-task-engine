@@ -23,31 +23,23 @@ body { background:#fff; width:100%; font-family:'Segoe UI','Helvetica Neue',Aria
 
 /* VAULT */
 .zone-vault {
-  flex:0 0 18em;
+  flex:0 0 14em;
   border:2px dashed #9C27B0;
   background:#F3E5F5;
   border-radius:8px;
   padding:0.8em;
 }
 .zone-vault .zone-title { color:#6a1b9a; }
-.vault-inner { display:flex; gap:0.5em; margin-top:0.5em; }
-.vault-md {
-  flex:0 0 9.5em;
+.vault-stack { display:flex; flex-direction:column; gap:0.4em; }
+.vault-card {
   background:#fff;
   border:1.5px solid #AB47BC;
   border-radius:4px;
-  padding:0.6em 0.7em;
+  padding:0.5em 0.7em;
 }
-.vault-right { flex:1; display:flex; flex-direction:column; gap:0.5em; }
-.vault-boards, .vault-recipes {
-  background:#fff;
-  border:1.5px solid #AB47BC;
-  border-radius:4px;
-  padding:0.6em 0.7em;
-  flex:1;
-}
+.vault-card .ext { font-weight:400; color:#AB47BC; font-size:0.85em; }
 
-/* ENGINE */
+/* ENGINE — 가로 4칸 */
 .zone-engine {
   flex:1;
   border:2px solid #4CAF50;
@@ -57,42 +49,38 @@ body { background:#fff; width:100%; font-family:'Segoe UI','Helvetica Neue',Aria
   min-width:0;
 }
 .zone-engine .zone-title { color:#1b5e20; }
-.engine-inner { display:flex; gap:0.6em; margin-top:0.5em; }
+.engine-inner { display:flex; gap:0.5em; }
 .engine-box {
   flex:1;
   background:#fff;
-  border:1.5px solid #4CAF50;
+  border:1px solid #4CAF50;
   border-radius:4px;
-  padding:0.6em 0.7em;
+  padding:0.5em 0.7em;
   min-width:0;
-  overflow:hidden;
 }
-.engine-box .box-text { word-break:keep-all; }
+.engine-box .box-title { color:#1a1a1a; }
+.engine-box .box-text { color:#555; }
+.engine-box code { background:#f0f0f0; padding:1px 4px; border-radius:2px; font-size:0.85em; }
 
 /* EXTERNAL */
 .zone-external {
-  flex:0 0 11em;
+  flex:0 0 9em;
   border:2px dashed #2196F3;
   background:#E3F2FD;
   border-radius:8px;
   padding:0.8em;
 }
 .zone-external .zone-title { color:#0d47a1; }
-.ext-inner { display:flex; flex-direction:column; gap:0.5em; margin-top:0.5em; }
-.ext-openclaw {
-  background:#fff; border:1.5px solid #2196F3;
-  border-radius:4px; padding:0.5em 0.6em; text-align:center;
+.ext-inner { display:flex; flex-direction:column; gap:0.4em; }
+.ext-card {
+  background:#fff;
+  border:1px solid #2196F3;
+  border-radius:4px;
+  padding:0.5em 0.7em;
+  text-align:center;
 }
-.ext-row { display:flex; gap:0.5em; }
-.ext-jira, .ext-github {
-  flex:1; background:#fff; border:1.5px solid #2196F3;
-  border-radius:4px; padding:0.5em 0.3em; text-align:center;
-}
-.ext-note {
-  background:#fafafa; border:1px dashed #2196F3;
-  border-radius:4px; padding:0.5em 0.6em;
-  font-size:0.9em; color:#555; line-height:1.5;
-}
+.ext-card .box-title { color:#1a1a1a; }
+.ext-card .box-text { color:#555; font-size:0.85em; }
 
 /* ── arrows between zones ── */
 .arch-arrows { display:flex; flex-direction:column; justify-content:center; align-items:center; gap:0.15em; font-size:0.85em; color:#555; flex:0 0 2em; }
@@ -109,109 +97,54 @@ body { background:#fff; width:100%; font-family:'Segoe UI','Helvetica Neue',Aria
 /* ── DIVIDER ── */
 .divider { border:none; border-top:1px dashed #ddd; margin:1em 0; }
 
-/* ── PANELS ── */
-.panel-row { display:flex; gap:0.8em; }
-.panel {
+/* ── LIFECYCLE PANEL ── */
+.lifecycle-panel {
   background:#fafafa; border:1.5px dashed #ccc;
-  border-radius:6px; padding:0.9em;
+  border-radius:6px; padding:1em 1.2em;
+  margin-top:0.7em;
 }
-.panel-title { font-size:1.05em; font-weight:700; color:#222; margin-bottom:0.8em; text-align:center; }
+.lifecycle-title {
+  font-size:1.05em; font-weight:700; color:#222;
+  text-align:center; margin-bottom:0.7em;
+}
+.lifecycle-meta { font-weight:400; color:#888; font-size:0.85em; }
 
-/* Panel 1 */
-.p1 { flex:0 0 30em; }
-.status-row { display:flex; gap:0.4em; align-items:center; margin-bottom:0.5em; flex-wrap:nowrap; }
-.status-row .lbl { font-size:0.85em; color:#888; font-style:italic; }
+.lc-row { display:flex; gap:0.5em; align-items:center; justify-content:center; flex-wrap:wrap; }
+.lc-stage { display:flex; flex-direction:column; align-items:center; gap:0.25em; }
+.lc-rev { font-size:0.78em; color:#888; font-style:italic; white-space:nowrap; }
+.lc-arrow { display:flex; flex-direction:column; align-items:center; gap:0.1em; }
+.lc-fwd { font-size:1.2em; color:#555; line-height:1; }
+.lc-lbl { font-size:0.78em; color:#555; white-space:nowrap; }
+
+.lc-failed-row {
+  display:flex; gap:0.7em; align-items:center; justify-content:center;
+  margin-top:0.8em;
+}
+.lc-fail-arrow { font-size:0.8em; color:#c62828; font-style:italic; }
+
+.lc-note {
+  margin-top:0.8em; text-align:center;
+  font-size:0.82em; color:#888; font-style:italic;
+}
+.lc-note code { background:#f0f0f0; padding:1px 5px; border-radius:2px; font-size:0.95em; }
+
+/* ── STATUS BADGES ── */
 .st {
-  padding:0.3em 0.6em; border-radius:4px;
+  padding:0.3em 0.7em; border-radius:4px;
   font-size:0.9em; font-weight:700;
   white-space:nowrap;
 }
-.st-todo    { background:#FFF9C4; border:1.5px solid #F9A825; color:#333; }
-.st-ready   { background:#E8F5E9; border:1.5px solid #43A047; color:#2e7d32; }
-.st-running { background:#BBDEFB; border:2px   solid #1E88E5; color:#1565C0; }
-.st-review  { background:#FFF9C4; border:1.5px solid #F9A825; color:#333; }
-.st-done    { background:#E8F5E9; border:2px   solid #43A047; color:#2e7d32; }
-.st-failed  { background:#FFEBEE; border:2px   solid #E53935; color:#b71c1c; }
-
-.arrow-lbl  { font-size:0.8em; color:#555; text-align:center; white-space:nowrap; }
-.arrow-fwd  { font-size:1.2em; color:#555; line-height:1; }
-.arrow-back { font-size:0.8em; color:#888; font-style:italic; display:flex; flex-direction:column; align-items:center; }
-
-.transitions-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.3em 1em; margin:0.7em 0; }
-.tr { font-size:0.88em; color:#555; display:flex; gap:0.3em; align-items:baseline; }
-.tr code { font-size:0.85em; background:#f0f0f0; padding:0.1em 0.35em; border-radius:2px; }
-.tr .dir  { font-size:0.8em; color:#888; }
-
-.p1-note {
-  background:#F3E5F5; border:1px dashed #9C27B0;
-  border-radius:4px; padding:0.6em 0.7em; margin-top:0.7em;
-}
-.p1-note p { font-size:0.88em; color:#6a1b9a; font-style:italic; line-height:1.6; }
-
-/* Panel 2 */
-.p2 { flex:0 0 26em; }
-.recipe-step {
-  background:#E0E0E0; border:1.5px solid #9E9E9E;
-  border-radius:3px; padding:0.4em 0.8em; margin-bottom:0.3em;
-  font-size:0.9em; color:#333; text-align:center;
-}
-.recipe-arrow { text-align:center; font-size:1em; color:#555; margin:0.15em 0; }
-.policy-box {
-  background:#C8E6C9; border:1.5px solid #43A047;
-  border-radius:4px; padding:0.5em 0.8em; text-align:center;
-  font-size:0.9em; font-weight:700; color:#333; margin:0.5em 0;
-}
-.fork-row { display:flex; gap:0.6em; align-items:flex-start; margin-top:0.3em; }
-.exec-box {
-  flex:1;
-  background:#BBDEFB; border:1.5px solid #1E88E5;
-  border-radius:4px; padding:0.6em 0.7em; text-align:center;
-}
-.worktree-box {
-  background:#fff; border:1.5px solid #1E88E5;
-  border-radius:4px; padding:0.4em 0.6em; text-align:center;
-  font-size:0.9em; font-weight:700; color:#1565C0;
-  margin-top:0.5em;
-}
-.validate-box {
-  flex:0 0 8em;
-  background:#F3E5F5; border:1.5px dashed #9C27B0;
-  border-radius:4px; padding:0.6em 0.6em; text-align:center;
-}
-.flow-note { font-size:0.85em; color:#555; font-style:italic; margin-top:0.6em; }
-.flow-fail { color:#c62828; }
-
-/* Panel 3 */
-.p3 { flex:1; }
-.p3-inner { display:flex; gap:0.9em; }
-.p3-flow { display:flex; flex-direction:column; gap:0; align-items:center; flex:0 0 8.5em; }
-.p3-box {
-  width:8.5em; text-align:center; border-radius:4px; padding:0.6em 0.5em;
-}
-.p3-vault  { background:#F3E5F5; border:1.5px solid #9C27B0; }
-.p3-engine { background:#E8F5E9; border:1.5px solid #4CAF50; }
-.p3-adapter{ background:#E3F2FD; border:1.5px solid #2196F3; }
-.p3-jira   { background:#BBDEFB; border:1.5px solid #1565C0; }
-.p3-arrow  { font-size:1.3em; color:#555; line-height:1.3; text-align:center; }
-.p3-right  { flex:1; display:flex; flex-direction:column; gap:0.6em; }
-.writeback-box {
-  background:#FFF3E0; border:1.5px solid #FF9800;
-  border-radius:4px; padding:0.8em 0.9em;
-}
-.wb-title { font-size:0.9em; font-weight:700; color:#7a3900; margin-bottom:0.5em; }
-.wb-item  { font-size:0.9em; line-height:1.7; }
-.wb-ok    { color:#2e7d32; }
-.wb-no    { color:#c62828; }
-.wb-note  { font-size:0.82em; color:#888; font-style:italic; margin-top:0.35em; }
-.policy-note {
-  background:#fafafa; border:1px dashed #9E9E9E;
-  border-radius:4px; padding:0.7em 0.8em;
-  font-size:0.85em; color:#555; line-height:1.6; font-style:italic;
-}
+.st-todo    { background:#FFF3CD; border:2px solid #E6A817; color:#5c3d00; }
+.st-ready   { background:#E8F5E9; border:2px solid #43A047; color:#2e7d32; }
+.st-running { background:#BBDEFB; border:2px solid #1E88E5; color:#1565C0; }
+.st-review  { background:#FFF3CD; border:2px solid #E6A817; color:#5c3d00; }
+.st-done    { background:#E8F5E9; border:2px solid #43A047; color:#2e7d32; }
+.st-failed  { background:#FFEBEE; border:2px solid #E53935; color:#b71c1c; }
 
 /* ── FOOTER ── */
 .footer { margin-top:1em; border-top:1px solid #eee; padding-top:0.7em; }
 .footer p { font-size:0.85em; color:#aaa; line-height:1.7; }
+.footer a { color:#888; }
 </style>
 </head>
 <body>
@@ -225,27 +158,21 @@ body { background:#fff; width:100%; font-family:'Segoe UI','Helvetica Neue',Aria
   <!-- VAULT -->
   <div class="zone-vault">
     <div class="zone-title">🗂 Vault</div>
-    <div style="font-size:9.5px;color:#9C27B0;font-style:italic;margin-bottom:6px;">Live Issue State — 별도 Git 저장소</div>
-    <div class="vault-inner">
-      <div class="vault-md">
-        <div class="box-title">Markdown Issues</div>
-        <div class="box-text">.md + YAML frontmatter</div>
-        <div class="sot">← SoT</div>
-        <div class="box-text">issues/ · epics/</div>
-        <div class="box-text">registry.yaml</div>
-        <div class="box-text">active-recipe.yaml</div>
-        <div class="box-text">runs/ · events/</div>
+    <div style="font-size:9.5px;color:#9C27B0;font-style:italic;margin-bottom:8px;">별도 Git 저장소</div>
+    <div class="vault-stack">
+      <div class="vault-card">
+        <div class="box-title">Markdown Issues <span class="ext">.md</span></div>
+        <div class="sot">← Source of Truth</div>
+        <div class="box-text">사람이 직접 읽고 쓰는 파일</div>
       </div>
-      <div class="vault-right">
-        <div class="vault-boards">
-          <div class="box-title">Boards &amp; Templates</div>
-          <div class="box-text">boards/ · templates/</div>
-        </div>
-        <div class="vault-recipes">
-          <div class="box-title">Recipes</div>
-          <div class="box-text">recipes/*.yaml</div>
-          <div class="box-text">mode + modules + policy</div>
-        </div>
+      <div class="vault-card">
+        <div class="box-title">Boards <span class="ext">.md</span></div>
+        <div class="box-text">어떤 이슈가 어느 컬럼에 있는지</div>
+      </div>
+      <div class="vault-card">
+        <div class="box-title">Recipes <span class="ext">.yaml</span></div>
+        <div class="box-text">누가 어떤 도구로 실행할지</div>
+        <div class="box-italic">예: Codex로 실행 / Jira export만</div>
       </div>
     </div>
   </div>
@@ -253,56 +180,30 @@ body { background:#fff; width:100%; font-family:'Segoe UI','Helvetica Neue',Aria
   <!-- arrow Vault→Engine -->
   <div class="arch-arrows">
     <span style="font-size:1.4em;">→</span>
-    <span>parse</span>
-    <span>→JSON</span>
+    <span>읽어서</span>
+    <span>JSON화</span>
   </div>
 
   <!-- ENGINE -->
   <div class="zone-engine">
-    <div class="zone-title">⚙️ Engine — Logic Only (no live state)</div>
+    <div class="zone-title">⚙️ Engine</div>
+    <div style="font-size:9.5px;color:#4CAF50;font-style:italic;margin-bottom:8px;">로직만 · 데이터 없음</div>
     <div class="engine-inner">
       <div class="engine-box">
-        <div class="box-title">packages/core</div>
-        <div class="box-text">Runtime</div>
-        <div class="box-text">StateMachine</div>
-        <div class="box-text">PolicyEngine</div>
-        <div class="box-text">Store · Executor</div>
-        <div class="box-text">ModuleRunner</div>
-        <div class="box-text">EventBus</div>
-        <div class="box-text">DeadLetterQ</div>
+        <div class="box-title">Core</div>
+        <div class="box-text">상태 전이 · 실행 루프</div>
       </div>
       <div class="engine-box">
-        <div class="box-title">packages/schema</div>
-        <div class="box-text">IssueFrontmatter</div>
-        <div class="box-text">CanonicalIssueModel</div>
-        <div class="box-text">IssueStatus (6)</div>
-        <div class="box-text">VALID_ISSUE_TRANSITIONS (8)</div>
+        <div class="box-title">Schema</div>
+        <div class="box-text">.md ↔ JSON 계약</div>
       </div>
       <div class="engine-box">
-        <div class="box-title">Adapters + Executor</div>
-        <div class="box-text">adapter-claude-code</div>
-        <div class="box-text">codex-runner</div>
-        <div class="box-text">adapter-jira</div>
-        <div class="box-text">adapter-firebase</div>
-        <div class="box-text">adapter-openclaw</div>
-        <div class="box-text">adapter-github</div>
-        <div class="box-text">adapter-cli</div>
+        <div class="box-title">Adapters</div>
+        <div class="box-text">Jira · GitHub · Codex 연결</div>
       </div>
       <div class="engine-box">
-        <div class="box-title">packages/cli</div>
-        <div class="box-text">CLI entry point</div>
-        <div class="box-text">kanban sync · board</div>
-        <div class="box-text">kanban run · next</div>
-        <div class="box-text">kanban approve</div>
-        <div class="box-text">retry · abort</div>
-      </div>
-      <div class="engine-box">
-        <div class="box-title">recipes/</div>
-        <div class="box-text">home-assisted.yaml</div>
-        <div class="box-text">validate-only.yaml</div>
-        <div class="box-text">work-jira-export.yaml</div>
-        <div class="box-italic">examples/</div>
-        <div class="box-italic">home-full-auto.yaml</div>
+        <div class="box-title">CLI</div>
+        <div class="box-text"><code>kanban run</code> 진입점</div>
       </div>
     </div>
   </div>
@@ -311,31 +212,21 @@ body { background:#fff; width:100%; font-family:'Segoe UI','Helvetica Neue',Aria
   <div class="arch-arrows">
     <span style="font-size:1.4em;">→</span>
     <span>adapter</span>
-    <span>output</span>
+    <span>경유</span>
   </div>
 
   <!-- EXTERNAL -->
   <div class="zone-external">
     <div class="zone-title" style="color:#0d47a1;">🌐 External</div>
+    <div style="font-size:9.5px;color:#1565C0;font-style:italic;margin-bottom:8px;">외부 시스템</div>
     <div class="ext-inner">
-      <div class="ext-openclaw">
-        <div class="box-title">OpenClaw</div>
-        <div class="box-italic">Home only</div>
+      <div class="ext-card">
+        <div class="box-title">Codex</div>
+        <div class="box-text">Home 실행기</div>
       </div>
-      <div class="ext-row">
-        <div class="ext-jira">
-          <div class="box-title">Jira</div>
-          <div class="box-italic">Work only</div>
-        </div>
-        <div class="ext-github">
-          <div class="box-title">GitHub</div>
-          <div class="box-text">Firebase</div>
-        </div>
-      </div>
-      <div class="ext-note">
-        <b>Home:</b> OpenClaw · Firebase<br/>
-        <b>Work:</b> Jira export only<br/>
-        <span style="font-style:italic;color:#888;">CLI (user interface)</span>
+      <div class="ext-card">
+        <div class="box-title">Jira · GitHub</div>
+        <div class="box-text">Work 연동</div>
       </div>
     </div>
   </div>
@@ -351,157 +242,61 @@ body { background:#fff; width:100%; font-family:'Segoe UI','Helvetica Neue',Aria
 
 <hr class="divider"/>
 
-<!-- ══ PANELS ══ -->
-<div class="panel-row">
+<!-- ══ ISSUE LIFECYCLE ══ -->
+<div class="lifecycle-panel">
+  <div class="lifecycle-title">Issue Lifecycle <span class="lifecycle-meta">— IssueStatus (6) · VALID_ISSUE_TRANSITIONS (8)</span></div>
 
-  <!-- PANEL 1 -->
-  <div class="panel p1">
-    <div class="panel-title">Panel 1 — Issue Lifecycle (8개 전이)</div>
-
-    <!-- forward flow -->
-    <div class="status-row">
+  <!-- forward + reverse top row -->
+  <div class="lc-row">
+    <div class="lc-stage">
       <span class="st st-todo">TODO</span>
-      <div style="display:flex;flex-direction:column;align-items:center">
-        <span style="font-size:0.75em;color:#888;font-style:italic;">되돌리기↩</span>
-        <span class="arrow-fwd">→</span>
-        <span class="arrow-lbl">준비</span>
-      </div>
-      <span class="st st-ready">READY</span>
-      <div style="display:flex;flex-direction:column;align-items:center">
-        <span class="arrow-fwd">→</span>
-        <span class="arrow-lbl">실행</span>
-      </div>
-      <span class="st st-running">RUNNING</span>
-      <div style="display:flex;flex-direction:column;align-items:center">
-        <span class="arrow-fwd">→</span>
-        <span class="arrow-lbl">exit 0</span>
-      </div>
+      <span class="lc-rev">↺ READY → TODO</span>
+    </div>
+    <div class="lc-arrow">
+      <span class="lc-fwd">→</span>
+      <span class="lc-lbl">prep</span>
+    </div>
+    <span class="st st-ready">READY</span>
+    <div class="lc-arrow">
+      <span class="lc-fwd">→</span>
+      <span class="lc-lbl">--execute</span>
+    </div>
+    <span class="st st-running">RUNNING</span>
+    <div class="lc-arrow">
+      <span class="lc-fwd">→</span>
+      <span class="lc-lbl">exit 0 + 변경</span>
+    </div>
+    <div class="lc-stage">
       <span class="st st-review">REVIEW</span>
-      <div style="display:flex;flex-direction:column;align-items:center">
-        <span style="font-size:0.75em;color:#888;font-style:italic;">retry↩</span>
-        <span class="arrow-fwd">→</span>
-        <span class="arrow-lbl">approve</span>
-      </div>
-      <span class="st st-done">DONE</span>
+      <span class="lc-rev">↺ REVIEW → RUNNING (retry)</span>
     </div>
-
-    <!-- FAILED branch -->
-    <div style="display:flex;align-items:center;gap:0.5em;margin:4px 0 4px 148px;">
-      <div style="display:flex;flex-direction:column;align-items:center;">
-        <span style="font-size:0.85em;color:#c62828;">↓ no-change / exit non-0</span>
-      </div>
+    <div class="lc-arrow">
+      <span class="lc-fwd">→</span>
+      <span class="lc-lbl">approve</span>
     </div>
-    <div style="display:flex;align-items:center;gap:0.5em;margin-left:11.5em;">
-      <span class="st st-failed">FAILED</span>
-      <span style="font-size:0.85em;color:#888;font-style:italic;">↺ retry → READY</span>
-    </div>
-
-    <!-- transitions table -->
-    <div class="transitions-grid" style="margin-top:1em;">
-      <div class="tr"><code>TODO → READY</code><span class="dir">전진 · 준비</span></div>
-      <div class="tr"><code>READY → TODO</code><span class="dir">후퇴 · 되돌리기</span></div>
-      <div class="tr"><code>READY → RUNNING</code><span class="dir">전진 · --execute</span></div>
-      <div class="tr"><code>RUNNING → REVIEW</code><span class="dir">전진 · exit 0+변경</span></div>
-      <div class="tr"><code>RUNNING → FAILED</code><span class="dir">전진 · no-change</span></div>
-      <div class="tr"><code>REVIEW → DONE</code><span class="dir">전진 · approve</span></div>
-      <div class="tr"><code>REVIEW → RUNNING</code><span class="dir">후퇴 · retry</span></div>
-      <div class="tr"><code>FAILED → READY</code><span class="dir">후퇴 · retry</span></div>
-    </div>
-
-    <div class="p1-note">
-      <p>Epic: TODO / DONE 상태만 허용 (executor = human 강제)</p>
-      <p>no-change success (exit 0, file change 없음) → FAILED 수렴</p>
-      <p>Terminal states: DONE, FAILED (completed 필드는 DONE에만)</p>
-    </div>
+    <span class="st st-done">DONE</span>
   </div>
 
-  <!-- PANEL 2 -->
-  <div class="panel p2">
-    <div class="panel-title">Panel 2 — Recipe → Execution Loop</div>
-
-    <div style="font-size:10px;font-weight:700;color:#333;margin-bottom:6px;">Active Recipe Resolution (우선순위 순):</div>
-    <div class="recipe-step">① KANBAN_RECIPE (env)</div>
-    <div class="recipe-arrow">↓</div>
-    <div class="recipe-step">② vault/config/active-recipe.yaml</div>
-    <div class="recipe-arrow">↓</div>
-    <div class="recipe-step">③ bundled home-assisted.yaml</div>
-    <div class="recipe-arrow">↓</div>
-    <div class="policy-box">PolicyEngine<br/><span style="font-weight:400;font-size:9.5px;">(fail-closed)</span></div>
-
-    <div class="fork-row">
-      <div style="flex:1;">
-        <div style="font-size:0.85em;color:#555;text-align:center;margin-bottom:0.35em;">--execute ↓</div>
-        <div class="exec-box">
-          <div class="box-title">claude-code-executor</div>
-          <div class="box-text">or codex-runner</div>
-        </div>
-        <div class="worktree-box">Isolated Worktree</div>
-        <div class="flow-note">READY → RUNNING → REVIEW → DONE<br/><span class="flow-fail">└→ FAILED</span></div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:0;gap:0.35em;">
-        <div style="font-size:0.85em;color:#888;font-style:italic;margin-bottom:0.2em;">validate-only.yaml →</div>
-        <div class="validate-box">
-          <div class="box-title" style="color:#6a1b9a;">validate-only</div>
-          <div class="box-text" style="color:#888;">(no mutation)</div>
-        </div>
-      </div>
-    </div>
+  <!-- failed branch row -->
+  <div class="lc-failed-row">
+    <span class="lc-fail-arrow">↓ exit non-0 / 변경 없음</span>
+    <span class="st st-failed">FAILED</span>
+    <span class="lc-rev">↺ retry → READY</span>
   </div>
 
-  <!-- PANEL 3 -->
-  <div class="panel p3">
-    <div class="panel-title">Panel 3 — Work Mode: Jira Export</div>
-    <div class="p3-inner">
-      <div class="p3-flow">
-        <div class="p3-box p3-vault">
-          <div class="box-title" style="color:#6a1b9a;">Vault</div>
-          <div class="box-text">Markdown Issues</div>
-          <div class="sot">SoT</div>
-        </div>
-        <div class="p3-arrow">↓</div>
-        <div class="p3-box p3-engine">
-          <div class="box-title" style="color:#1b5e20;">Engine</div>
-          <div class="box-text">parser + store</div>
-          <div class="box-text">→ Canonical JSON</div>
-        </div>
-        <div class="p3-arrow">↓</div>
-        <div class="p3-box p3-adapter">
-          <div class="box-title" style="color:#0d47a1;">adapter-jira</div>
-          <div class="box-text">RuntimePolicy check</div>
-        </div>
-        <div class="p3-arrow">↓</div>
-        <div class="p3-box p3-jira">
-          <div class="box-title" style="color:#0d47a1;">Jira API</div>
-          <div class="box-text">(one-way export)</div>
-        </div>
-      </div>
-      <div class="p3-right">
-        <div class="writeback-box">
-          <div class="wb-title">Work mode write-back 제한:</div>
-          <div class="wb-item wb-ok">✅  sync.jira.key</div>
-          <div class="wb-item wb-ok">✅  sync.jira.status</div>
-          <div class="wb-item wb-ok">✅  sync.jira.exportedAt</div>
-          <div class="wb-item wb-no">❌  body 수정 불가</div>
-          <div class="wb-item wb-no">❌  Firebase sync 불가</div>
-          <div class="wb-item wb-no">❌  OpenClaw execution 불가</div>
-          <div class="wb-item wb-no">❌  mobile real-time sync 불가</div>
-          <div class="wb-note">ExternalSyncPolicy = 'atlassian-only'</div>
-        </div>
-        <div class="policy-note">
-          assertAdapterAllowed() — policy 없이 permissive 동작 금지 (fail-closed)<br/>
-          packages/cli ≠ adapter-cli (CLI entry point vs adapter layer)<br/>
-          adapter guard는 모든 외부 요청 전에 RuntimePolicy를 확인합니다.
-        </div>
-      </div>
-    </div>
+  <div class="lc-note">
+    상세 전이 규칙은 <a href="../../packages/schema/src/status.ts"><code>packages/schema/src/status.ts</code></a> 참조
   </div>
-
-</div><!-- /panel-row -->
+</div>
 
 <!-- ══ FOOTER ══ -->
 <div class="footer">
-  <p>색상: 🟣 Vault(보라/dashed)  🟢 Engine(녹색/solid)  🔵 External(파랑/dashed)  🟠 Annotation  🔴 FAILED/금지</p>
-  <p>draw.io CLI 미설치 → HTML fallback 사용 · draw.io Desktop에서 .drawio 파일 열어 SVG export 가능 (docs/design/README.md 참조)</p>
+  <p>
+    📦 자산: <a href="kanban-task-engine-one-page.drawio">.drawio</a> ·
+    <a href="kanban-task-engine-one-page.svg">.svg</a> ·
+    <a href="kanban-use-case.html">use-case</a>
+  </p>
+  <p>색상 규칙은 <a href="README.md">docs/design/README.md</a> 참조.</p>
 </div>
 
 </body>

@@ -69,6 +69,22 @@
 
 <br/>
 
+## 🎬 Use Case — Home Assisted 실행
+
+<p align="center">
+  <a href="docs/design/kanban-use-case.svg">
+    <img src="docs/design/kanban-use-case.svg" alt="kanban-task-engine use case kanban board showing TODO READY RUNNING REVIEW DONE FAILED columns with session IDs and CLI commands" width="100%" />
+  </a>
+</p>
+
+> 💡 인터랙티브 버전: [`docs/design/kanban-use-case.html`](docs/design/kanban-use-case.html)을 브라우저로 여세요. RUNNING/REVIEW/DONE/FAILED 카드에 `kanban run VC-001 --execute --agent codex` 등 실제 CLI 명령과 session ID가 매핑되어 있습니다.
+
+<br/>
+
+<img src="docs/design/divider.svg" alt="" width="100%" />
+
+<br/>
+
 ### 🎨 핵심 설계 포인트
 
 <table>

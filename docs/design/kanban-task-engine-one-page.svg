@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" font-family="&#39;Segoe UI&#39;,&#39;Helvetica Neue&#39;,Arial,sans-serif" role="img" aria-labelledby="title desc">
   <title id="title">kanban-task-engine system map</title>
-  <desc id="desc">Full one-page architecture diagram showing the separate Vault source of truth, Engine packages, executor flow, issue lifecycle with IssueStatus and VALID_ISSUE_TRANSITIONS, and Work mode Jira export boundaries.</desc>
+  <desc id="desc">Full one-page architecture diagram showing the separate Vault source of truth, Engine roles, executor flow, issue lifecycle with IssueStatus and VALID_ISSUE_TRANSITIONS, and Work mode Jira export boundaries.</desc>
   <defs>
     <style>
       text { font-family: &#39;Segoe UI&#39;, &#39;Helvetica Neue&#39;, Arial, sans-serif; }
@@ -37,101 +37,62 @@
 
   
   <rect x="16" y="80" width="150" height="128" rx="3" fill="#fff" stroke="#AB47BC" stroke-width="1.2"></rect>
-  <text x="91" y="95" text-anchor="middle" class="bh" fill="#333">Markdown Issues</text>
-  <text x="91" y="108" text-anchor="middle" class="bs" fill="#555">.md + YAML frontmatter</text>
-  <text x="91" y="120" text-anchor="middle" class="bs" fill="#7a3900" font-style="italic">← SoT</text>
-  <text x="91" y="132" text-anchor="middle" class="bs" fill="#555">issues/ · epics/</text>
-  <text x="91" y="144" text-anchor="middle" class="bs" fill="#555">registry.yaml</text>
-  <text x="91" y="156" text-anchor="middle" class="bs" fill="#555">active-recipe.yaml</text>
-  <text x="91" y="168" text-anchor="middle" class="bs" fill="#555">runs/ · events/</text>
-  <text x="91" y="180" text-anchor="middle" class="bs" fill="#555">runtime artifacts</text>
+  <text x="91" y="114" text-anchor="middle" class="bh" fill="#333">Markdown Issues (.md)</text>
+  <text x="91" y="130" text-anchor="middle" class="bs" fill="#7a3900" font-style="italic">← Source of Truth (SoT)</text>
+  <text x="91" y="146" text-anchor="middle" class="bs" fill="#555">사람이 직접 읽고 쓰는 파일</text>
 
   
   <rect x="174" y="80" width="94" height="58" rx="3" fill="#fff" stroke="#AB47BC" stroke-width="1.2"></rect>
-  <text x="221" y="95" text-anchor="middle" class="bh" fill="#333">Boards &amp;</text>
-  <text x="221" y="107" text-anchor="middle" class="bh" fill="#333">Templates</text>
-  <text x="221" y="120" text-anchor="middle" class="bs" fill="#555">boards/ · templates/</text>
+  <text x="221" y="95" text-anchor="middle" class="bh" fill="#333">Boards (.md)</text>
+  <text x="221" y="108" text-anchor="middle" class="bs" fill="#555">어떤 이슈가</text>
+  <text x="221" y="120" text-anchor="middle" class="bs" fill="#555">어느 컬럼에 있는지</text>
 
   
   <rect x="174" y="146" width="94" height="62" rx="3" fill="#fff" stroke="#AB47BC" stroke-width="1.2"></rect>
-  <text x="221" y="161" text-anchor="middle" class="bh" fill="#333">Recipes</text>
-  <text x="221" y="174" text-anchor="middle" class="bs" fill="#555">recipes/*.yaml</text>
-  <text x="221" y="186" text-anchor="middle" class="bs" fill="#555">mode+modules</text>
-  <text x="221" y="198" text-anchor="middle" class="bs" fill="#555">+policy</text>
+  <text x="221" y="161" text-anchor="middle" class="bh" fill="#333">Recipes (.yaml)</text>
+  <text x="221" y="174" text-anchor="middle" class="bs" fill="#555">누가 어떤 도구로</text>
+  <text x="221" y="186" text-anchor="middle" class="bs" fill="#555">실행할지</text>
+  <text x="221" y="198" text-anchor="middle" fill="#555" font-size="8" textLength="86" lengthAdjust="spacingAndGlyphs">예: Codex로 실행 / Jira export만</text>
 
   
   <rect x="284" y="44" width="1100" height="172" rx="6" fill="#E8F5E9" stroke="#4CAF50" stroke-width="1.8"></rect>
   <text x="298" y="60" class="zone" fill="#1b5e20">⚙️  Engine — Logic Only (no live state)</text>
 
   
-  <rect x="294" y="72" width="200" height="136" rx="3" fill="#fff" stroke="#4CAF50" stroke-width="1.2"></rect>
-  <text x="394" y="87" text-anchor="middle" class="bh" fill="#333">packages/core</text>
-  <text x="394" y="100" text-anchor="middle" class="bs" fill="#555">Runtime</text>
-  <text x="394" y="112" text-anchor="middle" class="bs" fill="#555">StateMachine</text>
-  <text x="394" y="124" text-anchor="middle" class="bs" fill="#555">PolicyEngine</text>
-  <text x="394" y="136" text-anchor="middle" class="bs" fill="#555">Store · Executor</text>
-  <text x="394" y="148" text-anchor="middle" class="bs" fill="#555">ModuleRunner</text>
-  <text x="394" y="160" text-anchor="middle" class="bs" fill="#555">EventBus</text>
-  <text x="394" y="172" text-anchor="middle" class="bs" fill="#555">DeadLetterQ</text>
-  <text x="394" y="196" text-anchor="middle" class="bs" fill="#888" font-style="italic">core runtime logic</text>
+  <rect x="304" y="72" width="250" height="136" rx="3" fill="#fff" stroke="#4CAF50" stroke-width="1.2"></rect>
+  <text x="429" y="122" text-anchor="middle" class="bh" fill="#333">Core</text>
+  <text x="429" y="138" text-anchor="middle" class="bs" fill="#555">상태 전이 · 실행 루프</text>
 
   
-  <rect x="514" y="72" width="200" height="136" rx="3" fill="#fff" stroke="#4CAF50" stroke-width="1.2"></rect>
-  <text x="614" y="87" text-anchor="middle" class="bh" fill="#333">packages/schema</text>
-  <text x="614" y="100" text-anchor="middle" class="bs" fill="#555">IssueFrontmatter</text>
-  <text x="614" y="112" text-anchor="middle" class="bs" fill="#555">CanonicalIssueModel</text>
-  <text x="614" y="124" text-anchor="middle" class="bs" fill="#555">IssueStatus (6)</text>
-  <text x="614" y="136" text-anchor="middle" class="bs" fill="#555">VALID_ISSUE_TRANSITIONS (8)</text>
+  <rect x="574" y="72" width="250" height="136" rx="3" fill="#fff" stroke="#4CAF50" stroke-width="1.2"></rect>
+  <text x="699" y="100" text-anchor="middle" class="bh" fill="#333">Schema</text>
+  <text x="699" y="114" text-anchor="middle" class="bs" fill="#555">.md ↔ JSON 계약</text>
+  <text x="699" y="128" text-anchor="middle" class="bs" fill="#555">Canonical JSON</text>
+  <text x="699" y="142" text-anchor="middle" class="bs" fill="#555">IssueStatus (6)</text>
+  <text x="699" y="156" text-anchor="middle" class="bs" fill="#555">VALID_ISSUE_TRANSITIONS (8)</text>
 
   
-  <rect x="734" y="72" width="200" height="136" rx="3" fill="#fff" stroke="#4CAF50" stroke-width="1.2"></rect>
-  <text x="834" y="87" text-anchor="middle" class="bh" fill="#333">Adapters + Executor</text>
-  <text x="834" y="100" text-anchor="middle" class="bs" fill="#555">adapter-claude-code</text>
-  <text x="834" y="112" text-anchor="middle" class="bs" fill="#555">codex-runner</text>
-  <text x="834" y="124" text-anchor="middle" class="bs" fill="#555">adapter-jira</text>
-  <text x="834" y="136" text-anchor="middle" class="bs" fill="#555">adapter-firebase</text>
-  <text x="834" y="148" text-anchor="middle" class="bs" fill="#555">adapter-openclaw</text>
-  <text x="834" y="160" text-anchor="middle" class="bs" fill="#555">adapter-github</text>
-  <text x="834" y="172" text-anchor="middle" class="bs" fill="#555">adapter-cli</text>
+  <rect x="844" y="72" width="250" height="136" rx="3" fill="#fff" stroke="#4CAF50" stroke-width="1.2"></rect>
+  <text x="969" y="108" text-anchor="middle" class="bh" fill="#333">Adapters</text>
+  <text x="969" y="124" text-anchor="middle" class="bs" fill="#555">Jira · GitHub · Codex 연결</text>
+  <text x="969" y="140" text-anchor="middle" class="bs" fill="#555">codex-runner</text>
 
   
-  <rect x="954" y="72" width="200" height="136" rx="3" fill="#fff" stroke="#4CAF50" stroke-width="1.2"></rect>
-  <text x="1054" y="87" text-anchor="middle" class="bh" fill="#333">packages/cli</text>
-  <text x="1054" y="100" text-anchor="middle" class="bs" fill="#555">CLI entry point</text>
-  <text x="1054" y="112" text-anchor="middle" class="bs" fill="#555">kanban sync · board</text>
-  <text x="1054" y="124" text-anchor="middle" class="bs" fill="#555">kanban run · next</text>
-  <text x="1054" y="136" text-anchor="middle" class="bs" fill="#555">kanban approve</text>
-  <text x="1054" y="148" text-anchor="middle" class="bs" fill="#555">kanban retry · abort</text>
-
-  
-  <rect x="1174" y="72" width="200" height="136" rx="3" fill="#fff" stroke="#4CAF50" stroke-width="1.2"></rect>
-  <text x="1274" y="87" text-anchor="middle" class="bh" fill="#333">recipes/</text>
-  <text x="1274" y="100" text-anchor="middle" class="bs" fill="#555">home-assisted.yaml</text>
-  <text x="1274" y="112" text-anchor="middle" class="bs" fill="#555">validate-only.yaml</text>
-  <text x="1274" y="124" text-anchor="middle" class="bs" fill="#555">work-jira-export.yaml</text>
-  <text x="1274" y="136" text-anchor="middle" class="bs" fill="#888" font-style="italic">examples/</text>
-  <text x="1274" y="148" text-anchor="middle" class="bs" fill="#888" font-style="italic">home-full-auto.yaml</text>
+  <rect x="1114" y="72" width="250" height="136" rx="3" fill="#fff" stroke="#4CAF50" stroke-width="1.2"></rect>
+  <text x="1239" y="116" text-anchor="middle" class="bh" fill="#333">CLI</text>
+  <text x="1239" y="132" text-anchor="middle" class="bs" fill="#555">kanban run --execute --agent codex</text>
 
   
   <rect x="1392" y="44" width="200" height="172" rx="6" fill="#E3F2FD" stroke="#2196F3" stroke-width="1.8" stroke-dasharray="7,3"></rect>
   <text x="1406" y="60" class="zone" fill="#0d47a1">🌐  External</text>
 
-  <rect x="1400" y="70" width="184" height="36" rx="3" fill="#fff" stroke="#2196F3" stroke-width="1.2"></rect>
-  <text x="1492" y="84" text-anchor="middle" class="bh" fill="#333">OpenClaw</text>
-  <text x="1492" y="97" text-anchor="middle" class="bs" fill="#888" font-style="italic">Home only</text>
+  <rect x="1400" y="70" width="184" height="50" rx="3" fill="#fff" stroke="#2196F3" stroke-width="1.2"></rect>
+  <text x="1492" y="91" text-anchor="middle" class="bh" fill="#333">Codex</text>
+  <text x="1492" y="105" text-anchor="middle" class="bs" fill="#555">Home 실행기</text>
 
-  <rect x="1400" y="114" width="86" height="36" rx="3" fill="#fff" stroke="#2196F3" stroke-width="1.2"></rect>
-  <text x="1443" y="128" text-anchor="middle" class="bh" fill="#333">Jira</text>
-  <text x="1443" y="141" text-anchor="middle" class="bs" fill="#888" font-style="italic">Work only</text>
-
-  <rect x="1498" y="114" width="86" height="36" rx="3" fill="#fff" stroke="#2196F3" stroke-width="1.2"></rect>
-  <text x="1541" y="128" text-anchor="middle" class="bh" fill="#333">GitHub</text>
-  <text x="1541" y="141" text-anchor="middle" class="bs" fill="#555">Firebase</text>
-
-  <rect x="1400" y="158" width="184" height="50" rx="3" fill="#fafafa" stroke="#2196F3" stroke-width="1" stroke-dasharray="4,2"></rect>
-  <text x="1492" y="174" text-anchor="middle" class="bs" fill="#555" font-weight="bold">Home: OpenClaw · Firebase</text>
-  <text x="1492" y="188" text-anchor="middle" class="bs" fill="#555" font-weight="bold">Work: Jira export only</text>
-  <text x="1492" y="200" text-anchor="middle" class="bs" fill="#888" font-style="italic">CLI (user interface)</text>
+  <rect x="1400" y="134" width="184" height="50" rx="3" fill="#fff" stroke="#2196F3" stroke-width="1.2"></rect>
+  <text x="1492" y="155" text-anchor="middle" class="bh" fill="#333">Jira · GitHub</text>
+  <text x="1492" y="169" text-anchor="middle" class="bs" fill="#555">Work 연동</text>
 
   
   <line x1="276" y1="130" x2="282" y2="130" stroke="#555" stroke-width="1.8" marker-end="url(#ar)"></line>
