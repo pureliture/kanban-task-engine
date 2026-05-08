@@ -13,9 +13,9 @@ def check_readme_links(root: Path) -> bool:
     if "kanban-task-engine-one-page.svg" not in readme:
         issues.append("README must reference kanban-task-engine-one-page.svg")
     if "kanban-use-case.svg" not in readme:
-        issues.append("README must reference Home Assisted use-case SVG: kanban-use-case.svg")
+        issues.append("README must reference AI CLI use-case SVG: kanban-use-case.svg")
     if "kanban-use-case.html" not in readme:
-        issues.append("README must link Home Assisted use-case HTML: kanban-use-case.html")
+        issues.append("README must link AI CLI use-case HTML: kanban-use-case.html")
     if "docs/design" not in readme:
         issues.append("README must link to docs/design/")
     if "validate-only" not in readme:
@@ -43,11 +43,11 @@ def check_internal_links(root: Path) -> bool:
     if "kanban-task-engine-one-page.svg" not in content:
         issues.append("docs/design/README.md must reference one-page SVG")
     if "kanban-use-case.drawio" not in content:
-        issues.append("docs/design/README.md must reference Home Assisted use-case drawio source: kanban-use-case.drawio")
+        issues.append("docs/design/README.md must reference AI CLI use-case drawio source: kanban-use-case.drawio")
     if "kanban-use-case.svg" not in content:
-        issues.append("docs/design/README.md must reference Home Assisted use-case SVG: kanban-use-case.svg")
+        issues.append("docs/design/README.md must reference AI CLI use-case SVG: kanban-use-case.svg")
     if "kanban-use-case.html" not in content:
-        issues.append("docs/design/README.md must reference Home Assisted use-case HTML: kanban-use-case.html")
+        issues.append("docs/design/README.md must reference AI CLI use-case HTML: kanban-use-case.html")
     compact = root / "docs/design/kanban-task-engine-architecture-overview.svg"
     if compact.exists() and "kanban-task-engine-architecture-overview.svg" not in content:
         issues.append("docs/design/README.md must reference compact architecture overview SVG")

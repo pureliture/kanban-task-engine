@@ -69,11 +69,11 @@
 
 <br/>
 
-## 🎬 Use Case — Home Assisted 실행
+## 🎬 Use Case — AI CLI 실행 연동
 
 <p align="center">
   <a href="docs/design/kanban-use-case.svg">
-    <img src="docs/design/kanban-use-case.svg" alt="kanban-task-engine use case kanban board showing TODO READY RUNNING REVIEW DONE FAILED columns with session IDs and CLI commands" width="100%" />
+    <img src="docs/design/kanban-use-case.svg" alt="kanban-task-engine AI CLI integration use case kanban board showing TODO READY RUNNING REVIEW DONE FAILED columns with session IDs and CLI commands" width="100%" />
   </a>
 </p>
 

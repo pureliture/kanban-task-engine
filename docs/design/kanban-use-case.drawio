@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mxfile host="app.diagrams.net" modified="2026-05-07" agent="kanban-task-engine-design" version="24.0.0">
-  <diagram name="Use Case - Home Assisted" id="kanban-use-case-home-assisted">
+  <diagram name="Use Case - AI CLI 실행 연동" id="kanban-use-case-ai-cli">
     <mxGraphModel dx="0" dy="0" grid="10" gridSize="10" guides="1" tooltips="1"
                   connect="1" arrows="1" fold="1" page="1" pageScale="1"
                   pageWidth="1500" pageHeight="760" math="0" shadow="0">
@@ -9,7 +9,7 @@
         <mxCell id="1" parent="0"/>
 
         <!-- PAGE TITLE -->
-        <mxCell id="page-title" value="kanban-task-engine — Use Case (Home Assisted)"
+        <mxCell id="page-title" value="kanban-task-engine — Use Case (AI CLI 실행 연동)"
                 style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=22;fontColor=#1a1a1a;"
                 vertex="1" parent="1">
           <mxGeometry x="24" y="18" width="760" height="32" as="geometry"/>
