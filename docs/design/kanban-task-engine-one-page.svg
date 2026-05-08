@@ -1,179 +1,280 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="opTitle opDesc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 760" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="opTitle opDesc"
+     font-family="'Segoe UI',system-ui,-apple-system,BlinkMacSystemFont,sans-serif">
   <title id="opTitle">kanban-task-engine system map</title>
-  <desc id="opDesc">One-page architecture diagram. Vault as separate Git repo holding Markdown Issues (Source of Truth, SoT), Boards, and Recipes. Engine repo containing Core, Schema, Adapters (Jira GitHub Codex), and CLI logic only — no live state. External systems Codex (Home executor) and Jira and GitHub (Work integration). Issue lifecycle with IssueStatus (6) and VALID_ISSUE_TRANSITIONS (8) including TODO READY RUNNING REVIEW DONE FAILED. validate-only recipe mentioned. Adapters run in isolated worktree.</desc>
+  <desc id="opDesc">One-page architecture diagram. Vault as separate Git repo holding Markdown Issues (Source of Truth, SoT), Boards, and Recipes. Engine repo with Core, Schema, Adapters (Jira GitHub Codex), and CLI logic only — no live state. External systems Codex (Home executor) and Jira and GitHub (Work integration). Issue lifecycle with IssueStatus (6) and VALID_ISSUE_TRANSITIONS (8) including TODO READY RUNNING REVIEW DONE FAILED. validate-only recipe mentioned. Adapters run in isolated Worktree. Canonical JSON internal contract.</desc>
   <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdf4ff"/>
+      <stop offset="35%" stop-color="#eef2ff"/>
+      <stop offset="70%" stop-color="#ecfeff"/>
+      <stop offset="100%" stop-color="#f0fdfa"/>
+    </linearGradient>
+    <linearGradient id="purple-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="green-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="blue-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="teal-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2dd4bf"/>
+      <stop offset="100%" stop-color="#0d9488"/>
+    </linearGradient>
+    <linearGradient id="amber-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="3" result="offset-blur"/>
+      <feFlood flood-color="#1e1b4b" flood-opacity="0.18"/>
+      <feComposite in2="offset-blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
+    </marker>
     <style>
-      text { font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; }
-      .ttl{font-size:22px;font-weight:700;}
-      .sub{font-size:13px;}
-      .zone{font-size:16px;font-weight:700;}
-      .zsub{font-size:11px;font-style:italic;}
-      .bh{font-size:13px;font-weight:700;}
-      .bs{font-size:12px;}
-      .bx{font-size:11px;font-style:italic;}
-      .sot{font-size:12px;font-style:italic;}
-      .ann{font-size:12px;}
-      .ext{font-size:11px;}
-      .arr{font-size:14px;}
-      .arl{font-size:11px;}
-      .lct{font-size:15px;font-weight:700;}
-      .lcm{font-size:12px;}
-      .stxt{font-size:13px;font-weight:700;}
-      .lcl{font-size:11px;}
-      .lcr{font-size:10px;font-style:italic;}
-      .ftn{font-size:11px;font-style:italic;}
-      .mono{font-family:Menlo,Consolas,monospace;font-size:12px;}
+      .h-title { font-size: 22px; font-weight: 700; fill: #1e293b; letter-spacing: 0.5; }
+      .h-sub   { font-size: 12px; fill: #64748b; }
+      .zh      { font-size: 16px; font-weight: 700; fill: #ffffff; letter-spacing: 0.3; }
+      .zsub    { font-size: 11px; fill: #ffffff; opacity: 0.85; font-style: italic; }
+      .bh      { font-size: 13px; font-weight: 700; fill: #1e293b; }
+      .bs      { font-size: 12px; fill: #475569; }
+      .bx      { font-size: 11px; fill: #94a3b8; font-style: italic; }
+      .sot     { font-size: 11px; fill: #b45309; font-style: italic; font-weight: 600; }
+      .ann     { font-size: 12px; fill: #475569; }
+      .ann-h   { font-size: 12px; fill: #1e293b; font-weight: 700; }
+      .lab-box { font-size: 11px; font-weight: 500; fill: #475569; }
+      .lct     { font-size: 16px; font-weight: 700; fill: #1e293b; letter-spacing: 0.3; }
+      .lcm     { font-size: 11px; fill: #64748b; }
+      .stxt    { font-size: 13px; font-weight: 700; }
+      .lcl     { font-size: 11px; fill: #475569; }
+      .lcr     { font-size: 10px; fill: #94a3b8; font-style: italic; }
+      .ftn     { font-size: 11px; fill: #64748b; font-style: italic; }
+      .mono    { font-family: Menlo, Consolas, 'Courier New', monospace; font-size: 11px; fill: #1e293b; }
     </style>
   </defs>
 
-  <rect width="1280" height="720" fill="#ffffff"/>
+  <!-- Background with rounded corners -->
+  <rect width="1120" height="760" rx="18" fill="url(#bg-grad)"/>
 
-  <!-- ═══ TITLE ═══ -->
-  <text x="24" y="32" class="ttl" fill="#1a1a1a">kanban-task-engine — System Map</text>
-  <text x="24" y="54" class="sub" fill="#888">packages/schema/src/status.ts 기준 IssueStatus (6) · VALID_ISSUE_TRANSITIONS (8)</text>
+  <!-- Decorative dots -->
+  <circle cx="30"   cy="30"  r="3" fill="#8b5cf6" opacity="0.4"/>
+  <circle cx="1090" cy="30"  r="3" fill="#3b82f6" opacity="0.4"/>
+  <circle cx="30"   cy="730" r="3" fill="#10b981" opacity="0.4"/>
+  <circle cx="1090" cy="730" r="3" fill="#f59e0b" opacity="0.4"/>
+
+  <!-- Title -->
+  <text x="560" y="42" text-anchor="middle" dominant-baseline="middle" class="h-title">kanban-task-engine — System Map</text>
+  <line x1="430" y1="62" x2="510" y2="62" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/>
+  <line x1="610" y1="62" x2="690" y2="62" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="560" cy="62" r="4" fill="#8b5cf6"/>
+  <text x="560" y="82" text-anchor="middle" class="h-sub">IssueStatus (6) · VALID_ISSUE_TRANSITIONS (8) · packages/schema/src/status.ts</text>
 
   <!-- ═══ ARCHITECTURE ROW ═══ -->
 
   <!-- VAULT zone -->
-  <rect x="24" y="76" width="240" height="232" rx="8" fill="#F3E5F5" stroke="#9C27B0" stroke-width="2" stroke-dasharray="6 4"/>
-  <text x="36" y="100" class="zone" fill="#6a1b9a">🗂 Vault</text>
-  <text x="36" y="118" class="zsub" fill="#9C27B0">별도 Git 저장소</text>
+  <g filter="url(#shadow)">
+    <rect x="40" y="110" width="260" height="280" rx="12" fill="#ffffff" stroke="#a78bfa" stroke-width="1.5"/>
+    <rect x="40" y="110" width="260" height="44" rx="12" fill="url(#purple-grad)"/>
+    <rect x="40" y="132" width="260" height="22" fill="url(#purple-grad)"/>
+  </g>
+  <text x="170" y="132" text-anchor="middle" dominant-baseline="middle" class="zh">🗂  Vault</text>
+  <text x="170" y="148" text-anchor="middle" dominant-baseline="middle" class="zsub">별도 Git 저장소 — Live Issue State</text>
 
-  <!-- Vault > Markdown Issues card -->
-  <rect x="36" y="128" width="216" height="60" fill="#ffffff" stroke="#AB47BC"/>
-  <text x="46" y="146" class="bh" fill="#1a1a1a">Markdown Issues<tspan fill="#AB47BC" font-weight="400">  .md</tspan></text>
-  <text x="46" y="164" class="sot" fill="#7a3900">← Source of Truth (SoT)</text>
-  <text x="46" y="180" class="bs" fill="#555">사람이 직접 읽고 쓰는 파일</text>
+  <!-- Vault > Markdown Issues -->
+  <rect x="56" y="170" width="228" height="78" rx="6" fill="#fdf4ff" stroke="#c4b5fd"/>
+  <text x="68" y="190" class="bh">Markdown Issues  <tspan fill="#7c3aed" font-weight="500">.md</tspan></text>
+  <text x="68" y="208" class="sot">← Source of Truth (SoT)</text>
+  <text x="68" y="226" class="bs">사람이 직접 읽고 쓰는 파일</text>
+  <text x="68" y="242" class="bx">issues/ · epics/ · runs/ · events/</text>
 
-  <!-- Vault > Boards card -->
-  <rect x="36" y="194" width="216" height="44" fill="#ffffff" stroke="#AB47BC"/>
-  <text x="46" y="212" class="bh" fill="#1a1a1a">Boards<tspan fill="#AB47BC" font-weight="400">  .md</tspan></text>
-  <text x="46" y="230" class="bs" fill="#555">어떤 이슈가 어느 컬럼에 있는지</text>
+  <!-- Vault > Boards -->
+  <rect x="56" y="258" width="228" height="56" rx="6" fill="#fdf4ff" stroke="#c4b5fd"/>
+  <text x="68" y="278" class="bh">Boards  <tspan fill="#7c3aed" font-weight="500">.md</tspan></text>
+  <text x="68" y="296" class="bs">어떤 이슈가 어느 컬럼에 있는지</text>
+  <text x="68" y="310" class="bx">boards/ · templates/</text>
 
-  <!-- Vault > Recipes card -->
-  <rect x="36" y="244" width="216" height="58" fill="#ffffff" stroke="#AB47BC"/>
-  <text x="46" y="262" class="bh" fill="#1a1a1a">Recipes<tspan fill="#AB47BC" font-weight="400">  .yaml</tspan></text>
-  <text x="46" y="278" class="bs" fill="#555">누가 어떤 도구로 실행할지</text>
-  <text x="46" y="294" class="bx" fill="#888">예: codex 실행 / validate-only / Jira export</text>
+  <!-- Vault > Recipes -->
+  <rect x="56" y="318" width="228" height="62" rx="6" fill="#fdf4ff" stroke="#c4b5fd"/>
+  <text x="68" y="338" class="bh">Recipes  <tspan fill="#7c3aed" font-weight="500">.yaml</tspan></text>
+  <text x="68" y="356" class="bs">누가 어떤 도구로 실행할지</text>
+  <text x="68" y="372" class="bx">예: codex 실행 / validate-only / Jira export</text>
 
-  <!-- Arrow Vault -> Engine -->
-  <text x="280" y="190" class="arr" fill="#555" text-anchor="middle">→</text>
-  <text x="280" y="206" class="arl" fill="#555" text-anchor="middle">읽어서</text>
-  <text x="280" y="220" class="arl" fill="#555" text-anchor="middle">JSON화</text>
+  <!-- Arrow Vault → Engine -->
+  <line x1="300" y1="250" x2="375" y2="250" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="305" y="240" width="65" height="20" rx="10" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="337" y="251" text-anchor="middle" dominant-baseline="middle" class="lab-box">parse → JSON</text>
 
   <!-- ENGINE zone -->
-  <rect x="296" y="76" width="722" height="232" rx="8" fill="#E8F5E9" stroke="#4CAF50" stroke-width="2"/>
-  <text x="308" y="100" class="zone" fill="#1b5e20">⚙️ Engine</text>
-  <text x="308" y="118" class="zsub" fill="#4CAF50">로직만 · 데이터(live state) 없음</text>
+  <g filter="url(#shadow)">
+    <rect x="380" y="110" width="500" height="280" rx="12" fill="#ffffff" stroke="#34d399" stroke-width="1.5"/>
+    <rect x="380" y="110" width="500" height="44" rx="12" fill="url(#green-grad)"/>
+    <rect x="380" y="132" width="500" height="22" fill="url(#green-grad)"/>
+  </g>
+  <text x="630" y="132" text-anchor="middle" dominant-baseline="middle" class="zh">⚙️  Engine — Logic Only</text>
+  <text x="630" y="148" text-anchor="middle" dominant-baseline="middle" class="zsub">로직 · 스키마 · 정책만 (live state 없음)</text>
 
-  <!-- Engine > 4 boxes -->
-  <rect x="308" y="130" width="170" height="170" fill="#ffffff" stroke="#4CAF50"/>
-  <text x="318" y="152" class="bh" fill="#1a1a1a">Core</text>
-  <text x="318" y="174" class="bs" fill="#555">상태 전이 · 실행 루프</text>
-  <text x="318" y="194" class="bs" fill="#555">PolicyEngine</text>
-  <text x="318" y="214" class="bs" fill="#555">DeadLetterQ · EventBus</text>
-  <text x="318" y="244" class="bx" fill="#888">Canonical JSON 생성</text>
+  <!-- Engine sub-boxes (4 columns) -->
+  <rect x="396" y="170" width="114" height="206" rx="6" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="453" y="194" text-anchor="middle" class="bh">Core</text>
+  <text x="453" y="216" text-anchor="middle" class="bs">상태 전이</text>
+  <text x="453" y="232" text-anchor="middle" class="bs">실행 루프</text>
+  <text x="453" y="248" text-anchor="middle" class="bs">PolicyEngine</text>
+  <text x="453" y="264" text-anchor="middle" class="bs">EventBus</text>
+  <text x="453" y="280" text-anchor="middle" class="bs">DeadLetterQ</text>
+  <text x="453" y="320" text-anchor="middle" class="bx">Canonical JSON</text>
+  <text x="453" y="336" text-anchor="middle" class="bx">생성 · 정책 검사</text>
 
-  <rect x="486" y="130" width="170" height="170" fill="#ffffff" stroke="#4CAF50"/>
-  <text x="496" y="152" class="bh" fill="#1a1a1a">Schema</text>
-  <text x="496" y="174" class="bs" fill="#555">.md ↔ Canonical JSON 계약</text>
-  <text x="496" y="194" class="bs" fill="#555">IssueFrontmatter</text>
-  <text x="496" y="244" class="bx" fill="#888">internal contract</text>
+  <rect x="518" y="170" width="114" height="206" rx="6" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="575" y="194" text-anchor="middle" class="bh">Schema</text>
+  <text x="575" y="216" text-anchor="middle" class="bs">.md ↔ JSON</text>
+  <text x="575" y="232" text-anchor="middle" class="bs">변환 계약</text>
+  <text x="575" y="252" text-anchor="middle" class="bs">IssueFrontmatter</text>
+  <text x="575" y="320" text-anchor="middle" class="bx">internal contract</text>
+  <text x="575" y="336" text-anchor="middle" class="bx">(human edit 아님)</text>
 
-  <rect x="664" y="130" width="170" height="170" fill="#ffffff" stroke="#4CAF50"/>
-  <text x="674" y="152" class="bh" fill="#1a1a1a">Adapters</text>
-  <text x="674" y="174" class="bs" fill="#555">Jira · GitHub · Codex</text>
-  <text x="674" y="194" class="bs" fill="#555">codex-runner</text>
-  <text x="674" y="214" class="bs" fill="#555">isolated Worktree</text>
-  <text x="674" y="244" class="bx" fill="#888">RuntimePolicy 검사</text>
+  <rect x="640" y="170" width="114" height="206" rx="6" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="697" y="194" text-anchor="middle" class="bh">Adapters</text>
+  <text x="697" y="216" text-anchor="middle" class="bs">Jira</text>
+  <text x="697" y="232" text-anchor="middle" class="bs">GitHub</text>
+  <text x="697" y="248" text-anchor="middle" class="bs">Codex</text>
+  <text x="697" y="268" text-anchor="middle" class="bs">codex-runner</text>
+  <text x="697" y="320" text-anchor="middle" class="bx">isolated Worktree</text>
+  <text x="697" y="336" text-anchor="middle" class="bx">RuntimePolicy</text>
 
-  <rect x="842" y="130" width="170" height="170" fill="#ffffff" stroke="#4CAF50"/>
-  <text x="852" y="152" class="bh" fill="#1a1a1a">CLI</text>
-  <text x="852" y="174" class="mono" fill="#1a1a1a">kanban run</text>
-  <text x="852" y="194" class="mono" fill="#1a1a1a">  --execute --agent codex</text>
-  <text x="852" y="218" class="mono" fill="#1a1a1a">kanban approve / retry</text>
-  <text x="852" y="244" class="bx" fill="#888">사용자 진입점</text>
+  <rect x="762" y="170" width="102" height="206" rx="6" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="813" y="194" text-anchor="middle" class="bh">CLI</text>
+  <text x="813" y="218" text-anchor="middle" class="mono">kanban run</text>
+  <text x="813" y="234" text-anchor="middle" class="mono">kanban next</text>
+  <text x="813" y="250" text-anchor="middle" class="mono">kanban approve</text>
+  <text x="813" y="266" text-anchor="middle" class="mono">kanban retry</text>
+  <text x="813" y="320" text-anchor="middle" class="bx">사용자 진입점</text>
+  <text x="813" y="336" text-anchor="middle" class="bx">--execute --agent</text>
 
-  <!-- Arrow Engine -> External -->
-  <text x="1034" y="190" class="arr" fill="#555" text-anchor="middle">→</text>
-  <text x="1034" y="206" class="arl" fill="#555" text-anchor="middle">adapter</text>
-  <text x="1034" y="220" class="arl" fill="#555" text-anchor="middle">경유</text>
+  <!-- Arrow Engine → External -->
+  <line x1="880" y1="250" x2="940" y2="250" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="885" y="240" width="50" height="20" rx="10" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="910" y="251" text-anchor="middle" dominant-baseline="middle" class="lab-box">adapter</text>
 
   <!-- EXTERNAL zone -->
-  <rect x="1050" y="76" width="206" height="232" rx="8" fill="#E3F2FD" stroke="#2196F3" stroke-width="2" stroke-dasharray="6 4"/>
-  <text x="1062" y="100" class="zone" fill="#0d47a1">🌐 External</text>
-  <text x="1062" y="118" class="zsub" fill="#1565C0">외부 시스템</text>
+  <g filter="url(#shadow)">
+    <rect x="945" y="110" width="135" height="280" rx="12" fill="#ffffff" stroke="#60a5fa" stroke-width="1.5"/>
+    <rect x="945" y="110" width="135" height="44" rx="12" fill="url(#blue-grad)"/>
+    <rect x="945" y="132" width="135" height="22" fill="url(#blue-grad)"/>
+  </g>
+  <text x="1012" y="132" text-anchor="middle" dominant-baseline="middle" class="zh">🌐 External</text>
+  <text x="1012" y="148" text-anchor="middle" dominant-baseline="middle" class="zsub">외부 시스템</text>
 
-  <rect x="1062" y="128" width="182" height="78" fill="#ffffff" stroke="#2196F3"/>
-  <text x="1153" y="152" class="bh" fill="#1a1a1a" text-anchor="middle">Codex</text>
-  <text x="1153" y="172" class="bs" fill="#555" text-anchor="middle">Home 실행기</text>
-  <text x="1153" y="192" class="bx" fill="#888" text-anchor="middle">codex-runner</text>
+  <rect x="961" y="172" width="103" height="92" rx="6" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text x="1012" y="198" text-anchor="middle" class="bh">Codex</text>
+  <text x="1012" y="220" text-anchor="middle" class="bs">Home 실행기</text>
+  <text x="1012" y="240" text-anchor="middle" class="bx">codex-runner</text>
+  <text x="1012" y="256" text-anchor="middle" class="bx">isolated Worktree</text>
 
-  <rect x="1062" y="216" width="182" height="80" fill="#ffffff" stroke="#2196F3"/>
-  <text x="1153" y="240" class="bh" fill="#1a1a1a" text-anchor="middle">Jira · GitHub</text>
-  <text x="1153" y="260" class="bs" fill="#555" text-anchor="middle">Work 연동 (export)</text>
-  <text x="1153" y="280" class="bx" fill="#888" text-anchor="middle">단방향</text>
+  <rect x="961" y="274" width="103" height="100" rx="6" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text x="1012" y="298" text-anchor="middle" class="bh">Jira · GitHub</text>
+  <text x="1012" y="318" text-anchor="middle" class="bs">Work 연동</text>
+  <text x="1012" y="338" text-anchor="middle" class="bx">단방향 export</text>
+  <text x="1012" y="356" text-anchor="middle" class="bx">read-only attach</text>
 
-  <!-- ═══ ANNOTATIONS ═══ -->
-  <rect x="24" y="324" width="404" height="48" rx="4" fill="#FFF3E0" stroke="#FF9800" stroke-width="1.5"/>
-  <text x="36" y="346" class="ann" fill="#7a3900"><tspan font-weight="700">💡 Engine repo에 live state 없음</tspan></text>
-  <text x="36" y="362" class="ann" fill="#7a3900">Vault는 별도 Git 저장소 (Markdown SoT)</text>
+  <!-- ═══ ANNOTATION ROW ═══ -->
+  <g filter="url(#shadow)">
+    <rect x="40"  y="416" width="338" height="60" rx="8" fill="#ffffff" stroke="#fbbf24" stroke-width="1.2"/>
+  </g>
+  <text x="56" y="438" class="ann-h">💡 Engine repo에 live state 없음</text>
+  <text x="56" y="458" class="ann">Vault는 별도 Git 저장소 (Markdown SoT)</text>
 
-  <rect x="438" y="324" width="404" height="48" rx="4" fill="#FFF3E0" stroke="#FF9800" stroke-width="1.5"/>
-  <text x="450" y="346" class="ann" fill="#7a3900"><tspan font-weight="700">💡 Mode is emergent</tspan></text>
-  <text x="450" y="362" class="ann" fill="#7a3900">recipe modules + policy 조합으로 결정 (코드에 switch 없음)</text>
+  <g filter="url(#shadow)">
+    <rect x="391" y="416" width="338" height="60" rx="8" fill="#ffffff" stroke="#fbbf24" stroke-width="1.2"/>
+  </g>
+  <text x="407" y="438" class="ann-h">💡 Mode is emergent</text>
+  <text x="407" y="458" class="ann">recipe modules + policy 조합으로 결정 (코드 switch 없음)</text>
 
-  <rect x="852" y="324" width="404" height="48" rx="4" fill="#FFF3E0" stroke="#FF9800" stroke-width="1.5"/>
-  <text x="864" y="346" class="ann" fill="#7a3900"><tspan font-weight="700">💡 Canonical JSON = internal contract</tspan></text>
-  <text x="864" y="362" class="ann" fill="#7a3900">human editing surface 아님 (.md가 SoT)</text>
+  <g filter="url(#shadow)">
+    <rect x="742" y="416" width="338" height="60" rx="8" fill="#ffffff" stroke="#fbbf24" stroke-width="1.2"/>
+  </g>
+  <text x="758" y="438" class="ann-h">💡 Canonical JSON = internal contract</text>
+  <text x="758" y="458" class="ann">human editing surface 아님 (.md만 SoT)</text>
 
   <!-- ═══ LIFECYCLE PANEL ═══ -->
-  <rect x="24" y="396" width="1232" height="270" rx="8" fill="#fafafa" stroke="#cccccc" stroke-width="1.5" stroke-dasharray="6 4"/>
-  <text x="640" y="424" class="lct" fill="#222" text-anchor="middle">Issue Lifecycle</text>
-  <text x="640" y="442" class="lcm" fill="#888" text-anchor="middle">— IssueStatus (6) · VALID_ISSUE_TRANSITIONS (8) —</text>
+  <g filter="url(#shadow)">
+    <rect x="40" y="500" width="1040" height="220" rx="12" fill="#ffffff" stroke="#2dd4bf" stroke-width="1.5"/>
+    <rect x="40" y="500" width="1040" height="44" rx="12" fill="url(#teal-grad)"/>
+    <rect x="40" y="522" width="1040" height="22" fill="url(#teal-grad)"/>
+  </g>
+  <text x="560" y="522" text-anchor="middle" dominant-baseline="middle" class="zh">🔁  Issue Lifecycle</text>
+  <text x="560" y="538" text-anchor="middle" dominant-baseline="middle" class="zsub">IssueStatus (6) · VALID_ISSUE_TRANSITIONS (8) — happy path 5단계 + reverse 2 + FAILED 분기</text>
 
-  <!-- Forward badges -->
-  <rect x="84"   y="468" width="100" height="36" rx="4" fill="#FFF3CD" stroke="#E6A817" stroke-width="2"/>
-  <text x="134" y="492" class="stxt" fill="#5c3d00" text-anchor="middle">TODO</text>
+  <!-- Forward badges row -->
+  <g filter="url(#shadow)">
+    <rect x="80"   y="582" width="118" height="40" rx="20" fill="#FFF3CD" stroke="#E6A817" stroke-width="2"/>
+  </g>
+  <text x="139" y="606" text-anchor="middle" class="stxt" fill="#5c3d00">TODO</text>
 
-  <rect x="284"  y="468" width="100" height="36" rx="4" fill="#E8F5E9" stroke="#43A047" stroke-width="2"/>
-  <text x="334" y="492" class="stxt" fill="#2e7d32" text-anchor="middle">READY</text>
+  <g filter="url(#shadow)">
+    <rect x="280"  y="582" width="118" height="40" rx="20" fill="#E8F5E9" stroke="#43A047" stroke-width="2"/>
+  </g>
+  <text x="339" y="606" text-anchor="middle" class="stxt" fill="#2e7d32">READY</text>
 
-  <rect x="484"  y="468" width="120" height="36" rx="4" fill="#BBDEFB" stroke="#1E88E5" stroke-width="2"/>
-  <text x="544" y="492" class="stxt" fill="#1565C0" text-anchor="middle">RUNNING</text>
+  <g filter="url(#shadow)">
+    <rect x="480"  y="582" width="138" height="40" rx="20" fill="#BBDEFB" stroke="#1E88E5" stroke-width="2"/>
+  </g>
+  <text x="549" y="606" text-anchor="middle" class="stxt" fill="#1565C0">RUNNING</text>
 
-  <rect x="704"  y="468" width="120" height="36" rx="4" fill="#FFF3CD" stroke="#E6A817" stroke-width="2"/>
-  <text x="764" y="492" class="stxt" fill="#5c3d00" text-anchor="middle">REVIEW</text>
+  <g filter="url(#shadow)">
+    <rect x="700"  y="582" width="128" height="40" rx="20" fill="#FFF3CD" stroke="#E6A817" stroke-width="2"/>
+  </g>
+  <text x="764" y="606" text-anchor="middle" class="stxt" fill="#5c3d00">REVIEW</text>
 
-  <rect x="924"  y="468" width="100" height="36" rx="4" fill="#E8F5E9" stroke="#43A047" stroke-width="2"/>
-  <text x="974" y="492" class="stxt" fill="#2e7d32" text-anchor="middle">DONE</text>
+  <g filter="url(#shadow)">
+    <rect x="910"  y="582" width="118" height="40" rx="20" fill="#E8F5E9" stroke="#43A047" stroke-width="2"/>
+  </g>
+  <text x="969" y="606" text-anchor="middle" class="stxt" fill="#2e7d32">DONE</text>
 
-  <!-- Forward arrows + labels (between badges) -->
-  <text x="234" y="486" class="arr" fill="#555" text-anchor="middle">→</text>
-  <text x="234" y="502" class="lcl" fill="#555" text-anchor="middle">prep</text>
+  <!-- Forward arrows + labels -->
+  <line x1="200" y1="602" x2="278" y2="602" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="216" y="592" width="46" height="20" rx="10" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="239" y="603" text-anchor="middle" dominant-baseline="middle" class="lab-box">prep</text>
 
-  <text x="434" y="486" class="arr" fill="#555" text-anchor="middle">→</text>
-  <text x="434" y="502" class="lcl" fill="#555" text-anchor="middle">--execute</text>
+  <line x1="400" y1="602" x2="478" y2="602" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="408" y="592" width="62" height="20" rx="10" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="439" y="603" text-anchor="middle" dominant-baseline="middle" class="lab-box mono">--execute</text>
 
-  <text x="654" y="486" class="arr" fill="#555" text-anchor="middle">→</text>
-  <text x="654" y="502" class="lcl" fill="#555" text-anchor="middle">exit 0 + 변경</text>
+  <line x1="620" y1="602" x2="698" y2="602" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="630" y="592" width="58" height="20" rx="10" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="659" y="603" text-anchor="middle" dominant-baseline="middle" class="lab-box">exit 0 + 변경</text>
 
-  <text x="874" y="486" class="arr" fill="#555" text-anchor="middle">→</text>
-  <text x="874" y="502" class="lcl" fill="#555" text-anchor="middle">approve</text>
+  <line x1="830" y1="602" x2="908" y2="602" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="844" y="592" width="50" height="20" rx="10" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="869" y="603" text-anchor="middle" dominant-baseline="middle" class="lab-box">approve</text>
 
-  <!-- Reverse labels under badges -->
-  <text x="234" y="525" class="lcr" fill="#888" text-anchor="middle">↺ READY → TODO (되돌리기)</text>
-  <text x="764" y="525" class="lcr" fill="#888" text-anchor="middle">↺ REVIEW → RUNNING (retry)</text>
+  <!-- Reverse labels -->
+  <text x="239" y="640" text-anchor="middle" class="lcr">↺ READY → TODO (되돌리기)</text>
+  <text x="869" y="640" text-anchor="middle" class="lcr">↺ REVIEW → RUNNING (retry)</text>
 
-  <!-- FAILED branch row -->
-  <text x="544" y="566" class="lcr" fill="#c62828" text-anchor="middle">↓ exit non-0 / no-change</text>
-  <rect x="484" y="578" width="120" height="36" rx="4" fill="#FFEBEE" stroke="#E53935" stroke-width="2"/>
-  <text x="544" y="602" class="stxt" fill="#b71c1c" text-anchor="middle">FAILED</text>
-  <text x="704" y="602" class="lcr" fill="#888" text-anchor="middle">↺ retry → READY</text>
+  <!-- FAILED branch -->
+  <line x1="549" y1="622" x2="549" y2="660" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3 3" marker-end="url(#arrow-red)"/>
+  <text x="549" y="654" text-anchor="middle" class="lcr" fill="#dc2626">↓ exit non-0 / 변경 없음</text>
+  <g filter="url(#shadow)">
+    <rect x="490" y="668" width="118" height="40" rx="20" fill="#FFEBEE" stroke="#E53935" stroke-width="2"/>
+  </g>
+  <text x="549" y="692" text-anchor="middle" class="stxt" fill="#b71c1c">FAILED</text>
+  <line x1="490" y1="688" x2="409" y2="622" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#arrow)"/>
+  <text x="408" y="676" text-anchor="middle" class="lcr">↺ retry → READY</text>
 
-  <!-- Lifecycle footnote -->
-  <text x="640" y="640" class="ftn" fill="#666" text-anchor="middle">8개 전이 상세: <tspan font-family="Menlo,Consolas,monospace">packages/schema/src/status.ts</tspan> · validate-only 모드는 mutation 없이 검증만</text>
-
-  <!-- Footer -->
-  <text x="24" y="700" class="ftn" fill="#888">자산: drawio · svg · kanban-use-case.svg / 색상 규칙은 docs/design/README.md 참조</text>
+  <!-- ═══ FOOTER ═══ -->
+  <text x="560" y="744" text-anchor="middle" class="ftn">자산: kanban-task-engine-one-page.{drawio,svg,html} · kanban-use-case.{drawio,svg,html} — 색상 규칙 docs/design/README.md</text>
 </svg>

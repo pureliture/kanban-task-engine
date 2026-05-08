@@ -1,136 +1,239 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 700" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="ucTitle ucDesc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 760" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="ucTitle ucDesc"
+     font-family="'Segoe UI',system-ui,-apple-system,BlinkMacSystemFont,sans-serif">
   <title id="ucTitle">kanban-task-engine — Use Case (AI CLI 실행 연동)</title>
   <desc id="ucDesc">Vault 이슈가 AI CLI에 의해 처리되고 사람이 최종 승인하는 칸반 흐름. 5컬럼 (TODO READY RUNNING REVIEW DONE) + FAILED 행. RUNNING REVIEW DONE FAILED 카드에 session ID와 CLI 명령 매핑 (예: kanban run VC-001 --execute --agent codex). approve / retry 명령으로 다음 상태로 이동. isolated worktree에서 실행.</desc>
   <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdf4ff"/>
+      <stop offset="35%" stop-color="#eef2ff"/>
+      <stop offset="70%" stop-color="#ecfeff"/>
+      <stop offset="100%" stop-color="#f0fdfa"/>
+    </linearGradient>
+    <linearGradient id="amber-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="green-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="blue-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="red-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f87171"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+    <linearGradient id="indigo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="3" result="offset-blur"/>
+      <feFlood flood-color="#1e1b4b" flood-opacity="0.18"/>
+      <feComposite in2="offset-blur" operator="in"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="shadow-sm" x="-10%" y="-10%" width="120%" height="130%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.5"/>
+      <feOffset dx="0" dy="1.5" result="offset-blur"/>
+      <feFlood flood-color="#1e1b4b" flood-opacity="0.12"/>
+      <feComposite in2="offset-blur" operator="in"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
     <style>
-      text { font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; }
-      .title{font-size:22px;font-weight:700;}
-      .sub{font-size:13px;}
-      .head{font-size:15px;font-weight:700;}
-      .ct{font-size:13px;font-weight:700;}
-      .cm{font-size:12px;}
-      .lbl{font-size:12px;}
-      .ses{font-size:13px;font-weight:700;font-family:Menlo,Consolas,monospace;}
-      .cli{font-size:12px;font-family:Menlo,Consolas,monospace;}
-      .ftitle{font-size:14px;font-weight:700;}
-      .flow{font-size:13px;}
-      .mono{font-family:Menlo,Consolas,monospace;}
+      .h-title { font-size: 22px; font-weight: 700; fill: #1e293b; letter-spacing: 0.5; }
+      .h-sub   { font-size: 12px; fill: #64748b; }
+      .colh    { font-size: 14px; font-weight: 700; fill: #ffffff; letter-spacing: 0.4; }
+      .ct      { font-size: 13px; font-weight: 700; fill: #1e293b; }
+      .cm      { font-size: 12px; fill: #475569; }
+      .ci      { font-size: 11px; fill: #94a3b8; font-style: italic; }
+      .actn    { font-size: 12px; font-weight: 700; }
+      .lbl     { font-size: 12px; fill: #64748b; }
+      .ses     { font-size: 12px; font-weight: 700; font-family: Menlo, Consolas, monospace; }
+      .cli     { font-size: 11px; font-family: Menlo, Consolas, monospace; fill: #1e293b; }
+      .fail-h  { font-size: 14px; font-weight: 700; fill: #ffffff; letter-spacing: 0.4; }
+      .ftitle  { font-size: 14px; font-weight: 700; fill: #ffffff; letter-spacing: 0.3; }
+      .flow    { font-size: 12px; fill: #475569; }
+      .flow-em { font-size: 12px; fill: #1e293b; font-weight: 700; }
+      .mono    { font-family: Menlo, Consolas, monospace; }
+      .ftn     { font-size: 11px; fill: #64748b; font-style: italic; }
     </style>
   </defs>
 
-  <rect width="1280" height="700" fill="#ffffff"/>
+  <!-- Background -->
+  <rect width="1120" height="760" rx="18" fill="url(#bg-grad)"/>
+
+  <!-- Decorative dots -->
+  <circle cx="30"   cy="30"  r="3" fill="#8b5cf6" opacity="0.4"/>
+  <circle cx="1090" cy="30"  r="3" fill="#3b82f6" opacity="0.4"/>
+  <circle cx="30"   cy="730" r="3" fill="#10b981" opacity="0.4"/>
+  <circle cx="1090" cy="730" r="3" fill="#f59e0b" opacity="0.4"/>
 
   <!-- Title -->
-  <text x="40" y="44" class="title" fill="#1a1a1a">kanban-task-engine — Use Case (AI CLI 실행 연동)</text>
-  <text x="40" y="68" class="sub" fill="#666">Vault의 이슈가 AI CLI에 의해 처리되고, 사람이 최종 승인하는 흐름 · executor: codex</text>
+  <text x="560" y="42" text-anchor="middle" dominant-baseline="middle" class="h-title">Use Case — AI CLI 실행 연동</text>
+  <line x1="430" y1="62" x2="510" y2="62" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/>
+  <line x1="610" y1="62" x2="690" y2="62" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="560" cy="62" r="4" fill="#8b5cf6"/>
+  <text x="560" y="82" text-anchor="middle" class="h-sub">Vault의 이슈가 AI CLI에 의해 처리되고, 사람이 최종 승인하는 흐름 · executor: codex</text>
 
-  <!-- Column headers -->
-  <rect x="40"   y="100" width="232" height="36" rx="6" fill="#FFF3CD" stroke="#E6A817" stroke-width="2"/>
-  <text x="156"  y="124" class="head" fill="#5c3d00" text-anchor="middle">TODO</text>
-  <rect x="282"  y="100" width="232" height="36" rx="6" fill="#E8F5E9" stroke="#43A047" stroke-width="2"/>
-  <text x="398"  y="124" class="head" fill="#2e7d32" text-anchor="middle">READY</text>
-  <rect x="524"  y="100" width="232" height="36" rx="6" fill="#BBDEFB" stroke="#1E88E5" stroke-width="2"/>
-  <text x="640"  y="124" class="head" fill="#1565C0" text-anchor="middle">RUNNING</text>
-  <rect x="766"  y="100" width="232" height="36" rx="6" fill="#FFF3CD" stroke="#E6A817" stroke-width="2"/>
-  <text x="882"  y="124" class="head" fill="#5c3d00" text-anchor="middle">REVIEW</text>
-  <rect x="1008" y="100" width="232" height="36" rx="6" fill="#E8F5E9" stroke="#43A047" stroke-width="2"/>
-  <text x="1124" y="124" class="head" fill="#2e7d32" text-anchor="middle">DONE</text>
+  <!-- ═══ KANBAN BOARD (5 columns evenly: w=196, gap=15) ═══ -->
 
-  <!-- Column body panels -->
-  <rect x="40"   y="136" width="232" height="240" fill="#fffdf0" stroke="#E6A817" stroke-width="1.5"/>
-  <rect x="282"  y="136" width="232" height="240" fill="#f5fbf5" stroke="#43A047" stroke-width="1.5"/>
-  <rect x="524"  y="136" width="232" height="240" fill="#f0f7ff" stroke="#1E88E5" stroke-width="1.5"/>
-  <rect x="766"  y="136" width="232" height="240" fill="#fffdf0" stroke="#E6A817" stroke-width="1.5"/>
-  <rect x="1008" y="136" width="232" height="240" fill="#f5fbf5" stroke="#43A047" stroke-width="1.5"/>
+  <!-- TODO column (x=40~236) -->
+  <g filter="url(#shadow)">
+    <rect x="40" y="110" width="196" height="320" rx="12" fill="#ffffff" stroke="#fbbf24" stroke-width="1.5"/>
+    <rect x="40" y="110" width="196" height="40" rx="12" fill="url(#amber-grad)"/>
+    <rect x="40" y="130" width="196" height="20" fill="url(#amber-grad)"/>
+  </g>
+  <text x="138" y="130" text-anchor="middle" dominant-baseline="middle" class="colh">TODO</text>
+  <g filter="url(#shadow-sm)">
+    <rect x="56" y="166" width="164" height="100" rx="6" fill="#fffbea" stroke="#fde68a"/>
+  </g>
+  <text x="68" y="186" class="ct">VC-042</text>
+  <text x="68" y="206" class="cm">캐시 레이어 추가</text>
+  <text x="68" y="232" class="ci">executor: codex</text>
+  <text x="68" y="250" class="ci">priority: high</text>
 
-  <!-- Inter-column arrows -->
-  <text x="277"  y="125" font-size="14" fill="#aaa" text-anchor="middle">→</text>
-  <text x="519"  y="125" font-size="14" fill="#aaa" text-anchor="middle">→</text>
-  <text x="761"  y="125" font-size="14" fill="#aaa" text-anchor="middle">→</text>
-  <text x="1003" y="125" font-size="14" fill="#aaa" text-anchor="middle">→</text>
+  <line x1="236" y1="270" x2="248" y2="270" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 
-  <!-- TODO card -->
-  <rect x="52" y="152" width="208" height="92" fill="#fff" stroke="#ddd"/>
-  <text x="64" y="174" class="ct" fill="#1a1a1a">VC-042 캐시 레이어 추가</text>
-  <text x="64" y="198" class="cm" fill="#555">executor: codex</text>
-  <text x="64" y="220" class="cm" fill="#555">priority: high</text>
+  <!-- READY column (x=251~447) -->
+  <g filter="url(#shadow)">
+    <rect x="251" y="110" width="196" height="320" rx="12" fill="#ffffff" stroke="#34d399" stroke-width="1.5"/>
+    <rect x="251" y="110" width="196" height="40" rx="12" fill="url(#green-grad)"/>
+    <rect x="251" y="130" width="196" height="20" fill="url(#green-grad)"/>
+  </g>
+  <text x="349" y="130" text-anchor="middle" dominant-baseline="middle" class="colh">READY</text>
+  <g filter="url(#shadow-sm)">
+    <rect x="267" y="166" width="164" height="100" rx="6" fill="#f0fdf4" stroke="#86efac"/>
+  </g>
+  <text x="279" y="186" class="ct">VC-038</text>
+  <text x="279" y="206" class="cm">API 타임아웃 수정</text>
+  <text x="279" y="232" class="ci">executor: codex</text>
+  <text x="279" y="250" class="ci">↑ frontmatter status: READY</text>
 
-  <!-- READY card -->
-  <rect x="294" y="152" width="208" height="92" fill="#fff" stroke="#ddd"/>
-  <text x="306" y="174" class="ct" fill="#1a1a1a">VC-038 API 타임아웃 수정</text>
-  <text x="306" y="198" class="cm" fill="#555">executor: codex</text>
-  <text x="306" y="220" class="cm" fill="#888" font-style="italic">↑ frontmatter status: READY</text>
+  <line x1="447" y1="270" x2="459" y2="270" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 
-  <!-- RUNNING card -->
-  <rect x="536" y="152" width="208" height="216" fill="#fff" stroke="#1E88E5" stroke-width="1.5"/>
-  <text x="548" y="174" class="ct" fill="#1a1a1a">VC-035 로그 포맷 통일</text>
-  <text x="548" y="196" class="cm" fill="#1565C0" font-weight="700">▶ AI CLI 실행 중</text>
-  <text x="548" y="216" class="cm" fill="#555">isolated worktree</text>
-  <rect x="548" y="226" width="184" height="46" fill="#f0f7ff" stroke="#90CAF9" rx="3"/>
-  <text x="558" y="244" class="lbl" fill="#888">session</text>
-  <text x="558" y="264" class="ses" fill="#1565C0">run-20260507-a3f2</text>
-  <text x="548" y="298" class="cli" fill="#1a1a1a">kanban run VC-035</text>
-  <text x="548" y="318" class="cli" fill="#1a1a1a">  --execute --agent codex</text>
-  <text x="548" y="346" class="lbl" fill="#888" font-style="italic">session 추적 ID</text>
+  <!-- RUNNING column (x=462~658) -->
+  <g filter="url(#shadow)">
+    <rect x="462" y="110" width="196" height="320" rx="12" fill="#ffffff" stroke="#60a5fa" stroke-width="1.5"/>
+    <rect x="462" y="110" width="196" height="40" rx="12" fill="url(#blue-grad)"/>
+    <rect x="462" y="130" width="196" height="20" fill="url(#blue-grad)"/>
+  </g>
+  <text x="560" y="130" text-anchor="middle" dominant-baseline="middle" class="colh">▶ RUNNING</text>
+  <g filter="url(#shadow-sm)">
+    <rect x="478" y="166" width="164" height="246" rx="6" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+  </g>
+  <text x="490" y="186" class="ct">VC-035</text>
+  <text x="490" y="206" class="cm">로그 포맷 통일</text>
+  <text x="490" y="228" class="actn" fill="#1565C0">▶ AI CLI 실행 중</text>
+  <text x="490" y="244" class="cm">isolated worktree</text>
+  <rect x="490" y="252" width="140" height="50" rx="4" fill="#dbeafe" stroke="#93c5fd"/>
+  <text x="500" y="270" class="lbl">session</text>
+  <text x="500" y="290" class="ses" fill="#1565C0">run-20260507-a3f2</text>
+  <text x="490" y="322" class="cli">kanban run VC-035</text>
+  <text x="490" y="338" class="cli">  --execute</text>
+  <text x="490" y="354" class="cli">  --agent codex</text>
 
-  <!-- REVIEW card -->
-  <rect x="778" y="152" width="208" height="200" fill="#fff" stroke="#ddd"/>
-  <text x="790" y="174" class="ct" fill="#1a1a1a">VC-031 에러 메시지 개선</text>
-  <text x="790" y="196" class="cm" fill="#555">AI CLI 완료 · exit 0</text>
-  <text x="790" y="216" class="cm" fill="#7a5c00" font-weight="700">→ 사람이 approve 대기</text>
-  <rect x="790" y="226" width="184" height="46" fill="#fffbea" stroke="#f0c36d" rx="3"/>
-  <text x="800" y="244" class="lbl" fill="#888">session</text>
-  <text x="800" y="264" class="ses" fill="#7a5c00">run-20260507-b1c9</text>
-  <text x="790" y="298" class="cli" fill="#1a1a1a">kanban approve VC-031</text>
+  <line x1="658" y1="270" x2="670" y2="270" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 
-  <!-- DONE card -->
-  <rect x="1020" y="152" width="208" height="180" fill="#fff" stroke="#ddd" opacity="0.95"/>
-  <text x="1032" y="174" class="ct" fill="#1a1a1a">VC-028 README 업데이트</text>
-  <text x="1032" y="196" class="cm" fill="#2e7d32" font-weight="700">✅ 완료</text>
-  <rect x="1032" y="208" width="184" height="46" fill="#f0fbf0" stroke="#a5d6a7" rx="3"/>
-  <text x="1042" y="226" class="lbl" fill="#888">session</text>
-  <text x="1042" y="246" class="ses" fill="#2e7d32">run-20260506-d7e1</text>
-  <text x="1032" y="280" class="cli" fill="#555">completed: 2026-05-06</text>
+  <!-- REVIEW column (x=673~869) -->
+  <g filter="url(#shadow)">
+    <rect x="673" y="110" width="196" height="320" rx="12" fill="#ffffff" stroke="#fbbf24" stroke-width="1.5"/>
+    <rect x="673" y="110" width="196" height="40" rx="12" fill="url(#amber-grad)"/>
+    <rect x="673" y="130" width="196" height="20" fill="url(#amber-grad)"/>
+  </g>
+  <text x="771" y="130" text-anchor="middle" dominant-baseline="middle" class="colh">REVIEW</text>
+  <g filter="url(#shadow-sm)">
+    <rect x="689" y="166" width="164" height="200" rx="6" fill="#fffbea" stroke="#fde68a"/>
+  </g>
+  <text x="701" y="186" class="ct">VC-031</text>
+  <text x="701" y="206" class="cm">에러 메시지 개선</text>
+  <text x="701" y="228" class="cm" fill="#7a5c00">AI CLI 완료 · exit 0</text>
+  <text x="701" y="246" class="actn" fill="#7a5c00">→ 사람이 approve 대기</text>
+  <rect x="701" y="254" width="140" height="50" rx="4" fill="#fef3c7" stroke="#fcd34d"/>
+  <text x="711" y="272" class="lbl">session</text>
+  <text x="711" y="292" class="ses" fill="#7a5c00">run-20260507-b1c9</text>
+  <text x="701" y="324" class="cli">kanban approve VC-031</text>
 
-  <!-- FAILED row -->
-  <rect x="40" y="408" width="120" height="40" rx="6" fill="#FFEBEE" stroke="#E53935" stroke-width="2"/>
-  <text x="100" y="434" class="head" fill="#b71c1c" text-anchor="middle">FAILED</text>
-  <rect x="180" y="400" width="340" height="62" fill="#fff" stroke="#E53935"/>
-  <text x="194" y="422" class="ct" fill="#1a1a1a">VC-033 DB 마이그레이션</text>
-  <text x="194" y="442" class="cm" fill="#b71c1c" font-weight="700">exit non-0 — 변경사항 없음</text>
-  <text x="194" y="458" class="ses" fill="#c62828" font-size="12">session: run-20260507-f9a0</text>
-  <text x="540" y="438" class="cli" fill="#1a1a1a">kanban retry VC-033</text>
-  <text x="540" y="456" class="lbl" fill="#888" font-style="italic">→ READY로 복귀</text>
+  <line x1="869" y1="270" x2="881" y2="270" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 
-  <!-- Flow summary -->
-  <rect x="40" y="490" width="1200" height="170" rx="6" fill="#f0f4ff" stroke="#b0c4f0"/>
-  <text x="56" y="516" class="ftitle" fill="#334">흐름 요약</text>
-  <text x="56" y="540" class="flow" fill="#445">
-    <tspan>1️⃣ </tspan>
-    <tspan font-weight="700" fill="#1a1a1a">status: TODO → READY</tspan>
-    <tspan> (frontmatter 편집)</tspan>
+  <!-- DONE column (x=884~1080) -->
+  <g filter="url(#shadow)">
+    <rect x="884" y="110" width="196" height="320" rx="12" fill="#ffffff" stroke="#34d399" stroke-width="1.5"/>
+    <rect x="884" y="110" width="196" height="40" rx="12" fill="url(#green-grad)"/>
+    <rect x="884" y="130" width="196" height="20" fill="url(#green-grad)"/>
+  </g>
+  <text x="982" y="130" text-anchor="middle" dominant-baseline="middle" class="colh">✅ DONE</text>
+  <g filter="url(#shadow-sm)">
+    <rect x="900" y="166" width="164" height="200" rx="6" fill="#f0fdf4" stroke="#86efac" opacity="0.95"/>
+  </g>
+  <text x="912" y="186" class="ct">VC-028</text>
+  <text x="912" y="206" class="cm">README 업데이트</text>
+  <text x="912" y="232" class="actn" fill="#2e7d32">✅ 완료</text>
+  <rect x="912" y="244" width="140" height="50" rx="4" fill="#dcfce7" stroke="#86efac"/>
+  <text x="922" y="262" class="lbl">session</text>
+  <text x="922" y="282" class="ses" fill="#2e7d32">run-20260506-d7e1</text>
+  <text x="912" y="316" class="ci">completed: 2026-05-06</text>
+
+  <!-- ═══ FAILED ROW ═══ -->
+  <g filter="url(#shadow)">
+    <rect x="40"  y="450" width="180" height="60" rx="12" fill="#ffffff" stroke="#f87171" stroke-width="1.5"/>
+    <rect x="40"  y="450" width="180" height="40" rx="12" fill="url(#red-grad)"/>
+    <rect x="40"  y="470" width="180" height="20" fill="url(#red-grad)"/>
+  </g>
+  <text x="130" y="470" text-anchor="middle" dominant-baseline="middle" class="fail-h">⚠ FAILED</text>
+  <g filter="url(#shadow-sm)">
+    <rect x="240" y="450" width="380" height="60" rx="6" fill="#fef2f2" stroke="#fca5a5"/>
+  </g>
+  <text x="252" y="470" class="ct">VC-033</text>
+  <text x="252" y="488" class="cm">DB 마이그레이션</text>
+  <text x="252" y="504" class="actn" fill="#b71c1c" font-size="11">exit non-0 — 변경사항 없음</text>
+  <text x="412" y="470" class="lbl">session</text>
+  <text x="412" y="488" class="ses" fill="#c62828">run-20260507-f9a0</text>
+  <line x1="630" y1="480" x2="700" y2="480" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="720" y="478" class="cli">kanban retry VC-033</text>
+  <text x="720" y="498" class="cm" font-style="italic">→ READY로 복귀</text>
+
+  <!-- ═══ FLOW SUMMARY (indigo gradient header) ═══ -->
+  <g filter="url(#shadow)">
+    <rect x="40" y="540" width="1040" height="180" rx="12" fill="#ffffff" stroke="#818cf8" stroke-width="1.5"/>
+    <rect x="40" y="540" width="1040" height="40" rx="12" fill="url(#indigo-grad)"/>
+    <rect x="40" y="560" width="1040" height="20" fill="url(#indigo-grad)"/>
+  </g>
+  <text x="560" y="560" text-anchor="middle" dominant-baseline="middle" class="ftitle">📋  흐름 요약 — 4단계 + 실패 retry</text>
+
+  <text x="64" y="612" class="flow">
+    <tspan class="flow-em">1️⃣  status: TODO → READY</tspan>
+    <tspan>  (frontmatter 편집)</tspan>
   </text>
-  <text x="56" y="566" class="flow" fill="#445">
-    <tspan>2️⃣ </tspan>
-    <tspan class="mono" fill="#1a1a1a">kanban run VC-001 --execute --agent codex</tspan>
-    <tspan> — session 생성, AI CLI 실행</tspan>
+  <text x="64" y="638" class="flow">
+    <tspan>2️⃣  </tspan>
+    <tspan class="flow-em mono">kanban run VC-001 --execute --agent codex</tspan>
+    <tspan>  — session 생성, AI CLI 실행</tspan>
   </text>
-  <text x="56" y="592" class="flow" fill="#445">
-    <tspan>3️⃣ exit 0 + 변경 → </tspan>
-    <tspan font-weight="700" fill="#5c3d00">REVIEW</tspan>
-    <tspan> (session ID 기록)</tspan>
+  <text x="64" y="664" class="flow">
+    <tspan>3️⃣  exit 0 + 변경 → </tspan>
+    <tspan class="flow-em" fill="#7a5c00">REVIEW</tspan>
+    <tspan>  (session ID 기록)</tspan>
   </text>
-  <text x="56" y="618" class="flow" fill="#445">
-    <tspan>4️⃣ </tspan>
-    <tspan class="mono" fill="#1a1a1a">kanban approve VC-001</tspan>
+  <text x="64" y="690" class="flow">
+    <tspan>4️⃣  </tspan>
+    <tspan class="flow-em mono">kanban approve VC-001</tspan>
     <tspan> → </tspan>
-    <tspan font-weight="700" fill="#2e7d32">DONE</tspan>
-    <tspan> (session 완료)</tspan>
+    <tspan class="flow-em" fill="#2e7d32">DONE</tspan>
+    <tspan>  (session 완료)</tspan>
   </text>
-  <text x="56" y="644" class="flow" fill="#445">
+  <text x="64" y="710" class="flow" fill="#94a3b8" font-style="italic">
     <tspan>실패 시: </tspan>
-    <tspan class="mono" fill="#1a1a1a">kanban retry VC-001</tspan>
+    <tspan class="mono">kanban retry VC-001</tspan>
     <tspan> → READY 복귀</tspan>
   </text>
+
+  <text x="560" y="744" text-anchor="middle" class="ftn">자산: kanban-use-case.{drawio,svg,html} · isolated worktree에서 실행</text>
 </svg>
