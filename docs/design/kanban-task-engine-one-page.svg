@@ -113,11 +113,9 @@
   <text x="68" y="356" class="bs">누가 어떤 도구로 실행할지</text>
   <text x="68" y="372" class="bx">예: codex 실행 / validate-only / Jira export</text>
 
-  <!-- Arrow Vault → Engine (line split around label) -->
-  <line x1="300" y1="250" x2="305" y2="250" stroke="#94a3b8" stroke-width="1.5"/>
-  <rect x="305" y="238" width="70" height="24" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
-  <text x="340" y="253" text-anchor="middle" dominant-baseline="middle" class="lab-box">parse → JSON</text>
-  <line x1="375" y1="250" x2="380" y2="250" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Arrow Vault → Engine (label above line, no box) -->
+  <line x1="305" y1="250" x2="375" y2="250" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="340" y="240" text-anchor="middle" class="lab-box">parse → JSON</text>
 
   <!-- ENGINE zone -->
   <g filter="url(#shadow)">
@@ -165,11 +163,9 @@
   <text x="813" y="320" text-anchor="middle" class="bx">사용자 진입점</text>
   <text x="813" y="336" text-anchor="middle" class="bx">--execute --agent</text>
 
-  <!-- Arrow Engine → External (line split around label) -->
-  <line x1="880" y1="250" x2="885" y2="250" stroke="#94a3b8" stroke-width="1.5"/>
-  <rect x="885" y="238" width="60" height="24" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
-  <text x="915" y="253" text-anchor="middle" dominant-baseline="middle" class="lab-box">adapter</text>
-  <line x1="945" y1="250" x2="950" y2="250" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Arrow Engine → External (label above line, no box) -->
+  <line x1="880" y1="250" x2="945" y2="250" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="912" y="240" text-anchor="middle" class="lab-box">adapter</text>
 
   <!-- EXTERNAL zone -->
   <g filter="url(#shadow)">
@@ -246,26 +242,18 @@
   </g>
   <text x="969" y="606" text-anchor="middle" class="stxt" fill="#2e7d32">DONE</text>
 
-  <!-- Forward arrows + labels (line split around label box) -->
-  <line x1="200" y1="602" x2="216" y2="602" stroke="#94a3b8" stroke-width="1.5"/>
-  <rect x="216" y="590" width="46" height="24" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
-  <text x="239" y="605" text-anchor="middle" dominant-baseline="middle" class="lab-box">prep</text>
-  <line x1="262" y1="602" x2="278" y2="602" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Forward arrows + labels (label above line, no box) -->
+  <line x1="200" y1="602" x2="278" y2="602" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="239" y="592" text-anchor="middle" class="lab-box">prep</text>
 
-  <line x1="400" y1="602" x2="408" y2="602" stroke="#94a3b8" stroke-width="1.5"/>
-  <rect x="408" y="590" width="68" height="24" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
-  <text x="442" y="605" text-anchor="middle" dominant-baseline="middle" class="lab-box mono">--execute</text>
-  <line x1="476" y1="602" x2="478" y2="602" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="400" y1="602" x2="478" y2="602" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="439" y="592" text-anchor="middle" class="lab-box mono">--execute</text>
 
-  <line x1="620" y1="602" x2="624" y2="602" stroke="#94a3b8" stroke-width="1.5"/>
-  <rect x="624" y="590" width="74" height="24" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
-  <text x="661" y="605" text-anchor="middle" dominant-baseline="middle" class="lab-box">exit 0 + 변경</text>
-  <line x1="698" y1="602" x2="700" y2="602" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="620" y1="602" x2="698" y2="602" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="659" y="592" text-anchor="middle" class="lab-box">exit 0 + 변경</text>
 
-  <line x1="830" y1="602" x2="838" y2="602" stroke="#94a3b8" stroke-width="1.5"/>
-  <rect x="838" y="590" width="62" height="24" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
-  <text x="869" y="605" text-anchor="middle" dominant-baseline="middle" class="lab-box">approve</text>
-  <line x1="900" y1="602" x2="908" y2="602" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="830" y1="602" x2="908" y2="602" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="869" y="592" text-anchor="middle" class="lab-box">approve</text>
 
   <!-- Reverse labels (boxed for visual consistency) -->
   <rect x="160" y="630" width="158" height="22" rx="11" fill="#fefce8" stroke="#fde68a"/>
@@ -286,8 +274,7 @@
 
   <!-- retry: FAILED → READY (elbow path) -->
   <path d="M 490 690 L 339 690 L 339 624" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 3" marker-end="url(#arrow)"/>
-  <rect x="364" y="678" width="116" height="22" rx="11" fill="#ffffff" stroke="#cbd5e1"/>
-  <text x="422" y="693" text-anchor="middle" dominant-baseline="middle" class="lcr">↺ retry → READY</text>
+  <text x="412" y="682" text-anchor="middle" class="lcr">↺ retry → READY</text>
 
   <!-- ═══ FOOTER ═══ -->
   <text x="560" y="744" text-anchor="middle" class="ftn">자산: kanban-task-engine-one-page.{drawio,svg,html} · kanban-use-case.{drawio,svg,html} — 색상 규칙 docs/design/README.md</text>
