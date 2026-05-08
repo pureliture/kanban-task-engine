@@ -36,17 +36,17 @@
           <mxGeometry x="20" y="8" width="460" height="20" as="geometry"/>
         </mxCell>
 
-        <mxCell id="vault-md" value="&lt;b&gt;Markdown Issues&lt;/b&gt;&lt;br/&gt;.md + YAML frontmatter&lt;br/&gt;&lt;i style='color:#7a3900'&gt;← SoT (source of truth)&lt;/i&gt;&lt;br/&gt;issues/ · epics/ · registry.yaml"
+        <mxCell id="vault-md" value="&lt;b&gt;Markdown Issues (.md)&lt;/b&gt;&lt;br/&gt;&lt;i style='color:#7a3900'&gt;← Source of Truth (SoT)&lt;/i&gt;&lt;br/&gt;사람이 직접 읽고 쓰는 파일"
                 style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#AB47BC;strokeWidth=1.5;fontSize=11;align=center;verticalAlign=middle;"
                 vertex="1" parent="vault-zone">
           <mxGeometry x="16" y="32" width="190" height="100" as="geometry"/>
         </mxCell>
-        <mxCell id="vault-boards" value="&lt;b&gt;Boards &amp; Templates&lt;/b&gt;&lt;br/&gt;boards/&lt;br/&gt;templates/"
+        <mxCell id="vault-boards" value="&lt;b&gt;Boards (.md)&lt;/b&gt;&lt;br/&gt;어떤 이슈가&lt;br/&gt;어느 컬럼에 있는지"
                 style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#AB47BC;strokeWidth=1.5;fontSize=11;align=center;verticalAlign=middle;"
                 vertex="1" parent="vault-zone">
           <mxGeometry x="220" y="32" width="130" height="100" as="geometry"/>
         </mxCell>
-        <mxCell id="vault-recipes" value="&lt;b&gt;Recipes&lt;/b&gt;&lt;br/&gt;recipes/*.yaml&lt;br/&gt;mode label +&lt;br/&gt;modules + policy"
+        <mxCell id="vault-recipes" value="&lt;b&gt;Recipes (.yaml)&lt;/b&gt;&lt;br/&gt;누가 어떤 도구로 실행할지&lt;br/&gt;&lt;i&gt;예: Codex로 실행 / Jira export만&lt;/i&gt;"
                 style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#AB47BC;strokeWidth=1.5;fontSize=11;align=center;verticalAlign=middle;"
                 vertex="1" parent="vault-zone">
           <mxGeometry x="364" y="32" width="120" height="100" as="geometry"/>
@@ -66,30 +66,25 @@
           <mxGeometry x="20" y="8" width="500" height="20" as="geometry"/>
         </mxCell>
 
-        <mxCell id="engine-core" value="&lt;b&gt;packages/core&lt;/b&gt;&lt;br/&gt;Runtime · StateMachine&lt;br/&gt;PolicyEngine · Store&lt;br/&gt;Executor · ModuleRunner&lt;br/&gt;EventBus · DeadLetterQ"
+        <mxCell id="engine-core" value="&lt;b&gt;Core&lt;/b&gt;&lt;br/&gt;상태 전이 · 실행 루프"
                 style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;strokeWidth=1.5;fontSize=11;align=center;verticalAlign=middle;"
                 vertex="1" parent="engine-zone">
           <mxGeometry x="16" y="32" width="170" height="100" as="geometry"/>
         </mxCell>
-        <mxCell id="engine-schema" value="&lt;b&gt;packages/schema&lt;/b&gt;&lt;br/&gt;IssueFrontmatter&lt;br/&gt;CanonicalIssueModel&lt;br/&gt;IssueStatus (6)&lt;br/&gt;VALID_ISSUE_TRANSITIONS (8)"
+        <mxCell id="engine-schema" value="&lt;b&gt;Schema&lt;/b&gt;&lt;br/&gt;.md ↔ JSON 계약&lt;br/&gt;&lt;i&gt;Canonical JSON&lt;/i&gt;&lt;br/&gt;IssueStatus (6)&lt;br/&gt;VALID_ISSUE_TRANSITIONS (8)"
                 style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;strokeWidth=1.5;fontSize=11;align=center;verticalAlign=middle;"
                 vertex="1" parent="engine-zone">
           <mxGeometry x="200" y="32" width="155" height="100" as="geometry"/>
         </mxCell>
-        <mxCell id="engine-adapters" value="&lt;b&gt;Adapters + Executor&lt;/b&gt;&lt;br/&gt;adapter-claude-code&lt;br/&gt;codex-runner&lt;br/&gt;jira · github&lt;br/&gt;firebase · openclaw · cli"
+        <mxCell id="engine-adapters" value="&lt;b&gt;Adapters&lt;/b&gt;&lt;br/&gt;Jira · GitHub · Codex 연결&lt;br/&gt;codex-runner"
                 style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;strokeWidth=1.5;fontSize=11;align=center;verticalAlign=middle;"
                 vertex="1" parent="engine-zone">
           <mxGeometry x="369" y="32" width="192" height="100" as="geometry"/>
         </mxCell>
-        <mxCell id="engine-cli" value="&lt;b&gt;packages/cli&lt;/b&gt;&lt;br/&gt;CLI entry point&lt;br/&gt;kanban sync&lt;br/&gt;kanban run&lt;br/&gt;kanban next"
+        <mxCell id="engine-cli" value="&lt;b&gt;CLI&lt;/b&gt;&lt;br/&gt;kanban run&lt;br/&gt;--execute --agent codex"
                 style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;strokeWidth=1.5;fontSize=11;align=center;verticalAlign=middle;"
                 vertex="1" parent="engine-zone">
           <mxGeometry x="575" y="32" width="132" height="100" as="geometry"/>
-        </mxCell>
-        <mxCell id="engine-recipes" value="&lt;b&gt;recipes/&lt;/b&gt;&lt;br/&gt;home-assisted.yaml&lt;br/&gt;validate-only.yaml&lt;br/&gt;work-jira-export.yaml"
-                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4CAF50;strokeWidth=1.5;fontSize=11;align=center;verticalAlign=middle;"
-                vertex="1" parent="engine-zone">
-          <mxGeometry x="721" y="32" width="83" height="100" as="geometry"/>
         </mxCell>
 
         <!-- ════════════════════════════════════════
@@ -105,20 +100,15 @@
                 vertex="1" parent="ext-zone">
           <mxGeometry x="20" y="8" width="180" height="20" as="geometry"/>
         </mxCell>
-        <mxCell id="ext-openclaw" value="&lt;b&gt;OpenClaw&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Home only&lt;/i&gt;"
+        <mxCell id="ext-openclaw" value="&lt;b&gt;Codex&lt;/b&gt;&lt;br/&gt;Home 실행기"
                 style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2196F3;strokeWidth=1.5;fontSize=11;"
                 vertex="1" parent="ext-zone">
           <mxGeometry x="16" y="32" width="174" height="40" as="geometry"/>
         </mxCell>
-        <mxCell id="ext-jira" value="&lt;b&gt;Jira&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Work only&lt;/i&gt;"
+        <mxCell id="ext-jira" value="&lt;b&gt;Jira · GitHub&lt;/b&gt;&lt;br/&gt;Work 연동"
                 style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2196F3;strokeWidth=1.5;fontSize=11;"
                 vertex="1" parent="ext-zone">
-          <mxGeometry x="16" y="80" width="80" height="40" as="geometry"/>
-        </mxCell>
-        <mxCell id="ext-github" value="&lt;b&gt;GitHub&lt;/b&gt;&lt;br/&gt;Firebase"
-                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2196F3;strokeWidth=1.5;fontSize=11;"
-                vertex="1" parent="ext-zone">
-          <mxGeometry x="110" y="80" width="80" height="40" as="geometry"/>
+          <mxGeometry x="16" y="80" width="174" height="40" as="geometry"/>
         </mxCell>
 
         <!-- ════════════════════════════════════════
