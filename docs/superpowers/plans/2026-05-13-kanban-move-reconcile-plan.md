@@ -774,7 +774,7 @@ Co-Authored-By: Codex GPT-5 <noreply@openai.com>
 - Create: `packages/cli/tests/move-reconcile.test.ts`
 - Modify: `packages/cli/src/index.ts`
 
-- [ ] **Step 1: Write failing CLI integration tests**
+- [x] **Step 1: Write failing CLI integration tests**
 
 Create `packages/cli/tests/move-reconcile.test.ts`:
 
@@ -836,7 +836,7 @@ describe('move and reconcile-board CLI', () => {
 });
 ```
 
-- [ ] **Step 2: Run the focused RED test**
+- [x] **Step 2: Run the focused RED test**
 
 Run:
 
@@ -846,7 +846,7 @@ rtk pnpm --filter @kanban-task-engine/cli test -- tests/move-reconcile.test.ts
 
 Expected: FAIL with unknown command `move` or missing command module.
 
-- [ ] **Step 3: Implement `commandMove`**
+- [x] **Step 3: Implement `commandMove`**
 
 Create `packages/cli/src/commands/move.ts`:
 
@@ -885,7 +885,7 @@ Complete `parseMoveArgs` in the same file:
 - Support `--dry-run`.
 - Reject unknown options.
 
-- [ ] **Step 4: Implement `commandReconcileBoard`**
+- [x] **Step 4: Implement `commandReconcileBoard`**
 
 Create `packages/cli/src/commands/reconcile-board.ts`:
 
@@ -924,7 +924,7 @@ Complete `parseReconcileArgs`, `formatConflicts`, `formatDryRun`, and `formatApp
 - Reject `--dry-run --apply` together.
 - Print one line per proposal/conflict with deterministic issue id ordering.
 
-- [ ] **Step 5: Register commands and help text**
+- [x] **Step 5: Register commands and help text**
 
 Modify `packages/cli/src/index.ts`:
 
@@ -947,7 +947,7 @@ Update help text:
   reconcile-board --space <space> [--dry-run|--apply]
 ```
 
-- [ ] **Step 6: Run CLI tests**
+- [x] **Step 6: Run CLI tests**
 
 Run:
 
@@ -957,7 +957,7 @@ rtk pnpm --filter @kanban-task-engine/cli test -- tests/move-reconcile.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 rtk git add packages/cli/src/commands/move.ts packages/cli/src/commands/reconcile-board.ts packages/cli/src/index.ts packages/cli/tests/move-reconcile.test.ts
