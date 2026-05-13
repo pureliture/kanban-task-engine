@@ -69,4 +69,51 @@ describe('board reconciliation', () => {
       expect.objectContaining({ issueId: 'VC-001', kind: 'stale-checksum' }),
     ]);
   });
+
+  it('applies legal proposals through the shared move service', async () => {
+    const vaultRoot = await makePhase3Vault({ status: 'TODO' });
+    const projection = await collectBoardProjection({
+      vaultRoot,
+      space: 'vibe-coding',
+      generatedAt: '2026-05-13T10:00:00.000Z',
+    });
+    await fs.mkdir(path.dirname(projection.boardPath), { recursive: true });
+    await fs.writeFile(projection.boardPath, moveCardToLane(projection.boardMarkdown, 'VC-001', 'READY'));
+
+    const result = await reconcileBoard({
+      vaultRoot,
+      space: 'vibe-coding',
+      apply: true,
+      now: '2026-05-13T10:05:00.000Z',
+    });
+
+    expect(result.conflicts).toEqual([]);
+    expect(result.applied).toEqual([
+      expect.objectContaining({ issueId: 'VC-001', oldStatus: 'TODO', newStatus: 'READY' }),
+    ]);
+    await expect(fs.readFile(path.join(vaultRoot, result.applied[0].relativePath), 'utf8'))
+      .resolves.toContain('status: READY');
+  });
+
+  it('does not apply any proposal when one card conflicts', async () => {
+    const vaultRoot = await makePhase3Vault({ status: 'TODO', secondIssue: { id: 'VC-002', status: 'READY' } });
+    const projection = await collectBoardProjection({
+      vaultRoot,
+      space: 'vibe-coding',
+      generatedAt: '2026-05-13T10:00:00.000Z',
+    });
+    let board = moveCardToLane(projection.boardMarkdown, 'VC-001', 'READY');
+    board = moveCardToLane(board, 'VC-002', 'DONE');
+    await fs.mkdir(path.dirname(projection.boardPath), { recursive: true });
+    await fs.writeFile(projection.boardPath, board);
+
+    const result = await reconcileBoard({ vaultRoot, space: 'vibe-coding', apply: true });
+
+    expect(result.applied).toEqual([]);
+    expect(result.conflicts).toEqual([
+      expect.objectContaining({ issueId: 'VC-002', kind: 'illegal-transition' }),
+    ]);
+    await expect(fs.readFile(path.join(vaultRoot, 'issues/vibe-coding/kanban-task-engine/VC-001-ready.md'), 'utf8'))
+      .resolves.toContain('status: TODO');
+  });
 });
