@@ -133,11 +133,14 @@ async function normalizeIssuePrepared(args: {
 
   if (normalized.inPlace) {
     const owners = scan.owners.get(normalized.id) ?? [];
-    if (owners.length !== 1 || path.resolve(owners[0].filePath) !== args.sourcePath || owners[0].source !== 'frontmatter') {
+    const owner = owners[0];
+    const ownerPath = owners.length === 1 ? await fs.realpath(owners[0].filePath) : undefined;
+    const sourcePath = await fs.realpath(args.sourcePath);
+    if (owners.length !== 1 || ownerPath !== sourcePath || owner.source !== 'frontmatter') {
       throw new Error('Duplicate issue ids');
     }
-    await atomicWriteFile(args.sourcePath, normalized.markdown);
-    return { ...normalized, wrote: true };
+    await atomicWriteFile(owner.filePath, normalized.markdown);
+    return { ...normalized, sourcePath: owner.filePath, targetPath: owner.filePath, wrote: true };
   }
 
   await writeNewIssueFileInVault(args.vaultRoot, toVaultRelativePath(args.vaultRoot, normalized.targetPath), normalized.markdown);

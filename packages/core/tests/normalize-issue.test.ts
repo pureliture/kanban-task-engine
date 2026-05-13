@@ -203,6 +203,27 @@ merge_into: origin/--detach
       project: 'kanban-task-engine',
       write: false,
     })).rejects.toThrow('Invalid merge_into');
+
+    for (const [filename, mergeInto] of [
+      ['bad-dot-segment.md', 'feature/.hidden'],
+      ['bad-lock-segment.md', 'foo.lock/bar'],
+      ['bad-origin-dot-segment.md', 'origin/release/.candidate'],
+      ['bad-origin-lock-segment.md', 'origin/foo.lock/bar'],
+    ] as const) {
+      const source = path.join(vault, 'inbox', filename);
+      await fs.writeFile(source, `---
+merge_into: ${mergeInto}
+---
+# Bad merge segment
+`);
+      await expect(normalizeIssue({
+        vaultRoot: vault,
+        sourcePath: source,
+        space: 'vibe-coding',
+        project: 'kanban-task-engine',
+        write: false,
+      })).rejects.toThrow('Invalid merge_into');
+    }
   });
 });
 
@@ -226,6 +247,35 @@ custom_field: keep-me
     const result = await normalizeIssue({ vaultRoot: vault, sourcePath: source, write: true });
     expect(result.inPlace).toBe(true);
     expect(result.targetPath).toBe(source);
+    await expect(fs.readFile(source, 'utf8')).resolves.toContain('custom_field: keep-me');
+  });
+
+  it('rewrites in place when the requested source path is an in-vault symlink to the sole owner', async () => {
+    const vault = await makeVault();
+    await fs.mkdir(path.join(vault, 'inbox'), { recursive: true });
+    const source = path.join(vault, 'issues/vibe-coding/kanban-task-engine/VC-001-owned.md');
+    const link = path.join(vault, 'inbox/VC-001-link.md');
+    await fs.writeFile(source, `---
+id: VC-001
+title: Symlink owned
+type: task
+status: TODO
+executor: human
+project: kanban-task-engine
+created: 2026-05-12
+updated: 2026-05-12
+custom_field: keep-me
+---
+# Symlink owned
+`);
+    await fs.symlink(source, link);
+
+    const result = await normalizeIssue({ vaultRoot: vault, sourcePath: link, write: true });
+
+    expect(result.inPlace).toBe(true);
+    expect(result.sourcePath).toBe(source);
+    expect(result.targetPath).toBe(source);
+    expect((await fs.lstat(link)).isSymbolicLink()).toBe(true);
     await expect(fs.readFile(source, 'utf8')).resolves.toContain('custom_field: keep-me');
   });
 
