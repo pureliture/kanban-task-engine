@@ -80,7 +80,7 @@ Each child plan must be saved under `docs/superpowers/plans/` and must contain e
 | --- | --- | --- |
 | 1 | `docs/superpowers/plans/2026-05-12-kanban-authoring-new-normalize-plan.md` | `kanban new` and `kanban normalize` work against disposable vaults |
 | 2 | `docs/superpowers/plans/2026-05-12-obsidian-board-write-plan.md` | `kanban board --write` writes Obsidian Kanban and Dataview projections |
-| 3 | `docs/superpowers/plans/2026-05-12-kanban-move-reconcile-plan.md` | `kanban move` and `kanban reconcile-board` safely mutate issue frontmatter |
+| 3 | `docs/superpowers/plans/2026-05-13-kanban-move-reconcile-plan.md` | `kanban move` and `kanban reconcile-board` safely mutate issue frontmatter |
 | 4 | `docs/superpowers/plans/2026-05-12-obsidian-smoke-plan.md` | Disposable vault and optional Obsidian GUI smoke prove human usability |
 | 5 | `docs/superpowers/plans/2026-05-12-codex-openclaw-e2e-plan.md` | `new -> normalize -> board --write -> move -> reconcile -> run` works through agent execution gates |
 
@@ -201,7 +201,7 @@ Expected runtime result:
 
 **Goal:** CLI and Obsidian-originated movements can update issue status only through explicit validation.
 
-- [ ] Create the child plan for Phase 3 with a conflict matrix.
+- [x] Create the child spec and plan for Phase 3 with a conflict matrix.
 - [ ] Add failing tests for legal state transitions.
 - [ ] Add failing tests for illegal state transitions.
 - [ ] Add failing tests for board movement diff detection.
