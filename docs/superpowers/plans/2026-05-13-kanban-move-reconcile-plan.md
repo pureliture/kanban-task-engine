@@ -668,7 +668,7 @@ Co-Authored-By: Codex GPT-5 <noreply@openai.com>
 - Modify: `packages/core/src/boards/reconcile-board.ts`
 - Modify: `packages/core/tests/reconcile-board.test.ts`
 
-- [ ] **Step 1: Add failing apply and all-or-nothing tests**
+- [x] **Step 1: Add failing apply and all-or-nothing tests**
 
 Append to `packages/core/tests/reconcile-board.test.ts`:
 
@@ -721,7 +721,7 @@ it('does not apply any proposal when one card conflicts', async () => {
 });
 ```
 
-- [ ] **Step 2: Run the focused RED test**
+- [x] **Step 2: Run the focused RED test**
 
 Run:
 
@@ -731,7 +731,7 @@ rtk pnpm --filter @kanban-task-engine/core test -- tests/reconcile-board.test.ts
 
 Expected: FAIL because apply returns no applied moves.
 
-- [ ] **Step 3: Implement apply orchestration**
+- [x] **Step 3: Implement apply orchestration**
 
 In `packages/core/src/boards/reconcile-board.ts`:
 
@@ -742,7 +742,7 @@ In `packages/core/src/boards/reconcile-board.ts`:
 - Pass reason `reconcile-board:<space>`.
 - Preserve all-or-nothing by doing every validation before the first write.
 
-- [ ] **Step 4: Run reconciliation tests**
+- [x] **Step 4: Run reconciliation tests**
 
 Run:
 
@@ -752,7 +752,7 @@ rtk pnpm --filter @kanban-task-engine/core test -- tests/reconcile-board.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 rtk git add packages/core/src/boards/reconcile-board.ts packages/core/tests/reconcile-board.test.ts

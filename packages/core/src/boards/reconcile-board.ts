@@ -5,6 +5,7 @@ import { StateMachine } from '../state-machine';
 import { getRegistrySpace, loadRegistry } from '../store/registry';
 import { listRegistryIssueRecords, type RegistryIssueRecord } from '../store/registry-issue-source';
 import { resolveVaultPath } from '../store/vault-path';
+import { moveIssueStatus } from '../movement/issue-mover';
 import { computeBoardProjectionChecksum } from './obsidian-board-renderer';
 
 export type ReconcileConflictKind =
@@ -113,6 +114,27 @@ export async function reconcileBoard(options: ReconcileBoardOptions): Promise<Re
     }
 
     validateCardAgainstIssue(card, record, boardRelativePath, result);
+  }
+
+  if (options.apply !== true || result.conflicts.length > 0) return result;
+
+  for (const proposal of result.proposals) {
+    const move = await moveIssueStatus({
+      vaultRoot,
+      issueId: proposal.issueId,
+      targetStatus: proposal.proposedStatus,
+      dryRun: false,
+      now: options.now,
+      reason: `reconcile-board:${options.space}`,
+    });
+    if (move.changed) {
+      result.applied.push({
+        issueId: move.issueId,
+        oldStatus: move.oldStatus,
+        newStatus: move.newStatus,
+        relativePath: move.relativePath,
+      });
+    }
   }
 
   return result;

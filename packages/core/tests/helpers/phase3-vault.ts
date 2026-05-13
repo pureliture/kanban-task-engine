@@ -6,6 +6,10 @@ import type { IssueStatus, IssueType } from '@kanban-task-engine/schema';
 export interface MakePhase3VaultOptions {
   status?: IssueStatus;
   type?: IssueType;
+  secondIssue?: {
+    id: string;
+    status: IssueStatus;
+  };
 }
 
 export async function makePhase3Vault(options: MakePhase3VaultOptions = {}): Promise<string> {
@@ -28,14 +32,37 @@ export async function makePhase3Vault(options: MakePhase3VaultOptions = {}): Pro
         path: issues/vibe-coding/kanban-task-engine
 `);
 
+  await writeIssue(root, {
+    id: 'VC-001',
+    status,
+    type,
+    title: type === 'epic' ? 'Phase 3 epic' : 'Ready item',
+  });
+
+  if (options.secondIssue) {
+    await writeIssue(root, {
+      id: options.secondIssue.id,
+      status: options.secondIssue.status,
+      type: 'task',
+      title: 'Second item',
+    });
+  }
+
+  return root;
+}
+
+async function writeIssue(
+  root: string,
+  issue: { id: string; status: IssueStatus; type: IssueType; title: string },
+): Promise<void> {
   const frontmatter = [
     '---',
-    'id: VC-001',
-    `status: ${status}`,
+    `id: ${issue.id}`,
+    `status: ${issue.status}`,
     'priority: P1',
-    `type: ${type}`,
-    type === 'epic' ? 'title: Phase 3 epic' : 'title: Ready item',
-    type === 'epic' ? 'project: ""' : 'project: kanban-task-engine',
+    `type: ${issue.type}`,
+    `title: ${issue.title}`,
+    issue.type === 'epic' ? 'project: ""' : 'project: kanban-task-engine',
     'executor: codex',
     'created: 2026-05-13T09:00:00.000Z',
     'updated: 2026-05-13T09:00:00.000Z',
@@ -43,9 +70,9 @@ export async function makePhase3Vault(options: MakePhase3VaultOptions = {}): Pro
     '',
   ].join('\n');
 
-  const body = type === 'epic'
+  const body = issue.type === 'epic'
     ? [
-      '# VC-001 Phase 3 epic',
+      `# ${issue.id} ${issue.title}`,
       '',
       '## 목표',
       'Move source test.',
@@ -57,14 +84,14 @@ export async function makePhase3Vault(options: MakePhase3VaultOptions = {}): Pro
       '- Pass.',
       '',
       '## 하위 티켓',
-      '- VC-001',
+      `- ${issue.id}`,
       '',
       '## 로그',
       '- Created.',
       '',
     ].join('\n')
     : [
-      '# VC-001 Ready item',
+      `# ${issue.id} ${issue.title}`,
       '',
       '## 목적',
       'Move source test.',
@@ -83,11 +110,10 @@ export async function makePhase3Vault(options: MakePhase3VaultOptions = {}): Pro
       '',
     ].join('\n');
 
-  const relativePath = type === 'epic'
-    ? 'issues/vibe-coding/_epics/VC-001-ready.md'
-    : 'issues/vibe-coding/kanban-task-engine/VC-001-ready.md';
+  const relativePath = issue.type === 'epic'
+    ? `issues/vibe-coding/_epics/${issue.id}-ready.md`
+    : `issues/vibe-coding/kanban-task-engine/${issue.id}-ready.md`;
   await fs.writeFile(path.join(root, relativePath), `${frontmatter}${body}\n`);
-  return root;
 }
 
 export function moveCardToLane(markdown: string, issueId: string, targetLane: IssueStatus): string {
