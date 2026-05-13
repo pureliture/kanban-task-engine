@@ -1,6 +1,7 @@
 import { commandAbort } from './commands/abort.js';
 import { commandApprove } from './commands/approve.js';
 import { commandBoard } from './commands/board.js';
+import { commandMove } from './commands/move.js';
 import { commandNew } from './commands/new.js';
 import { commandNext } from './commands/next.js';
 import { commandNormalize } from './commands/normalize.js';
@@ -8,6 +9,7 @@ import { commandRetry } from './commands/retry.js';
 import { commandRecoverRun } from './commands/recover-run.js';
 import { commandRun } from './commands/run.js';
 import { commandSync } from './commands/sync.js';
+import { commandReconcileBoard } from './commands/reconcile-board.js';
 import { CliContext, createCliContext } from './context.js';
 
 export interface CliResult {
@@ -29,6 +31,8 @@ const handlers: Record<string, CliHandler> = {
   'recover-run': commandRecoverRun,
   sync: commandSync,
   board: commandBoard,
+  move: commandMove,
+  'reconcile-board': commandReconcileBoard,
 };
 
 export async function runCli(argv: string[], context = createCliContext()): Promise<CliResult> {
@@ -79,5 +83,7 @@ export function helpText(): string {
     '  recover-run <issue-id>',
     '  sync',
     '  board [--space <space>] [--write (--space <space>|--all)]',
+    '  move <issue-id> <status> [--reason <text>] [--dry-run]',
+    '  reconcile-board --space <space> [--dry-run|--apply]',
   ].join('\n');
 }
