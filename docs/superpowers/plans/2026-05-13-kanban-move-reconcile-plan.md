@@ -298,7 +298,7 @@ Co-Authored-By: Codex GPT-5 <noreply@openai.com>
 - Create: `packages/core/tests/issue-mover.test.ts`
 - Modify: `packages/core/src/index.ts`
 
-- [ ] **Step 1: Write failing move service tests**
+- [x] **Step 1: Write failing move service tests**
 
 Create `packages/core/tests/issue-mover.test.ts`:
 
@@ -385,7 +385,7 @@ describe('issue mover', () => {
 
 If no shared test helper exists, create `packages/core/tests/helpers/phase3-vault.ts` with a disposable registry and one valid issue. Keep helper output identical to the issue shape accepted by Phase 2 board tests.
 
-- [ ] **Step 2: Run the focused RED test**
+- [x] **Step 2: Run the focused RED test**
 
 Run:
 
@@ -395,7 +395,7 @@ rtk pnpm --filter @kanban-task-engine/core test -- tests/issue-mover.test.ts
 
 Expected: FAIL because `../src/movement/issue-mover` does not exist.
 
-- [ ] **Step 3: Implement the move service**
+- [x] **Step 3: Implement the move service**
 
 Create `packages/core/src/movement/issue-mover.ts` with this public API:
 
@@ -436,7 +436,7 @@ Implementation rules:
 - Append one log line under `## 로그`; create that section only if the existing body is valid but missing it because older fixtures require migration.
 - Write via `atomicWriteFile`.
 
-- [ ] **Step 4: Export the service**
+- [x] **Step 4: Export the service**
 
 Modify `packages/core/src/index.ts`:
 
@@ -444,7 +444,7 @@ Modify `packages/core/src/index.ts`:
 export * from './movement/issue-mover';
 ```
 
-- [ ] **Step 5: Run move tests and state-machine regression**
+- [x] **Step 5: Run move tests and state-machine regression**
 
 Run:
 
@@ -454,7 +454,7 @@ rtk pnpm --filter @kanban-task-engine/core test -- tests/issue-mover.test.ts tes
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 rtk git add packages/core/src/movement/issue-mover.ts packages/core/src/index.ts packages/core/tests/issue-mover.test.ts packages/core/tests/helpers/phase3-vault.ts
