@@ -89,3 +89,18 @@ export async function makePhase3Vault(options: MakePhase3VaultOptions = {}): Pro
   await fs.writeFile(path.join(root, relativePath), `${frontmatter}${body}\n`);
   return root;
 }
+
+export function moveCardToLane(markdown: string, issueId: string, targetLane: IssueStatus): string {
+  const lines = markdown.split('\n');
+  const cardIndex = lines.findIndex(line => line.includes(`kanban-task-engine:id=${issueId} `));
+  if (cardIndex < 0) throw new Error(`Card not found: ${issueId}`);
+
+  const [card] = lines.splice(cardIndex, 1);
+  const laneIndex = lines.findIndex(line => line === `## ${targetLane}`);
+  if (laneIndex < 0) throw new Error(`Lane not found: ${targetLane}`);
+
+  let insertIndex = laneIndex + 1;
+  while (insertIndex < lines.length && lines[insertIndex] === '') insertIndex += 1;
+  lines.splice(insertIndex, 0, card);
+  return lines.join('\n');
+}

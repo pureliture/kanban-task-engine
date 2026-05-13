@@ -42,6 +42,7 @@ export {
   writeBoardProjections,
   BoardProjectionWriteError,
 } from './boards/board-projection';
+export * from './boards/reconcile-board';
 export type {
   BoardProjection,
   BoardProjectionFailedWriteTarget,

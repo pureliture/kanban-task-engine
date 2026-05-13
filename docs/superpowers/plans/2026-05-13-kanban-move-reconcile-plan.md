@@ -475,7 +475,7 @@ Co-Authored-By: Codex GPT-5 <noreply@openai.com>
 - Create: `packages/core/tests/reconcile-board.test.ts`
 - Modify: `packages/core/src/index.ts`
 
-- [ ] **Step 1: Write failing parser and proposal tests**
+- [x] **Step 1: Write failing parser and proposal tests**
 
 Create `packages/core/tests/reconcile-board.test.ts`:
 
@@ -551,7 +551,7 @@ describe('board reconciliation', () => {
 });
 ```
 
-- [ ] **Step 2: Run the focused RED test**
+- [x] **Step 2: Run the focused RED test**
 
 Run:
 
@@ -561,7 +561,7 @@ rtk pnpm --filter @kanban-task-engine/core test -- tests/reconcile-board.test.ts
 
 Expected: FAIL because `reconcileBoard` is not exported.
 
-- [ ] **Step 3: Implement parser and dry-run**
+- [x] **Step 3: Implement parser and dry-run**
 
 Create `packages/core/src/boards/reconcile-board.ts` with these public shapes:
 
@@ -630,7 +630,7 @@ Implementation rules:
 - Add conflicts for invalid/missing metadata, unknown issue, duplicate id, stale status/checksum, illegal transition, and epic movement.
 - Do not write in this task.
 
-- [ ] **Step 4: Export reconciliation API**
+- [x] **Step 4: Export reconciliation API**
 
 Modify `packages/core/src/index.ts`:
 
@@ -638,7 +638,7 @@ Modify `packages/core/src/index.ts`:
 export * from './boards/reconcile-board';
 ```
 
-- [ ] **Step 5: Run parser/proposal tests**
+- [x] **Step 5: Run parser/proposal tests**
 
 Run:
 
@@ -648,7 +648,7 @@ rtk pnpm --filter @kanban-task-engine/core test -- tests/reconcile-board.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 rtk git add packages/core/src/boards/reconcile-board.ts packages/core/src/index.ts packages/core/tests/reconcile-board.test.ts packages/core/tests/helpers/phase3-vault.ts
