@@ -170,7 +170,7 @@ describe('cli', () => {
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('run <issue-id>');
     expect(result.stdout).toContain('recover-run <issue-id>');
-    expect(result.stdout).toContain('board');
+    expect(result.stdout).toContain('board [--space <space>] [--write (--space <space>|--all)]');
   });
 
   it('rejects unknown commands', async () => {

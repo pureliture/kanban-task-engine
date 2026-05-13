@@ -26,9 +26,36 @@ export { createGitCheckpointModule } from './modules/git-checkpoint-module';
 
 export { renderBoardMarkdown } from './boards/board-generator';
 export type { BoardIssue, RenderBoardOptions } from './boards/board-generator';
+export {
+  computeBoardProjectionChecksum,
+  renderObsidianBoardMarkdown,
+} from './boards/obsidian-board-renderer';
+export type {
+  ObsidianBoardIssue,
+  RenderObsidianBoardOptions,
+} from './boards/obsidian-board-renderer';
+export { renderDataviewIndexMarkdown } from './boards/dataview-index-renderer';
+export type { RenderDataviewIndexOptions } from './boards/dataview-index-renderer';
+export {
+  collectBoardProjection,
+  writeBoardProjection,
+  writeBoardProjections,
+  BoardProjectionWriteError,
+} from './boards/board-projection';
+export type {
+  BoardProjection,
+  BoardProjectionFailedWriteTarget,
+  BoardProjectionTargetKind,
+  BoardProjectionWriteTarget,
+  BoardProjectionWriteResult,
+  CollectBoardProjectionOptions,
+  WriteBoardProjectionOptions,
+  WriteBoardProjectionsOptions,
+} from './boards/board-projection';
 export { loadRegistry, parseRegistryYaml, getRegistrySpace, listRegistrySpaces } from './store/registry';
 export type { VaultRegistry, RegistrySpace, RegistrySpaceType, RegistryProject } from './store/registry';
 export { resolveVaultPath } from './store/vault-path';
 export { allocateNextIssueId, parseIssueSequence } from './store/sequence';
 export type { AllocateIssueIdOptions } from './store/sequence';
+export * from './authoring';
 export * from './executor';
