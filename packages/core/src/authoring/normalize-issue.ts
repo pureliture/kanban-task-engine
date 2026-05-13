@@ -71,7 +71,7 @@ export async function normalizeIssue(input: NormalizeIssueInput): Promise<Normal
   if (!input.write) return prepareAndNormalizeIssue(input, vaultRoot);
 
   const sourcePath = await resolveSourcePath(vaultRoot, input.sourcePath);
-  const registry = await loadRegistry(path.join(vaultRoot, 'registry.yaml'));
+  const registry = await loadRegistry(await resolveRegistryPath(vaultRoot, 'registry.yaml'));
   const preliminaryMatch = selectMostSpecificMatch(await classifySource(vaultRoot, registry, sourcePath));
   if (input.space && preliminaryMatch && input.space !== preliminaryMatch.spaceName) {
     throw new Error('Space does not match source registry root');
@@ -83,7 +83,7 @@ export async function normalizeIssue(input: NormalizeIssueInput): Promise<Normal
 
 async function prepareAndNormalizeIssue(input: NormalizeIssueInput, vaultRoot: string): Promise<NormalizeIssueResult> {
   const sourcePath = await resolveSourcePath(vaultRoot, input.sourcePath);
-  const registry = await loadRegistry(path.join(vaultRoot, 'registry.yaml'));
+  const registry = await loadRegistry(await resolveRegistryPath(vaultRoot, 'registry.yaml'));
   const raw = await fs.readFile(sourcePath, 'utf8');
   const parsed = parseRoughNote(raw);
   const matches = await classifySource(vaultRoot, registry, sourcePath);

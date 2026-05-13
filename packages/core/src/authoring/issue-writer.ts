@@ -122,7 +122,7 @@ export function validateMergeIntoValue(value: string): string[] {
 
 async function createIssueUnlocked(input: CreateIssueInput): Promise<CreateIssueResult> {
   const normalized = validateCreateIssueInput(input);
-  const registry = await loadRegistry(path.join(normalized.vaultRoot, 'registry.yaml'));
+  const registry = await loadRegistry(await resolveVaultPath(normalized.vaultRoot, 'registry.yaml'));
   const space = getRegistrySpace(registry, normalized.space);
   const targetRootRelative = selectIssueRoot(space, normalized);
   const targetRoot = await resolveRegistryPath(normalized.vaultRoot, targetRootRelative);
@@ -157,7 +157,7 @@ async function createIssueUnlocked(input: CreateIssueInput): Promise<CreateIssue
 }
 
 export async function scanIssueIds(vaultRoot: string, spaceName: string): Promise<ScanIssueIdsResult> {
-  const registry = await loadRegistry(path.join(vaultRoot, 'registry.yaml'));
+  const registry = await loadRegistry(await resolveVaultPath(vaultRoot, 'registry.yaml'));
   const space = getRegistrySpace(registry, spaceName);
   const roots = [space.epics];
   if (space.type === 'container') {
