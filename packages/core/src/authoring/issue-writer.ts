@@ -104,6 +104,7 @@ export function validateMergeIntoValue(value: string): string[] {
     errors.push('Invalid mergeInto');
   }
   const branch = value.trim().replace(/^origin\//, '');
+  const branchParts = branch.split('/');
   if (
     branch === '' ||
     branch.startsWith('-') ||
@@ -113,6 +114,7 @@ export function validateMergeIntoValue(value: string): string[] {
     branch.endsWith('/') ||
     branch.endsWith('.') ||
     branch.endsWith('.lock') ||
+    branchParts.some(part => part.startsWith('.') || part.endsWith('.lock')) ||
     /[\s~^:?*[\\]/.test(branch)
   ) {
     errors.push('Invalid mergeInto');

@@ -129,6 +129,15 @@ updated: 2026-05-12
       title: 'Unsafe',
       mergeInto: 'origin/-bad',
     })).rejects.toThrow('Invalid mergeInto');
+    for (const mergeInto of ['feature/.hidden', 'foo.lock/bar', 'origin/release/.candidate', 'origin/foo.lock/bar']) {
+      await expect(createIssue({
+        vaultRoot: vault,
+        space: 'vibe-coding',
+        project: 'kanban-task-engine',
+        title: 'Unsafe',
+        mergeInto,
+      })).rejects.toThrow('Invalid mergeInto');
+    }
   });
 
   it('allocates unique ids for concurrent creates with different title slugs', async () => {
