@@ -66,5 +66,6 @@ export type {
   ListRegistryIssueRecordsOptions,
   RegistryIssueRecord,
 } from './store/registry-issue-source';
+export * from './movement/issue-mover';
 export * from './authoring';
 export * from './executor';
