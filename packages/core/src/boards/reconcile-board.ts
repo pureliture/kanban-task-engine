@@ -151,6 +151,11 @@ function validateCardAgainstIssue(
     return;
   }
 
+  if (card.source !== record.relativePath) {
+    result.conflicts.push(conflict('stale-checksum', card, `Stale source for issue ${card.issueId}: board recorded ${card.source}, issue is ${record.relativePath}`));
+    return;
+  }
+
   const currentChecksum = computeBoardProjectionChecksum(record.projection);
   if (card.checksum !== currentChecksum) {
     result.conflicts.push(conflict('stale-checksum', card, `Stale checksum for issue ${card.issueId}`));

@@ -70,6 +70,29 @@ describe('board reconciliation', () => {
     ]);
   });
 
+  it('fails source metadata mismatches as stale checksum conflicts', async () => {
+    const vaultRoot = await makePhase3Vault({ status: 'TODO' });
+    const projection = await collectBoardProjection({
+      vaultRoot,
+      space: 'vibe-coding',
+      generatedAt: '2026-05-13T10:00:00.000Z',
+    });
+    await fs.mkdir(path.dirname(projection.boardPath), { recursive: true });
+    await fs.writeFile(
+      projection.boardPath,
+      projection.boardMarkdown.replace(
+        'source=issues/vibe-coding/kanban-task-engine/VC-001-ready.md',
+        'source=issues/vibe-coding/kanban-task-engine/VC-999-other.md',
+      ),
+    );
+
+    const result = await reconcileBoard({ vaultRoot, space: 'vibe-coding', apply: false });
+
+    expect(result.conflicts).toEqual([
+      expect.objectContaining({ issueId: 'VC-001', kind: 'stale-checksum' }),
+    ]);
+  });
+
   it('applies legal proposals through the shared move service', async () => {
     const vaultRoot = await makePhase3Vault({ status: 'TODO' });
     const projection = await collectBoardProjection({

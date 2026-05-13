@@ -129,7 +129,13 @@ grep -Eq 'checksum=sha256:[a-f0-9]{64}' "$DISPOSABLE_VAULT/boards/vibe-coding.md
 grep -q '```dataview' "$DISPOSABLE_VAULT/boards/vibe-coding-epics.md"
 ```
 
-`kanban board --write` writes generated projection files only. `boards/<space>.md` is an Obsidian Kanban board, and `boards/<space>-epics.md` is a Dataview index. These files are not source of truth; issue notes under `issues/**/*.md` remain authoritative. Moving an existing card in Obsidian is only a pending proposal until Phase 3 `kanban reconcile-board --apply` exists and succeeds.
+`kanban board --write` writes generated projection files only. `boards/<space>.md` is an Obsidian Kanban board, and `boards/<space>-epics.md` is a Dataview index. These files are not source of truth; issue notes under `issues/**/*.md` remain authoritative. Moving an existing card in Obsidian is only a pending proposal until `kanban reconcile-board --apply` succeeds.
+
+### Moving Issues
+
+`kanban move <issue-id> <status>` is the canonical CLI mutation path for issue status. It updates issue frontmatter and preserves generated board files as projections. Use `kanban board --write --space <space>` after a move to refresh Obsidian views.
+
+`kanban reconcile-board --space <space>` reads a generated Obsidian Kanban board and reports proposed card movements. It is dry-run by default. `--apply` writes issue frontmatter only when every proposal passes stale, duplicate, checksum, and state-machine checks.
 
 Use a disposable vault for smoke tests. Do not point write examples at `$HOME/.openclaw/workspace-kanban/kanban` unless the operator explicitly approves mutating that live-adjacent vault for this run.
 

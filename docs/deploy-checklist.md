@@ -25,6 +25,10 @@
 - [ ] Smoke test `kanban sync`, `kanban board`, `kanban next`, and inspect-only `kanban run <id>` against a disposable vault.
 - [ ] Confirm generated board files contain `kanban-plugin: board`, all six status lanes, no dummy cards, and `kanban-task-engine:id=... checksum=sha256:<64-hex>` metadata.
 - [ ] Confirm generated index files contain Dataview queries and remain generated projections, not source-of-truth files.
+- [ ] Run disposable-vault `kanban move` smoke and confirm only issue frontmatter changed.
+- [ ] Run disposable-vault `reconcile-board --dry-run` after a board lane edit and confirm exact diff.
+- [ ] Run disposable-vault `reconcile-board --apply` and regenerate board with `board --write`.
+- [ ] Demonstrate stale board conflict by editing an issue after board generation.
 - [ ] If execution is enabled, smoke test `kanban run <id> --execute --agent mock` against a disposable git repo and confirm `RUNNING` converges to `REVIEW` or `FAILED`.
 - [ ] Confirm no-change success converges to `FAILED` and leaves diagnostic artifacts.
 
