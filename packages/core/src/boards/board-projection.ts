@@ -79,7 +79,7 @@ const EPIC_SECTIONS = ['목표', '범위', '성공 지표', '하위 티켓', '�
 
 export async function collectBoardProjection(options: CollectBoardProjectionOptions): Promise<BoardProjection> {
   const vaultRoot = path.resolve(options.vaultRoot);
-  const registry = await loadRegistry(path.join(vaultRoot, 'registry.yaml'));
+  const registry = await loadRegistry(await resolveVaultPath(vaultRoot, 'registry.yaml'));
   const space = getRegistrySpace(registry, options.space);
   const generatedAt = options.generatedAt ?? new Date().toISOString();
 
@@ -133,7 +133,7 @@ export async function writeBoardProjection(options: WriteBoardProjectionOptions)
 
 export async function writeBoardProjections(options: WriteBoardProjectionsOptions): Promise<BoardProjectionWriteResult[]> {
   const vaultRoot = path.resolve(options.vaultRoot);
-  const registry = await loadRegistry(path.join(vaultRoot, 'registry.yaml'));
+  const registry = await loadRegistry(await resolveVaultPath(vaultRoot, 'registry.yaml'));
   const spaces = listRegistrySpaces(registry);
   const projections: BoardProjection[] = [];
 
