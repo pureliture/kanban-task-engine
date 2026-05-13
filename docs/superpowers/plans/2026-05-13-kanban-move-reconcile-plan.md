@@ -50,7 +50,7 @@ Expected: build and test baselines pass; working tree contains only intentional 
 
 Create:
 
-- `packages/core/src/issues/registry-issue-source.ts`
+- `packages/core/src/store/registry-issue-source.ts`
 - `packages/core/src/movement/issue-mover.ts`
 - `packages/core/src/boards/reconcile-board.ts`
 - `packages/core/tests/registry-issue-source.test.ts`
@@ -80,7 +80,7 @@ If using subagents, assign disjoint write scopes:
 
 | Worker | Scope |
 | --- | --- |
-| Worker A | `packages/core/src/issues/registry-issue-source.ts`, `packages/core/tests/registry-issue-source.test.ts`, narrow extraction from `packages/core/src/boards/board-projection.ts` |
+| Worker A | `packages/core/src/store/registry-issue-source.ts`, `packages/core/tests/registry-issue-source.test.ts`, narrow extraction from `packages/core/src/boards/board-projection.ts` |
 | Worker B | `packages/core/src/movement/issue-mover.ts`, `packages/core/tests/issue-mover.test.ts` |
 | Worker C | `packages/core/src/boards/reconcile-board.ts`, `packages/core/tests/reconcile-board.test.ts` |
 | Worker D | `packages/cli/src/commands/move.ts`, `packages/cli/src/commands/reconcile-board.ts`, `packages/cli/src/index.ts`, `packages/cli/tests/move-reconcile.test.ts` |
@@ -92,12 +92,12 @@ Workers are not alone in the codebase. They must not revert Phase 1/2 edits, rev
 
 **Files:**
 
-- Create: `packages/core/src/issues/registry-issue-source.ts`
+- Create: `packages/core/src/store/registry-issue-source.ts`
 - Create: `packages/core/tests/registry-issue-source.test.ts`
 - Modify: `packages/core/src/boards/board-projection.ts`
 - Modify: `packages/core/src/index.ts`
 
-- [ ] **Step 1: Write failing tests for registry-aware issue listing and lookup**
+- [x] **Step 1: Write failing tests for registry-aware issue listing and lookup**
 
 Create `packages/core/tests/registry-issue-source.test.ts`:
 
@@ -109,7 +109,7 @@ import { describe, expect, it } from 'vitest';
 import {
   listRegistryIssueRecords,
   findRegistryIssueById,
-} from '../src/issues/registry-issue-source';
+} from '../src/store/registry-issue-source';
 
 async function makeVault(): Promise<string> {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kanban-phase3-source-'));
@@ -196,7 +196,7 @@ describe('registry issue source', () => {
 });
 ```
 
-- [ ] **Step 2: Run the focused RED test**
+- [x] **Step 2: Run the focused RED test**
 
 Run:
 
@@ -204,11 +204,11 @@ Run:
 rtk pnpm --filter @kanban-task-engine/core test -- tests/registry-issue-source.test.ts
 ```
 
-Expected: FAIL because `../src/issues/registry-issue-source` does not exist.
+Expected: FAIL because `../src/store/registry-issue-source` does not exist.
 
-- [ ] **Step 3: Implement the shared source helper**
+- [x] **Step 3: Implement the shared source helper**
 
-Create `packages/core/src/issues/registry-issue-source.ts` with these public shapes:
+Create `packages/core/src/store/registry-issue-source.ts` with these public shapes:
 
 ```ts
 import type { IssueFrontmatter, IssueStatus } from '@kanban-task-engine/schema';
@@ -255,7 +255,7 @@ Implementation rules:
 - Validate required task/epic sections with the same section names currently used in `board-projection.ts`.
 - Return duplicate id errors before any caller can mutate.
 
-- [ ] **Step 4: Refactor board projection to use the helper**
+- [x] **Step 4: Refactor board projection to use the helper**
 
 In `packages/core/src/boards/board-projection.ts`, replace private issue scanning and parsing with `listRegistryIssueRecords({ vaultRoot, space })`, then map `record.projection` into `renderObsidianBoardMarkdown`.
 
@@ -267,7 +267,7 @@ writeBoardProjection(options)
 writeBoardProjections(options)
 ```
 
-- [ ] **Step 5: Run regression tests**
+- [x] **Step 5: Run regression tests**
 
 Run:
 
@@ -277,10 +277,10 @@ rtk pnpm --filter @kanban-task-engine/core test -- tests/registry-issue-source.t
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
-rtk git add packages/core/src/issues/registry-issue-source.ts packages/core/src/boards/board-projection.ts packages/core/src/index.ts packages/core/tests/registry-issue-source.test.ts
+rtk git add packages/core/src/store/registry-issue-source.ts packages/core/src/boards/board-projection.ts packages/core/src/index.ts packages/core/tests/registry-issue-source.test.ts
 rtk git commit -m "refactor: share registry issue source"
 ```
 
