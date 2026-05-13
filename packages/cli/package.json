@@ -9,13 +9,14 @@
     "kanban": "./dist/bin.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && esbuild src/bin.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/bin.js --external:fsevents --banner:js=\"import { createRequire } from 'node:module';const require = createRequire(import.meta.url);\"",
     "test": "vitest run",
     "test:watch": "vitest",
     "clean": "rm -rf dist"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "esbuild": "^0.27.7",
     "typescript": "^5.4.0",
     "vitest": "^1.0.0"
   },

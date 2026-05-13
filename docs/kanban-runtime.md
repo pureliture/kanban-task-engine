@@ -49,15 +49,103 @@ Important runtime rules:
 
 ## Operator Commands
 
+Authoring commands require an explicit `KANBAN_HOME`; the CLI must not write to the default Home vault unless the operator set the vault root deliberately. Run these from the engine repo after `pnpm -r build`.
+
 ```bash
-KANBAN_HOME=$HOME/.openclaw/workspace-kanban/kanban pnpm --filter @kanban-task-engine/cli start -- sync
-KANBAN_HOME=$HOME/.openclaw/workspace-kanban/kanban pnpm --filter @kanban-task-engine/cli start -- board
-KANBAN_HOME=$HOME/.openclaw/workspace-kanban/kanban pnpm --filter @kanban-task-engine/cli start -- next
-KANBAN_HOME=$HOME/.openclaw/workspace-kanban/kanban pnpm --filter @kanban-task-engine/cli start -- run VC-001
-KANBAN_HOME=$HOME/.openclaw/workspace-kanban/kanban pnpm --filter @kanban-task-engine/cli start -- run VC-001 --execute --agent codex
+KANBAN_HOME=$HOME/.openclaw/workspace-kanban/kanban node packages/cli/dist/bin.js new --space vibe-coding --project kanban-task-engine "Draft issue title"
+KANBAN_HOME=$HOME/.openclaw/workspace-kanban/kanban node packages/cli/dist/bin.js new --space vibe-coding --project kanban-task-engine --dry-run --json "Preview issue"
+KANBAN_HOME=$HOME/.openclaw/workspace-kanban/kanban node packages/cli/dist/bin.js normalize inbox/rough-note.md --check --space vibe-coding --project kanban-task-engine --json
+KANBAN_HOME=$HOME/.openclaw/workspace-kanban/kanban node packages/cli/dist/bin.js normalize inbox/rough-note.md --write --space vibe-coding --project kanban-task-engine
 ```
 
+`kanban new` creates a canonical issue file, allocates the next safe id, and fills required frontmatter. `kanban normalize` turns rough Markdown into a formal issue without using an LLM; `--check` previews the deterministic output and `--write` either rewrites a sole owned issue-root file in place or creates a canonical target while preserving the rough source.
+
+Lifecycle and projection commands:
+
+```bash
+KANBAN_HOME=$HOME/.openclaw/workspace-kanban/kanban node packages/cli/dist/bin.js sync
+KANBAN_HOME=$HOME/.openclaw/workspace-kanban/kanban node packages/cli/dist/bin.js board
+KANBAN_HOME=$HOME/.openclaw/workspace-kanban/kanban node packages/cli/dist/bin.js next
+KANBAN_HOME=$HOME/.openclaw/workspace-kanban/kanban node packages/cli/dist/bin.js run VC-001
+KANBAN_HOME=$HOME/.openclaw/workspace-kanban/kanban node packages/cli/dist/bin.js run VC-001 --execute --agent codex
+```
+
+Board write smoke tests must use a disposable vault prepared with a test `registry.yaml` and issue notes. This block is safe to copy as-is from the engine repo:
+
+```bash
+DISPOSABLE_VAULT=$(mktemp -d)
+mkdir -p "$DISPOSABLE_VAULT/issues/vibe-coding/kanban-task-engine" "$DISPOSABLE_VAULT/issues/vibe-coding/_epics"
+cat > "$DISPOSABLE_VAULT/registry.yaml" <<'YAML'
+spaces:
+  vibe-coding:
+    type: container
+    idPrefix: VC
+    issues: issues/vibe-coding
+    epics: issues/vibe-coding/_epics
+    board: boards/vibe-coding.md
+    epicBoard: boards/vibe-coding-epics.md
+    projects:
+      kanban-task-engine:
+        path: issues/vibe-coding/kanban-task-engine
+YAML
+cat > "$DISPOSABLE_VAULT/issues/vibe-coding/kanban-task-engine/VC-001-ready.md" <<'MD'
+---
+id: VC-001
+title: Ready item
+type: task
+status: READY
+priority: P1
+executor: human
+project: kanban-task-engine
+created: "2026-05-13T00:00:00.000Z"
+updated: "2026-05-13T00:00:00.000Z"
+labels: []
+depends_on: []
+run_count: 0
+---
+
+# Ready item
+
+## 목적
+x
+
+## 컨텍스트
+x
+
+## Acceptance Criteria
+x
+
+## 실행 힌트
+x
+
+## 로그
+x
+MD
+KANBAN_HOME=$DISPOSABLE_VAULT node packages/cli/dist/bin.js board --space vibe-coding
+KANBAN_HOME=$DISPOSABLE_VAULT node packages/cli/dist/bin.js board --write --space vibe-coding
+KANBAN_HOME=$DISPOSABLE_VAULT node packages/cli/dist/bin.js board --write --all
+grep -q 'kanban-plugin: board' "$DISPOSABLE_VAULT/boards/vibe-coding.md"
+grep -Eq 'checksum=sha256:[a-f0-9]{64}' "$DISPOSABLE_VAULT/boards/vibe-coding.md"
+grep -q '```dataview' "$DISPOSABLE_VAULT/boards/vibe-coding-epics.md"
+```
+
+`kanban board --write` writes generated projection files only. `boards/<space>.md` is an Obsidian Kanban board, and `boards/<space>-epics.md` is a Dataview index. These files are not source of truth; issue notes under `issues/**/*.md` remain authoritative. Moving an existing card in Obsidian is only a pending proposal until Phase 3 `kanban reconcile-board --apply` exists and succeeds.
+
+Use a disposable vault for smoke tests. Do not point write examples at `$HOME/.openclaw/workspace-kanban/kanban` unless the operator explicitly approves mutating that live-adjacent vault for this run.
+
 Approve/abort/retry commands are lifecycle commands over existing run state. They must preserve diagnostics unless the operator explicitly chooses discard semantics and the git ancestry checks pass.
+
+## Disposable Authoring Smoke
+
+Before running Phase 1 authoring commands against a live vault, build the CLI and smoke test a disposable vault:
+
+```bash
+pnpm -r build
+node packages/cli/dist/bin.js --help
+pnpm --filter @kanban-task-engine/core exec vitest run tests/authoring-runtime-smoke.test.ts
+```
+
+The smoke must prove `kanban new`, `kanban new --dry-run --json`, `kanban normalize --check --json`, and `kanban normalize --write --json` against a temporary vault. Passing this gate is not Obsidian GUI readiness and is not live `workspace-kanban` readiness.
 
 ## Recipes And Policy
 
