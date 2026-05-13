@@ -977,7 +977,7 @@ Co-Authored-By: Codex GPT-5 <noreply@openai.com>
 - Modify: `docs/kanban-runtime.md`
 - Modify: `docs/deploy-checklist.md`
 
-- [ ] **Step 1: Update operator docs**
+- [x] **Step 1: Update operator docs**
 
 In `docs/kanban-runtime.md`, add a section after board write:
 
@@ -989,7 +989,7 @@ In `docs/kanban-runtime.md`, add a section after board write:
 `kanban reconcile-board --space <space>` reads a generated Obsidian Kanban board and reports proposed card movements. It is dry-run by default. `--apply` writes issue frontmatter only when every proposal passes stale, duplicate, and state-machine checks.
 ```
 
-- [ ] **Step 2: Update deploy checklist**
+- [x] **Step 2: Update deploy checklist**
 
 In `docs/deploy-checklist.md`, add Phase 3 mutation checks:
 
@@ -1000,7 +1000,7 @@ In `docs/deploy-checklist.md`, add Phase 3 mutation checks:
 - [ ] Demonstrate stale board conflict by editing an issue after board generation.
 ```
 
-- [ ] **Step 3: Run full local verification**
+- [x] **Step 3: Run full local verification**
 
 Run:
 
@@ -1017,7 +1017,7 @@ rtk pnpm eval:hardening
 
 Expected: PASS.
 
-- [ ] **Step 4: Run disposable runtime smoke**
+- [x] **Step 4: Run disposable runtime smoke**
 
 Create a disposable vault, then run:
 
@@ -1041,7 +1041,7 @@ Expected:
 - apply updates the issue note to `status: RUNNING`,
 - regenerated board shows `VC-001` in the `RUNNING` lane.
 
-- [ ] **Step 5: Request review**
+- [x] **Step 5: Request review**
 
 Use `superpowers:requesting-code-review` after tests and runtime smoke pass. Ask reviewers to focus on:
 
@@ -1052,7 +1052,7 @@ Use `superpowers:requesting-code-review` after tests and runtime smoke pass. Ask
 - no agent execution trigger from board movement,
 - CLI error messages and exit codes.
 
-- [ ] **Step 6: Commit docs and final fixes**
+- [x] **Step 6: Commit docs and final fixes**
 
 ```bash
 rtk git add docs/kanban-runtime.md docs/deploy-checklist.md
