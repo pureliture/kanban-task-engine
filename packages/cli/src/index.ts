@@ -1,7 +1,9 @@
 import { commandAbort } from './commands/abort.js';
 import { commandApprove } from './commands/approve.js';
 import { commandBoard } from './commands/board.js';
+import { commandNew } from './commands/new.js';
 import { commandNext } from './commands/next.js';
+import { commandNormalize } from './commands/normalize.js';
 import { commandRetry } from './commands/retry.js';
 import { commandRecoverRun } from './commands/recover-run.js';
 import { commandRun } from './commands/run.js';
@@ -17,6 +19,8 @@ export interface CliResult {
 export type CliHandler = (args: string[], context: CliContext) => Promise<CliResult> | CliResult;
 
 const handlers: Record<string, CliHandler> = {
+  new: commandNew,
+  normalize: commandNormalize,
   run: commandRun,
   next: commandNext,
   approve: commandApprove,
@@ -65,6 +69,8 @@ export function helpText(): string {
     'Usage: kanban <command> [args]',
     '',
     'Commands:',
+    '  new --space <space> [--project <project>] "<title>"',
+    '  normalize <path> (--check|--write)',
     '  run <issue-id>',
     '  next',
     '  approve <issue-id>',
@@ -72,6 +78,6 @@ export function helpText(): string {
     '  retry <issue-id>',
     '  recover-run <issue-id>',
     '  sync',
-    '  board',
+    '  board [--space <space>] [--write (--space <space>|--all)]',
   ].join('\n');
 }

@@ -4,6 +4,8 @@ dist/
 .vitest/
 .worktrees/
 boards/
+!packages/core/src/boards/
+!packages/core/src/boards/*.ts
 issues/
 codex-eval-loop.md
 .superpowers/
