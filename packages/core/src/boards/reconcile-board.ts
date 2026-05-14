@@ -126,6 +126,8 @@ export async function reconcileBoard(options: ReconcileBoardOptions): Promise<Re
       dryRun: false,
       now: options.now,
       reason: `reconcile-board:${options.space}`,
+      space: options.space,
+      record: recordsById.get(proposal.issueId),
     });
     if (move.changed) {
       result.applied.push({
@@ -236,13 +238,13 @@ function parseBoardCards(markdown: string, conflicts: BoardReconcileConflict[]):
 }
 
 function parseMetadata(line: string): { id: string; status: string; checksum: string; source: string } | undefined {
-  const match = line.match(/<!--\s*kanban-task-engine:id=([^ ]+) status=([^ ]+) checksum=([^ ]+) source=([^ ]+)(?: [^>]*)?\s*-->/);
+  const match = line.match(/<!--\s*kanban-task-engine:id=([^ ]+) status=([^ ]+) checksum=([^ ]+) source=(.+?)\s*-->/);
   if (!match) return undefined;
   return {
     id: match[1],
     status: match[2],
     checksum: match[3],
-    source: match[4],
+    source: match[4].trim().replace(/\s+generatedAt=[^\s>]+$/, ''),
   };
 }
 
