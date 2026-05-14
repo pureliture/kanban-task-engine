@@ -13,6 +13,7 @@ import {
   loadRegistry,
   type RegistrySpace,
 } from '../store/registry';
+import { resolveRegistryPath } from '../store/registry-path';
 import { resolveVaultPath } from '../store/vault-path';
 
 export interface RegistryIssueRecord {
@@ -127,7 +128,7 @@ async function listIssueFiles(vaultRoot: string, relativeRoots: string[]): Promi
 
 async function dedupeRoots(vaultRoot: string, relativeRoots: string[]): Promise<string[]> {
   const entries = await Promise.all(relativeRoots.map(async (relativeRoot, index) => {
-    const rootPath = await resolveRegistryVaultPath(vaultRoot, relativeRoot, `scanRoot[${index}]`);
+    const rootPath = await resolveRegistryPath(vaultRoot, relativeRoot, { field: `scanRoot[${index}]` });
     let realPath: string;
     try {
       realPath = await fs.realpath(rootPath);
@@ -219,24 +220,6 @@ function parseIssueForRegistry(
   if (errors.length > 0) throw new Error(`Invalid issue markdown in ${relativePath}: ${errors.join('; ')}`);
   if (!validatedFrontmatter) throw new Error(`Invalid issue markdown in ${relativePath}: Missing validated frontmatter`);
   return { frontmatter: validatedFrontmatter, body };
-}
-
-async function resolveRegistryVaultPath(vaultRoot: string, relativePath: string, field: string): Promise<string> {
-  assertSafeRegistryPath(relativePath, field);
-  return resolveVaultPath(vaultRoot, ...relativePath.split('/'));
-}
-
-function assertSafeRegistryPath(value: string, field: string): void {
-  if (
-    value.trim() === '' ||
-    value.includes('\0') ||
-    value.includes('\\') ||
-    value.includes('//') ||
-    path.isAbsolute(value) ||
-    value.split('/').includes('..')
-  ) {
-    throw new Error(`Unsafe registry ${field} path: ${value}`);
-  }
 }
 
 function extractSections(body: string): Record<string, string> {
