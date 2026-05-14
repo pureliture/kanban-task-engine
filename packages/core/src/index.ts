@@ -42,6 +42,7 @@ export {
   writeBoardProjections,
   BoardProjectionWriteError,
 } from './boards/board-projection';
+export * from './boards/reconcile-board';
 export type {
   BoardProjection,
   BoardProjectionFailedWriteTarget,
@@ -57,5 +58,15 @@ export type { VaultRegistry, RegistrySpace, RegistrySpaceType, RegistryProject }
 export { resolveVaultPath } from './store/vault-path';
 export { allocateNextIssueId, parseIssueSequence } from './store/sequence';
 export type { AllocateIssueIdOptions } from './store/sequence';
+export {
+  findRegistryIssueById,
+  listRegistryIssueRecords,
+} from './store/registry-issue-source';
+export type {
+  FindRegistryIssueByIdOptions,
+  ListRegistryIssueRecordsOptions,
+  RegistryIssueRecord,
+} from './store/registry-issue-source';
+export * from './movement/issue-mover';
 export * from './authoring';
 export * from './executor';

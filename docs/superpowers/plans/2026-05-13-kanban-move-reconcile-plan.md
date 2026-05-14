@@ -50,7 +50,7 @@ Expected: build and test baselines pass; working tree contains only intentional 
 
 Create:
 
-- `packages/core/src/issues/registry-issue-source.ts`
+- `packages/core/src/store/registry-issue-source.ts`
 - `packages/core/src/movement/issue-mover.ts`
 - `packages/core/src/boards/reconcile-board.ts`
 - `packages/core/tests/registry-issue-source.test.ts`
@@ -80,7 +80,7 @@ If using subagents, assign disjoint write scopes:
 
 | Worker | Scope |
 | --- | --- |
-| Worker A | `packages/core/src/issues/registry-issue-source.ts`, `packages/core/tests/registry-issue-source.test.ts`, narrow extraction from `packages/core/src/boards/board-projection.ts` |
+| Worker A | `packages/core/src/store/registry-issue-source.ts`, `packages/core/tests/registry-issue-source.test.ts`, narrow extraction from `packages/core/src/boards/board-projection.ts` |
 | Worker B | `packages/core/src/movement/issue-mover.ts`, `packages/core/tests/issue-mover.test.ts` |
 | Worker C | `packages/core/src/boards/reconcile-board.ts`, `packages/core/tests/reconcile-board.test.ts` |
 | Worker D | `packages/cli/src/commands/move.ts`, `packages/cli/src/commands/reconcile-board.ts`, `packages/cli/src/index.ts`, `packages/cli/tests/move-reconcile.test.ts` |
@@ -92,12 +92,12 @@ Workers are not alone in the codebase. They must not revert Phase 1/2 edits, rev
 
 **Files:**
 
-- Create: `packages/core/src/issues/registry-issue-source.ts`
+- Create: `packages/core/src/store/registry-issue-source.ts`
 - Create: `packages/core/tests/registry-issue-source.test.ts`
 - Modify: `packages/core/src/boards/board-projection.ts`
 - Modify: `packages/core/src/index.ts`
 
-- [ ] **Step 1: Write failing tests for registry-aware issue listing and lookup**
+- [x] **Step 1: Write failing tests for registry-aware issue listing and lookup**
 
 Create `packages/core/tests/registry-issue-source.test.ts`:
 
@@ -109,7 +109,7 @@ import { describe, expect, it } from 'vitest';
 import {
   listRegistryIssueRecords,
   findRegistryIssueById,
-} from '../src/issues/registry-issue-source';
+} from '../src/store/registry-issue-source';
 
 async function makeVault(): Promise<string> {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kanban-phase3-source-'));
@@ -196,7 +196,7 @@ describe('registry issue source', () => {
 });
 ```
 
-- [ ] **Step 2: Run the focused RED test**
+- [x] **Step 2: Run the focused RED test**
 
 Run:
 
@@ -204,11 +204,11 @@ Run:
 rtk pnpm --filter @kanban-task-engine/core test -- tests/registry-issue-source.test.ts
 ```
 
-Expected: FAIL because `../src/issues/registry-issue-source` does not exist.
+Expected: FAIL because `../src/store/registry-issue-source` does not exist.
 
-- [ ] **Step 3: Implement the shared source helper**
+- [x] **Step 3: Implement the shared source helper**
 
-Create `packages/core/src/issues/registry-issue-source.ts` with these public shapes:
+Create `packages/core/src/store/registry-issue-source.ts` with these public shapes:
 
 ```ts
 import type { IssueFrontmatter, IssueStatus } from '@kanban-task-engine/schema';
@@ -255,7 +255,7 @@ Implementation rules:
 - Validate required task/epic sections with the same section names currently used in `board-projection.ts`.
 - Return duplicate id errors before any caller can mutate.
 
-- [ ] **Step 4: Refactor board projection to use the helper**
+- [x] **Step 4: Refactor board projection to use the helper**
 
 In `packages/core/src/boards/board-projection.ts`, replace private issue scanning and parsing with `listRegistryIssueRecords({ vaultRoot, space })`, then map `record.projection` into `renderObsidianBoardMarkdown`.
 
@@ -267,7 +267,7 @@ writeBoardProjection(options)
 writeBoardProjections(options)
 ```
 
-- [ ] **Step 5: Run regression tests**
+- [x] **Step 5: Run regression tests**
 
 Run:
 
@@ -277,10 +277,10 @@ rtk pnpm --filter @kanban-task-engine/core test -- tests/registry-issue-source.t
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
-rtk git add packages/core/src/issues/registry-issue-source.ts packages/core/src/boards/board-projection.ts packages/core/src/index.ts packages/core/tests/registry-issue-source.test.ts
+rtk git add packages/core/src/store/registry-issue-source.ts packages/core/src/boards/board-projection.ts packages/core/src/index.ts packages/core/tests/registry-issue-source.test.ts
 rtk git commit -m "refactor: share registry issue source"
 ```
 
@@ -298,7 +298,7 @@ Co-Authored-By: Codex GPT-5 <noreply@openai.com>
 - Create: `packages/core/tests/issue-mover.test.ts`
 - Modify: `packages/core/src/index.ts`
 
-- [ ] **Step 1: Write failing move service tests**
+- [x] **Step 1: Write failing move service tests**
 
 Create `packages/core/tests/issue-mover.test.ts`:
 
@@ -385,7 +385,7 @@ describe('issue mover', () => {
 
 If no shared test helper exists, create `packages/core/tests/helpers/phase3-vault.ts` with a disposable registry and one valid issue. Keep helper output identical to the issue shape accepted by Phase 2 board tests.
 
-- [ ] **Step 2: Run the focused RED test**
+- [x] **Step 2: Run the focused RED test**
 
 Run:
 
@@ -395,7 +395,7 @@ rtk pnpm --filter @kanban-task-engine/core test -- tests/issue-mover.test.ts
 
 Expected: FAIL because `../src/movement/issue-mover` does not exist.
 
-- [ ] **Step 3: Implement the move service**
+- [x] **Step 3: Implement the move service**
 
 Create `packages/core/src/movement/issue-mover.ts` with this public API:
 
@@ -436,7 +436,7 @@ Implementation rules:
 - Append one log line under `## 로그`; create that section only if the existing body is valid but missing it because older fixtures require migration.
 - Write via `atomicWriteFile`.
 
-- [ ] **Step 4: Export the service**
+- [x] **Step 4: Export the service**
 
 Modify `packages/core/src/index.ts`:
 
@@ -444,7 +444,7 @@ Modify `packages/core/src/index.ts`:
 export * from './movement/issue-mover';
 ```
 
-- [ ] **Step 5: Run move tests and state-machine regression**
+- [x] **Step 5: Run move tests and state-machine regression**
 
 Run:
 
@@ -454,7 +454,7 @@ rtk pnpm --filter @kanban-task-engine/core test -- tests/issue-mover.test.ts tes
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 rtk git add packages/core/src/movement/issue-mover.ts packages/core/src/index.ts packages/core/tests/issue-mover.test.ts packages/core/tests/helpers/phase3-vault.ts
@@ -475,7 +475,7 @@ Co-Authored-By: Codex GPT-5 <noreply@openai.com>
 - Create: `packages/core/tests/reconcile-board.test.ts`
 - Modify: `packages/core/src/index.ts`
 
-- [ ] **Step 1: Write failing parser and proposal tests**
+- [x] **Step 1: Write failing parser and proposal tests**
 
 Create `packages/core/tests/reconcile-board.test.ts`:
 
@@ -551,7 +551,7 @@ describe('board reconciliation', () => {
 });
 ```
 
-- [ ] **Step 2: Run the focused RED test**
+- [x] **Step 2: Run the focused RED test**
 
 Run:
 
@@ -561,7 +561,7 @@ rtk pnpm --filter @kanban-task-engine/core test -- tests/reconcile-board.test.ts
 
 Expected: FAIL because `reconcileBoard` is not exported.
 
-- [ ] **Step 3: Implement parser and dry-run**
+- [x] **Step 3: Implement parser and dry-run**
 
 Create `packages/core/src/boards/reconcile-board.ts` with these public shapes:
 
@@ -630,7 +630,7 @@ Implementation rules:
 - Add conflicts for invalid/missing metadata, unknown issue, duplicate id, stale status/checksum, illegal transition, and epic movement.
 - Do not write in this task.
 
-- [ ] **Step 4: Export reconciliation API**
+- [x] **Step 4: Export reconciliation API**
 
 Modify `packages/core/src/index.ts`:
 
@@ -638,7 +638,7 @@ Modify `packages/core/src/index.ts`:
 export * from './boards/reconcile-board';
 ```
 
-- [ ] **Step 5: Run parser/proposal tests**
+- [x] **Step 5: Run parser/proposal tests**
 
 Run:
 
@@ -648,7 +648,7 @@ rtk pnpm --filter @kanban-task-engine/core test -- tests/reconcile-board.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 rtk git add packages/core/src/boards/reconcile-board.ts packages/core/src/index.ts packages/core/tests/reconcile-board.test.ts packages/core/tests/helpers/phase3-vault.ts
@@ -668,7 +668,7 @@ Co-Authored-By: Codex GPT-5 <noreply@openai.com>
 - Modify: `packages/core/src/boards/reconcile-board.ts`
 - Modify: `packages/core/tests/reconcile-board.test.ts`
 
-- [ ] **Step 1: Add failing apply and all-or-nothing tests**
+- [x] **Step 1: Add failing apply and all-or-nothing tests**
 
 Append to `packages/core/tests/reconcile-board.test.ts`:
 
@@ -721,7 +721,7 @@ it('does not apply any proposal when one card conflicts', async () => {
 });
 ```
 
-- [ ] **Step 2: Run the focused RED test**
+- [x] **Step 2: Run the focused RED test**
 
 Run:
 
@@ -731,7 +731,7 @@ rtk pnpm --filter @kanban-task-engine/core test -- tests/reconcile-board.test.ts
 
 Expected: FAIL because apply returns no applied moves.
 
-- [ ] **Step 3: Implement apply orchestration**
+- [x] **Step 3: Implement apply orchestration**
 
 In `packages/core/src/boards/reconcile-board.ts`:
 
@@ -742,7 +742,7 @@ In `packages/core/src/boards/reconcile-board.ts`:
 - Pass reason `reconcile-board:<space>`.
 - Preserve all-or-nothing by doing every validation before the first write.
 
-- [ ] **Step 4: Run reconciliation tests**
+- [x] **Step 4: Run reconciliation tests**
 
 Run:
 
@@ -752,7 +752,7 @@ rtk pnpm --filter @kanban-task-engine/core test -- tests/reconcile-board.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 rtk git add packages/core/src/boards/reconcile-board.ts packages/core/tests/reconcile-board.test.ts
@@ -774,7 +774,7 @@ Co-Authored-By: Codex GPT-5 <noreply@openai.com>
 - Create: `packages/cli/tests/move-reconcile.test.ts`
 - Modify: `packages/cli/src/index.ts`
 
-- [ ] **Step 1: Write failing CLI integration tests**
+- [x] **Step 1: Write failing CLI integration tests**
 
 Create `packages/cli/tests/move-reconcile.test.ts`:
 
@@ -836,7 +836,7 @@ describe('move and reconcile-board CLI', () => {
 });
 ```
 
-- [ ] **Step 2: Run the focused RED test**
+- [x] **Step 2: Run the focused RED test**
 
 Run:
 
@@ -846,7 +846,7 @@ rtk pnpm --filter @kanban-task-engine/cli test -- tests/move-reconcile.test.ts
 
 Expected: FAIL with unknown command `move` or missing command module.
 
-- [ ] **Step 3: Implement `commandMove`**
+- [x] **Step 3: Implement `commandMove`**
 
 Create `packages/cli/src/commands/move.ts`:
 
@@ -885,7 +885,7 @@ Complete `parseMoveArgs` in the same file:
 - Support `--dry-run`.
 - Reject unknown options.
 
-- [ ] **Step 4: Implement `commandReconcileBoard`**
+- [x] **Step 4: Implement `commandReconcileBoard`**
 
 Create `packages/cli/src/commands/reconcile-board.ts`:
 
@@ -924,7 +924,7 @@ Complete `parseReconcileArgs`, `formatConflicts`, `formatDryRun`, and `formatApp
 - Reject `--dry-run --apply` together.
 - Print one line per proposal/conflict with deterministic issue id ordering.
 
-- [ ] **Step 5: Register commands and help text**
+- [x] **Step 5: Register commands and help text**
 
 Modify `packages/cli/src/index.ts`:
 
@@ -947,7 +947,7 @@ Update help text:
   reconcile-board --space <space> [--dry-run|--apply]
 ```
 
-- [ ] **Step 6: Run CLI tests**
+- [x] **Step 6: Run CLI tests**
 
 Run:
 
@@ -957,7 +957,7 @@ rtk pnpm --filter @kanban-task-engine/cli test -- tests/move-reconcile.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 rtk git add packages/cli/src/commands/move.ts packages/cli/src/commands/reconcile-board.ts packages/cli/src/index.ts packages/cli/tests/move-reconcile.test.ts
@@ -977,7 +977,7 @@ Co-Authored-By: Codex GPT-5 <noreply@openai.com>
 - Modify: `docs/kanban-runtime.md`
 - Modify: `docs/deploy-checklist.md`
 
-- [ ] **Step 1: Update operator docs**
+- [x] **Step 1: Update operator docs**
 
 In `docs/kanban-runtime.md`, add a section after board write:
 
@@ -989,7 +989,7 @@ In `docs/kanban-runtime.md`, add a section after board write:
 `kanban reconcile-board --space <space>` reads a generated Obsidian Kanban board and reports proposed card movements. It is dry-run by default. `--apply` writes issue frontmatter only when every proposal passes stale, duplicate, and state-machine checks.
 ```
 
-- [ ] **Step 2: Update deploy checklist**
+- [x] **Step 2: Update deploy checklist**
 
 In `docs/deploy-checklist.md`, add Phase 3 mutation checks:
 
@@ -1000,7 +1000,7 @@ In `docs/deploy-checklist.md`, add Phase 3 mutation checks:
 - [ ] Demonstrate stale board conflict by editing an issue after board generation.
 ```
 
-- [ ] **Step 3: Run full local verification**
+- [x] **Step 3: Run full local verification**
 
 Run:
 
@@ -1017,7 +1017,7 @@ rtk pnpm eval:hardening
 
 Expected: PASS.
 
-- [ ] **Step 4: Run disposable runtime smoke**
+- [x] **Step 4: Run disposable runtime smoke**
 
 Create a disposable vault, then run:
 
@@ -1041,7 +1041,7 @@ Expected:
 - apply updates the issue note to `status: RUNNING`,
 - regenerated board shows `VC-001` in the `RUNNING` lane.
 
-- [ ] **Step 5: Request review**
+- [x] **Step 5: Request review**
 
 Use `superpowers:requesting-code-review` after tests and runtime smoke pass. Ask reviewers to focus on:
 
@@ -1052,7 +1052,7 @@ Use `superpowers:requesting-code-review` after tests and runtime smoke pass. Ask
 - no agent execution trigger from board movement,
 - CLI error messages and exit codes.
 
-- [ ] **Step 6: Commit docs and final fixes**
+- [x] **Step 6: Commit docs and final fixes**
 
 ```bash
 rtk git add docs/kanban-runtime.md docs/deploy-checklist.md

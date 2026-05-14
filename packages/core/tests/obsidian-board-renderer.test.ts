@@ -96,10 +96,26 @@ describe('Obsidian board renderer', () => {
       .find(line => line.includes('kanban-task-engine:id=VC-001'));
 
     expect(card).toBe(
-      `- [ ] [[issues/vibe-coding/kanban-task-engine/VC-001-top-priority-ready|VC-001 Top priority ready]] \`P0\` <!-- kanban-task-engine:id=VC-001 status=READY checksum=${checksum} source=issues/vibe-coding/kanban-task-engine/VC-001-top-priority-ready.md generatedAt=${generatedAt} -->`,
+      `- [ ] [[issues/vibe-coding/kanban-task-engine/VC-001-top-priority-ready|VC-001 Top priority ready]] \`P0\` <!-- kanban-task-engine:id=VC-001 status=READY checksum=${checksum} source=${encodeURIComponent(issues[0].relativePath)} generatedAt=${generatedAt} -->`,
     );
     expect(card).toMatch(/-->$/);
     expect(checksum).toMatch(/^sha256:[a-f0-9]{64}$/);
+  });
+
+  it('encodes source metadata independently from the visible wikilink target', () => {
+    const issue: ObsidianBoardIssue = {
+      ...issues[0],
+      relativePath: 'issues/vibe-coding/kanban task=engine/VC-004-ready.md',
+    };
+
+    const markdown = renderObsidianBoardMarkdown({
+      space: 'vibe-coding',
+      generatedAt,
+      issues: [issue],
+    });
+
+    expect(markdown).toContain('[[issues/vibe-coding/kanban task=engine/VC-004-ready|VC-001 Top priority ready]]');
+    expect(markdown).toContain('source=issues%2Fvibe-coding%2Fkanban%20task%3Dengine%2FVC-004-ready.md');
   });
 
   it('computes projection checksums from the stable board projection fields', () => {
