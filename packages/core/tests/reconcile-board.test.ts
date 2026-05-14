@@ -173,6 +173,57 @@ describe('board reconciliation', () => {
     ]);
   });
 
+  it('parses board metadata source paths before later metadata keys', async () => {
+    const vaultRoot = await makePhase3Vault({
+      status: 'TODO',
+      projectPath: 'issues/vibe-coding/kanban task engine',
+    });
+    const projection = await collectBoardProjection({
+      vaultRoot,
+      space: 'vibe-coding',
+      generatedAt: '2026-05-13T10:00:00.000Z',
+    });
+    await fs.mkdir(path.dirname(projection.boardPath), { recursive: true });
+    const board = moveCardToLane(projection.boardMarkdown, 'VC-001', 'READY')
+      .replace('generatedAt=2026-05-13T10:00:00.000Z', 'generatedAt=2026-05-13T10:00:00.000Z reviewedBy=codex');
+    await fs.writeFile(projection.boardPath, board);
+
+    const result = await reconcileBoard({ vaultRoot, space: 'vibe-coding', apply: false });
+
+    expect(result.conflicts).toEqual([]);
+    expect(result.proposals).toEqual([
+      expect.objectContaining({
+        issueId: 'VC-001',
+        relativeIssuePath: 'issues/vibe-coding/kanban task engine/VC-001-ready.md',
+      }),
+    ]);
+  });
+
+  it('rejects duplicate issue ids in the selected space before reconciling cards', async () => {
+    const vaultRoot = await makePhase3Vault({ status: 'TODO' });
+    await fs.copyFile(
+      path.join(vaultRoot, 'issues/vibe-coding/kanban-task-engine/VC-001-ready.md'),
+      path.join(vaultRoot, 'issues/vibe-coding/kanban-task-engine/VC-001-copy.md'),
+    );
+    const projection = await collectBoardProjection({
+      vaultRoot,
+      space: 'vibe-coding',
+      generatedAt: '2026-05-13T10:00:00.000Z',
+    });
+    await fs.mkdir(path.dirname(projection.boardPath), { recursive: true });
+    await fs.writeFile(projection.boardPath, moveCardToLane(projection.boardMarkdown, 'VC-001', 'READY'));
+
+    const result = await reconcileBoard({ vaultRoot, space: 'vibe-coding', apply: false });
+
+    expect(result.proposals).toEqual([]);
+    expect(result.conflicts).toEqual([
+      expect.objectContaining({
+        issueId: 'VC-001',
+        kind: 'duplicate-issue',
+      }),
+    ]);
+  });
+
   it('does not apply any proposal when one card conflicts', async () => {
     const vaultRoot = await makePhase3Vault({ status: 'TODO', secondIssue: { id: 'VC-002', status: 'READY' } });
     const projection = await collectBoardProjection({

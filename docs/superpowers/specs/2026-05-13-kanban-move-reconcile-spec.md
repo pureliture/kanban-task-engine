@@ -30,7 +30,7 @@ Phase 3는 issue frontmatter status를 안전하게 변경하는 mutation layer�
 
 ### 포함
 
-- `kanban move <issue-id> <status> [--reason <text>] [--dry-run]`.
+- `kanban move <issue-id> <status> [--space <space>] [--reason <text>] [--dry-run]`.
 - Registry-aware issue id lookup across configured issue roots.
 - Shared status mutation service that validates `@kanban-task-engine/schema` status and `StateMachine` transitions.
 - `kanban reconcile-board --space <space> [--dry-run|--apply]`.
@@ -147,7 +147,7 @@ registry space
 ### 6.1 `kanban move`
 
 ```bash
-kanban move <issue-id> <status> [--reason <text>] [--dry-run]
+kanban move <issue-id> <status> [--space <space>] [--reason <text>] [--dry-run]
 ```
 
 Success output:

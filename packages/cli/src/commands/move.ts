@@ -8,6 +8,7 @@ interface ParsedMoveArgs {
   status: IssueStatus;
   dryRun: boolean;
   reason?: string;
+  space?: string;
 }
 
 type ParseResult<T> = { value: T } | { error: string };
@@ -26,6 +27,7 @@ export const commandMove: CliHandler = async (args, context) => {
       targetStatus: parsed.value.status,
       dryRun: parsed.value.dryRun,
       reason: parsed.value.reason,
+      space: parsed.value.space,
     });
     const verb = result.dryRun ? 'would move' : 'moved';
     return ok(`${verb} ${result.issueId} ${result.oldStatus} -> ${result.newStatus}: ${result.relativePath}`);
@@ -38,6 +40,7 @@ function parseMoveArgs(args: string[]): ParseResult<ParsedMoveArgs> {
   const positionals: string[] = [];
   let dryRun = false;
   let reason: string | undefined;
+  let space: string | undefined;
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
@@ -52,13 +55,20 @@ function parseMoveArgs(args: string[]): ParseResult<ParsedMoveArgs> {
       index += 1;
       continue;
     }
+    if (arg === '--space') {
+      const value = args[index + 1];
+      if (!value || value.startsWith('--')) return { error: 'Missing value for --space' };
+      space = value;
+      index += 1;
+      continue;
+    }
     if (arg.startsWith('--')) return { error: `Unknown option: ${arg}` };
     positionals.push(arg);
   }
 
-  if (positionals.length !== 2) return { error: 'Usage: kanban move <issue-id> <status> [--reason <text>] [--dry-run]' };
+  if (positionals.length !== 2) return { error: 'Usage: kanban move <issue-id> <status> [--space <space>] [--reason <text>] [--dry-run]' };
   const [issueId, rawStatus] = positionals;
   if (!/^[A-Z][A-Z0-9]*-\d+$/.test(issueId)) return { error: `Invalid issue id: ${issueId}` };
   if (!ISSUE_STATUSES.has(rawStatus)) return { error: `Invalid status: ${rawStatus}` };
-  return { value: { issueId, status: rawStatus as IssueStatus, dryRun, reason } };
+  return { value: { issueId, status: rawStatus as IssueStatus, dryRun, reason, space } };
 }

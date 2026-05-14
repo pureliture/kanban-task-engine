@@ -83,7 +83,7 @@ export function helpText(): string {
     '  recover-run <issue-id>',
     '  sync',
     '  board [--space <space>] [--write (--space <space>|--all)]',
-    '  move <issue-id> <status> [--reason <text>] [--dry-run]',
+    '  move <issue-id> <status> [--space <space>] [--reason <text>] [--dry-run]',
     '  reconcile-board --space <space> [--dry-run|--apply]',
   ].join('\n');
 }

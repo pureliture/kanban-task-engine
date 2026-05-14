@@ -133,7 +133,7 @@ grep -q '```dataview' "$DISPOSABLE_VAULT/boards/vibe-coding-epics.md"
 
 ### Moving Issues
 
-`kanban move <issue-id> <status>` is the canonical CLI mutation path for issue status. It updates issue frontmatter and preserves generated board files as projections. Use `kanban board --write --space <space>` after a move to refresh Obsidian views.
+`kanban move <issue-id> <status>` is the canonical CLI mutation path for issue status. It updates issue frontmatter and preserves generated board files as projections. Use `--space <space>` when a vault can contain the same issue id in multiple spaces, and use `kanban board --write --space <space>` after a move to refresh Obsidian views.
 
 `kanban reconcile-board --space <space>` reads a generated Obsidian Kanban board and reports proposed card movements. It is dry-run by default. `--apply` writes issue frontmatter only when every proposal passes stale, duplicate, checksum, and state-machine checks.
 

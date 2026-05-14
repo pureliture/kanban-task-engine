@@ -20,6 +20,22 @@ describe('move and reconcile-board CLI', () => {
       .resolves.toContain('status: READY');
   });
 
+  it('moves an issue within the selected space when another space has the same id', async () => {
+    const vaultRoot = await makePhase3Vault({ status: 'TODO', duplicateIdInOtherSpace: true });
+
+    const result = await runCli(['move', 'VC-001', 'READY', '--space', 'vibe-coding'], {
+      vaultRoot,
+      vaultRootExplicit: true,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('moved VC-001 TODO -> READY');
+    await expect(fs.readFile(path.join(vaultRoot, 'issues/vibe-coding/kanban-task-engine/VC-001-ready.md'), 'utf8'))
+      .resolves.toContain('status: READY');
+    await expect(fs.readFile(path.join(vaultRoot, 'issues/home/general/VC-001-ready.md'), 'utf8'))
+      .resolves.toContain('status: TODO');
+  });
+
   it('dry-runs board reconciliation by default', async () => {
     const vaultRoot = await makePhase3Vault({ status: 'TODO' });
     const projection = await collectBoardProjection({ vaultRoot, space: 'vibe-coding' });
