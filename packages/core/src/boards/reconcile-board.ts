@@ -244,22 +244,57 @@ function parseBoardCards(markdown: string, conflicts: BoardReconcileConflict[]):
 function parseMetadata(line: string): { id: string; status: string; checksum: string; source: string } | undefined {
   const match = line.match(/<!--\s*kanban-task-engine:(.+?)\s*-->/);
   if (!match) return undefined;
-  const metadata = parseMetadataPairs(match[1]);
-  if (!metadata.id || !metadata.status || !metadata.checksum || !metadata.source) return undefined;
+  return parseMetadataPayload(match[1]);
+}
+
+function parseMetadataPayload(input: string): { id: string; status: string; checksum: string; source: string } | undefined {
+  let cursor = 0;
+  const id = readMetadataToken(input, 'id', cursor);
+  if (!id) return undefined;
+  cursor = id.next;
+  const status = readMetadataToken(input, 'status', cursor);
+  if (!status) return undefined;
+  cursor = status.next;
+  const checksum = readMetadataToken(input, 'checksum', cursor);
+  if (!checksum) return undefined;
+  cursor = checksum.next;
+  const source = readMetadataTail(input, 'source', cursor);
+  if (!source) return undefined;
+
   return {
-    id: metadata.id,
-    status: metadata.status,
-    checksum: metadata.checksum,
-    source: metadata.source,
+    id: id.value,
+    status: status.value,
+    checksum: checksum.value,
+    source: decodeMetadataValue(source),
   };
 }
 
-function parseMetadataPairs(input: string): Record<string, string> {
-  const metadata: Record<string, string> = {};
-  for (const match of input.matchAll(/(\w+)=(.+?)(?=\s+\w+=|$)/g)) {
-    metadata[match[1]] = match[2].trim();
+function readMetadataToken(input: string, key: string, cursor: number): { value: string; next: number } | undefined {
+  const prefix = `${key}=`;
+  if (!input.startsWith(prefix, cursor)) return undefined;
+  const valueStart = cursor + prefix.length;
+  const valueEnd = input.indexOf(' ', valueStart);
+  if (valueEnd < 0) return undefined;
+  const value = input.slice(valueStart, valueEnd);
+  return value ? { value, next: valueEnd + 1 } : undefined;
+}
+
+function readMetadataTail(input: string, key: string, cursor: number): string | undefined {
+  const prefix = `${key}=`;
+  if (!input.startsWith(prefix, cursor)) return undefined;
+  const valueStart = cursor + prefix.length;
+  const value = input.slice(valueStart);
+  const generatedAtIndex = value.indexOf(' generatedAt=');
+  const source = (generatedAtIndex >= 0 ? value.slice(0, generatedAtIndex) : value).trim();
+  return source || undefined;
+}
+
+function decodeMetadataValue(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
   }
-  return metadata;
 }
 
 function duplicateIssueConflicts(records: RegistryIssueRecord[]): BoardReconcileConflict[] {

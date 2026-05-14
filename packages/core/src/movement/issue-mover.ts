@@ -115,8 +115,17 @@ function formatMoveLog(input: {
 
 function appendLog(body: string, entry: string): string {
   const normalized = body.trimEnd();
-  if (/^## 로그\s*$/m.test(normalized)) {
-    return `${normalized}\n\n${entry}\n`;
+  const logHeading = normalized.match(/^## 로그\s*$/m);
+  if (logHeading?.index !== undefined) {
+    const logBodyStart = logHeading.index + logHeading[0].length;
+    const rest = normalized.slice(logBodyStart);
+    const nextHeadingOffset = rest.search(/\n##\s+/);
+    if (nextHeadingOffset < 0) return `${normalized}\n\n${entry}\n`;
+
+    const insertAt = logBodyStart + nextHeadingOffset;
+    const before = normalized.slice(0, insertAt).trimEnd();
+    const after = normalized.slice(insertAt).trimStart();
+    return `${before}\n\n${entry}\n\n${after}\n`;
   }
   return `${normalized}\n\n## 로그\n\n${entry}\n`;
 }

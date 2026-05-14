@@ -49,6 +49,27 @@ describe('issue mover', () => {
     expect(content).toContain('- 2026-05-13T10:00:00.000Z move: TODO -> READY (operator selected item)');
   });
 
+  it('inserts a move log inside the log section before later sections', async () => {
+    const vaultRoot = await makePhase3Vault({ status: 'TODO' });
+    const issuePath = path.join(vaultRoot, 'issues/vibe-coding/kanban-task-engine/VC-001-ready.md');
+    await fs.writeFile(
+      issuePath,
+      `${(await fs.readFile(issuePath, 'utf8')).trimEnd()}\n\n## 후속 섹션\n\nKeep this section after logs.\n`,
+    );
+
+    const result = await moveIssueStatus({
+      vaultRoot,
+      issueId: 'VC-001',
+      targetStatus: 'READY',
+      dryRun: false,
+      now: '2026-05-13T10:00:00.000Z',
+    });
+
+    const content = await fs.readFile(path.join(vaultRoot, result.relativePath), 'utf8');
+    expect(content.indexOf('## 로그')).toBeLessThan(content.indexOf('- 2026-05-13T10:00:00.000Z move: TODO -> READY'));
+    expect(content.indexOf('- 2026-05-13T10:00:00.000Z move: TODO -> READY')).toBeLessThan(content.indexOf('## 후속 섹션'));
+  });
+
   it('rejects illegal transitions before writing', async () => {
     const vaultRoot = await makePhase3Vault({ status: 'READY' });
     const issuePath = path.join(vaultRoot, 'issues/vibe-coding/kanban-task-engine/VC-001-ready.md');

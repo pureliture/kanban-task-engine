@@ -81,8 +81,8 @@ describe('board reconciliation', () => {
     await fs.writeFile(
       projection.boardPath,
       projection.boardMarkdown.replace(
-        'source=issues/vibe-coding/kanban-task-engine/VC-001-ready.md',
-        'source=issues/vibe-coding/kanban-task-engine/VC-999-other.md',
+        `source=${encodeURIComponent('issues/vibe-coding/kanban-task-engine/VC-001-ready.md')}`,
+        `source=${encodeURIComponent('issues/vibe-coding/kanban-task-engine/VC-999-other.md')}`,
       ),
     );
 
@@ -151,7 +151,7 @@ describe('board reconciliation', () => {
   it('parses board metadata source paths containing spaces', async () => {
     const vaultRoot = await makePhase3Vault({
       status: 'TODO',
-      projectPath: 'issues/vibe-coding/kanban task engine',
+      projectPath: 'issues/vibe-coding/kanban task=engine',
     });
     const projection = await collectBoardProjection({
       vaultRoot,
@@ -168,7 +168,7 @@ describe('board reconciliation', () => {
       expect.objectContaining({
         issueId: 'VC-001',
         proposedStatus: 'READY',
-        relativeIssuePath: 'issues/vibe-coding/kanban task engine/VC-001-ready.md',
+        relativeIssuePath: 'issues/vibe-coding/kanban task=engine/VC-001-ready.md',
       }),
     ]);
   });
@@ -176,7 +176,7 @@ describe('board reconciliation', () => {
   it('parses board metadata source paths before later metadata keys', async () => {
     const vaultRoot = await makePhase3Vault({
       status: 'TODO',
-      projectPath: 'issues/vibe-coding/kanban task engine',
+      projectPath: 'issues/vibe-coding/kanban task=engine',
     });
     const projection = await collectBoardProjection({
       vaultRoot,
@@ -194,7 +194,7 @@ describe('board reconciliation', () => {
     expect(result.proposals).toEqual([
       expect.objectContaining({
         issueId: 'VC-001',
-        relativeIssuePath: 'issues/vibe-coding/kanban task engine/VC-001-ready.md',
+        relativeIssuePath: 'issues/vibe-coding/kanban task=engine/VC-001-ready.md',
       }),
     ]);
   });
