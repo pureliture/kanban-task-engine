@@ -7,7 +7,10 @@ import path from 'path';
 import YAML from 'yaml';
 import { validateIssueIdSegment, type IssueType, type Priority } from '@kanban-task-engine/schema';
 import { loadRegistry, getRegistrySpace, type RegistrySpace } from '../store/registry';
-import { resolveVaultPath } from '../store/vault-path';
+import {
+  resolveRegistryPath,
+  splitSafeRelativePath,
+} from '../store/registry-path';
 import { allocateNextIssueId } from '../store/sequence';
 import { createIssueDraft, type IssueExecutor } from './issue-factory';
 
@@ -57,22 +60,7 @@ const ISSUE_TYPES = new Set<string>(['epic', 'task', 'bug', 'chore', 'docs']);
 const PRIORITIES = new Set<string>(['P0', 'P1', 'P2', 'P3']);
 const EXECUTORS = new Set<string>(['human', 'codex', 'claude-code']);
 
-export function splitSafeRelativePath(relativePath: string): string[] {
-  if (path.isAbsolute(relativePath) || relativePath.includes('\\') || relativePath.includes('\0')) {
-    throw new Error(`Unsafe registry path: ${relativePath}`);
-  }
-
-  const parts = relativePath.split('/');
-  if (parts.length === 0 || parts.some(part => part.trim() === '' || part === '.' || part === '..')) {
-    throw new Error(`Unsafe registry path: ${relativePath}`);
-  }
-
-  return parts;
-}
-
-export async function resolveRegistryPath(vaultRoot: string, relativePath: string): Promise<string> {
-  return resolveVaultPath(vaultRoot, ...splitSafeRelativePath(relativePath));
-}
+export { resolveRegistryPath, splitSafeRelativePath };
 
 export async function writeNewIssueFile(filePath: string, content: string): Promise<void> {
   let handle: FileHandle | undefined;
@@ -124,7 +112,7 @@ export function validateMergeIntoValue(value: string): string[] {
 
 async function createIssueUnlocked(input: CreateIssueInput): Promise<CreateIssueResult> {
   const normalized = validateCreateIssueInput(input);
-  const registry = await loadRegistry(await resolveVaultPath(normalized.vaultRoot, 'registry.yaml'));
+  const registry = await loadRegistry(await resolveRegistryPath(normalized.vaultRoot, 'registry.yaml'));
   const space = getRegistrySpace(registry, normalized.space);
   const targetRootRelative = selectIssueRoot(space, normalized);
   const targetRoot = await resolveRegistryPath(normalized.vaultRoot, targetRootRelative);
@@ -159,7 +147,7 @@ async function createIssueUnlocked(input: CreateIssueInput): Promise<CreateIssue
 }
 
 export async function scanIssueIds(vaultRoot: string, spaceName: string): Promise<ScanIssueIdsResult> {
-  const registry = await loadRegistry(await resolveVaultPath(vaultRoot, 'registry.yaml'));
+  const registry = await loadRegistry(await resolveRegistryPath(vaultRoot, 'registry.yaml'));
   const space = getRegistrySpace(registry, spaceName);
   const roots = [space.epics];
   if (space.type === 'container') {

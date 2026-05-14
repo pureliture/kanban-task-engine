@@ -82,7 +82,7 @@ function renderCard(issue: ObsidianBoardIssue, generatedAt: string): string {
   const priority = normalizePriority(issue.priority);
   const checksum = computeBoardProjectionChecksum(issue);
 
-  return `- [ ] [[${linkTarget}|${alias}]] \`${priority}\` <!-- kanban-task-engine:id=${issue.id} status=${issue.status} checksum=${checksum} source=${issue.relativePath} generatedAt=${generatedAt} -->`;
+  return `- [ ] [[${linkTarget}|${alias}]] \`${priority}\` <!-- kanban-task-engine:id=${issue.id} status=${issue.status} checksum=${checksum} source=${encodeURIComponent(issue.relativePath)} generatedAt=${generatedAt} -->`;
 }
 
 function formatCardAlias(issue: ObsidianBoardIssue): string {
