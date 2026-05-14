@@ -118,6 +118,61 @@ describe('board reconciliation', () => {
       .resolves.toContain('status: READY');
   });
 
+  it('applies proposals within the selected space when another space has the same id', async () => {
+    const vaultRoot = await makePhase3Vault({ status: 'TODO', duplicateIdInOtherSpace: true });
+    const projection = await collectBoardProjection({
+      vaultRoot,
+      space: 'vibe-coding',
+      generatedAt: '2026-05-13T10:00:00.000Z',
+    });
+    await fs.mkdir(path.dirname(projection.boardPath), { recursive: true });
+    await fs.writeFile(projection.boardPath, moveCardToLane(projection.boardMarkdown, 'VC-001', 'READY'));
+
+    const result = await reconcileBoard({
+      vaultRoot,
+      space: 'vibe-coding',
+      apply: true,
+      now: '2026-05-13T10:05:00.000Z',
+    });
+
+    expect(result.conflicts).toEqual([]);
+    expect(result.applied).toEqual([
+      expect.objectContaining({
+        issueId: 'VC-001',
+        oldStatus: 'TODO',
+        newStatus: 'READY',
+        relativePath: 'issues/vibe-coding/kanban-task-engine/VC-001-ready.md',
+      }),
+    ]);
+    await expect(fs.readFile(path.join(vaultRoot, 'issues/home/general/VC-001-ready.md'), 'utf8'))
+      .resolves.toContain('status: TODO');
+  });
+
+  it('parses board metadata source paths containing spaces', async () => {
+    const vaultRoot = await makePhase3Vault({
+      status: 'TODO',
+      projectPath: 'issues/vibe-coding/kanban task engine',
+    });
+    const projection = await collectBoardProjection({
+      vaultRoot,
+      space: 'vibe-coding',
+      generatedAt: '2026-05-13T10:00:00.000Z',
+    });
+    await fs.mkdir(path.dirname(projection.boardPath), { recursive: true });
+    await fs.writeFile(projection.boardPath, moveCardToLane(projection.boardMarkdown, 'VC-001', 'READY'));
+
+    const result = await reconcileBoard({ vaultRoot, space: 'vibe-coding', apply: false });
+
+    expect(result.conflicts).toEqual([]);
+    expect(result.proposals).toEqual([
+      expect.objectContaining({
+        issueId: 'VC-001',
+        proposedStatus: 'READY',
+        relativeIssuePath: 'issues/vibe-coding/kanban task engine/VC-001-ready.md',
+      }),
+    ]);
+  });
+
   it('does not apply any proposal when one card conflicts', async () => {
     const vaultRoot = await makePhase3Vault({ status: 'TODO', secondIssue: { id: 'VC-002', status: 'READY' } });
     const projection = await collectBoardProjection({

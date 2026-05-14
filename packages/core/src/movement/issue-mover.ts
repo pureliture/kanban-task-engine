@@ -2,7 +2,10 @@ import YAML from 'yaml';
 import { isIssueStatus, type IssueStatus } from '@kanban-task-engine/schema';
 import { StateMachine } from '../state-machine';
 import { atomicWriteFile } from '../store/fs-utils';
-import { findRegistryIssueById } from '../store/registry-issue-source';
+import {
+  findRegistryIssueById,
+  type RegistryIssueRecord,
+} from '../store/registry-issue-source';
 
 export interface MoveIssueStatusOptions {
   vaultRoot: string;
@@ -11,6 +14,8 @@ export interface MoveIssueStatusOptions {
   dryRun?: boolean;
   now?: string;
   reason?: string;
+  space?: string;
+  record?: RegistryIssueRecord;
 }
 
 export interface MoveIssueStatusResult {
@@ -30,10 +35,12 @@ export async function moveIssueStatus(options: MoveIssueStatusOptions): Promise<
     throw new Error(`Invalid target status: ${String(options.targetStatus)}`);
   }
 
-  const record = await findRegistryIssueById({
+  const record = options.record ?? await findRegistryIssueById({
     vaultRoot: options.vaultRoot,
     issueId: options.issueId,
+    space: options.space,
   });
+  validateProvidedRecord(options, record);
   const oldStatus = record.frontmatter.status;
   const newStatus = options.targetStatus;
   const dryRun = options.dryRun ?? true;
@@ -76,6 +83,15 @@ export async function moveIssueStatus(options: MoveIssueStatusOptions): Promise<
   })).trimStart()}`;
   await atomicWriteFile(record.absolutePath, content.endsWith('\n') ? content : `${content}\n`);
   return result;
+}
+
+function validateProvidedRecord(options: MoveIssueStatusOptions, record: RegistryIssueRecord): void {
+  if (record.id !== options.issueId) {
+    throw new Error(`Record id mismatch: expected ${options.issueId}, got ${record.id}`);
+  }
+  if (options.space && record.space !== options.space) {
+    throw new Error(`Record space mismatch for ${options.issueId}: expected ${options.space}, got ${record.space}`);
+  }
 }
 
 function validateEpicTransition(issueId: string, oldStatus: IssueStatus, newStatus: IssueStatus): void {

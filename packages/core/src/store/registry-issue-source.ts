@@ -45,6 +45,7 @@ export interface ListRegistryIssueRecordsOptions {
 export interface FindRegistryIssueByIdOptions {
   vaultRoot: string;
   issueId: string;
+  space?: string;
 }
 
 const TASK_SECTIONS = ['목적', '컨텍스트', 'Acceptance Criteria', '실행 힌트', '로그'];
@@ -95,7 +96,7 @@ export async function listRegistryIssueRecords(
 export async function findRegistryIssueById(
   options: FindRegistryIssueByIdOptions,
 ): Promise<RegistryIssueRecord> {
-  const records = (await listRegistryIssueRecords({ vaultRoot: options.vaultRoot }))
+  const records = (await listRegistryIssueRecords({ vaultRoot: options.vaultRoot, space: options.space }))
     .filter(record => record.id === options.issueId);
 
   if (records.length === 0) {

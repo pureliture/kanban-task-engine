@@ -6,19 +6,26 @@ import type { IssueStatus, IssueType } from '@kanban-task-engine/schema';
 export interface MakePhase3VaultOptions {
   status?: IssueStatus;
   type?: IssueType;
+  projectPath?: string;
   secondIssue?: {
     id: string;
     status: IssueStatus;
   };
+  duplicateIdInOtherSpace?: boolean;
 }
 
 export async function makePhase3Vault(options: MakePhase3VaultOptions = {}): Promise<string> {
   const status = options.status ?? 'TODO';
   const type = options.type ?? 'task';
+  const projectPath = options.projectPath ?? 'issues/vibe-coding/kanban-task-engine';
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kanban-phase3-'));
 
-  await fs.mkdir(path.join(root, 'issues/vibe-coding/kanban-task-engine'), { recursive: true });
+  await fs.mkdir(path.join(root, projectPath), { recursive: true });
   await fs.mkdir(path.join(root, 'issues/vibe-coding/_epics'), { recursive: true });
+  if (options.duplicateIdInOtherSpace) {
+    await fs.mkdir(path.join(root, 'issues/home/general'), { recursive: true });
+    await fs.mkdir(path.join(root, 'issues/home/_epics'), { recursive: true });
+  }
   await fs.writeFile(path.join(root, 'registry.yaml'), `spaces:
   vibe-coding:
     type: container
@@ -29,14 +36,22 @@ export async function makePhase3Vault(options: MakePhase3VaultOptions = {}): Pro
     epicBoard: boards/vibe-coding-epics.md
     projects:
       kanban-task-engine:
-        path: issues/vibe-coding/kanban-task-engine
-`);
+        path: ${projectPath}
+${options.duplicateIdInOtherSpace ? `  home:
+    type: single
+    idPrefix: VC
+    issues: issues/home/general
+    epics: issues/home/_epics
+    board: boards/home.md
+    epicBoard: boards/home-epics.md
+` : ''}`);
 
   await writeIssue(root, {
     id: 'VC-001',
     status,
     type,
     title: type === 'epic' ? 'Phase 3 epic' : 'Ready item',
+    projectPath,
   });
 
   if (options.secondIssue) {
@@ -45,6 +60,17 @@ export async function makePhase3Vault(options: MakePhase3VaultOptions = {}): Pro
       status: options.secondIssue.status,
       type: 'task',
       title: 'Second item',
+      projectPath,
+    });
+  }
+
+  if (options.duplicateIdInOtherSpace) {
+    await writeIssue(root, {
+      id: 'VC-001',
+      status: 'TODO',
+      type: 'task',
+      title: 'Duplicate in other space',
+      projectPath: 'issues/home/general',
     });
   }
 
@@ -53,7 +79,7 @@ export async function makePhase3Vault(options: MakePhase3VaultOptions = {}): Pro
 
 async function writeIssue(
   root: string,
-  issue: { id: string; status: IssueStatus; type: IssueType; title: string },
+  issue: { id: string; status: IssueStatus; type: IssueType; title: string; projectPath: string },
 ): Promise<void> {
   const frontmatter = [
     '---',
@@ -112,7 +138,7 @@ async function writeIssue(
 
   const relativePath = issue.type === 'epic'
     ? `issues/vibe-coding/_epics/${issue.id}-ready.md`
-    : `issues/vibe-coding/kanban-task-engine/${issue.id}-ready.md`;
+    : `${issue.projectPath}/${issue.id}-ready.md`;
   await fs.writeFile(path.join(root, relativePath), `${frontmatter}${body}\n`);
 }
 
