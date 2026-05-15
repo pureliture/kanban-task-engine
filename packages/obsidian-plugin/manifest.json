@@ -1,0 +1,9 @@
+{
+  "id": "kanban-task-engine",
+  "name": "Kanban Task Engine",
+  "version": "0.1.0",
+  "minAppVersion": "1.12.0",
+  "description": "Obsidian-native control surface for Kanban task vault workflows.",
+  "author": "pureliture",
+  "isDesktopOnly": true
+}
