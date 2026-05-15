@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>kanban-task-engine Phase 3 - Obsidian-native UX Layer</title>
+<style>
+:root {
+  --ink: #18212f;
+  --muted: #5b6472;
+  --paper: #f6f3ec;
+  --panel: #fffdfa;
+  --line: #c8bda9;
+  --vault-bg: #f1e7f5;
+  --vault-line: #8e3aa7;
+  --engine-bg: #e4f3e7;
+  --engine-line: #2d8b57;
+  --plugin-bg: #e5eef8;
+  --plugin-line: #286eaa;
+  --human-bg: #fff0d7;
+  --human-line: #ba6b00;
+  --risk-bg: #ffe8e5;
+  --risk-line: #ba3a30;
+  --ok-bg: #e6f6ef;
+  --ok-line: #20815c;
+  --shadow: 0 18px 50px rgba(28, 32, 39, 0.13);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background:
+    linear-gradient(90deg, rgba(24, 33, 47, 0.045) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(24, 33, 47, 0.045) 1px, transparent 1px),
+    var(--paper);
+  background-size: 28px 28px;
+  color: var(--ink);
+  font-family: ui-serif, Georgia, "Times New Roman", serif;
+}
+
+main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 28px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-start;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 18px;
+}
+
+.kicker {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font: 700 13px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  max-width: 820px;
+  font-size: 46px;
+  line-height: 1.02;
+  letter-spacing: 0;
+}
+
+.subtitle {
+  margin: 14px 0 0;
+  max-width: 840px;
+  color: var(--muted);
+  font: 18px/1.55 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.stamp {
+  min-width: 220px;
+  border: 2px solid var(--ink);
+  background: var(--panel);
+  padding: 14px;
+  box-shadow: 7px 7px 0 rgba(24, 33, 47, 0.12);
+  font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.stamp strong {
+  display: block;
+  font-size: 16px;
+}
+
+.section {
+  margin-top: 28px;
+  border: 2px solid var(--ink);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: baseline;
+  padding: 16px 18px;
+  border-bottom: 2px solid var(--ink);
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 25px;
+  line-height: 1.15;
+}
+
+.section-header p {
+  margin: 0;
+  color: var(--muted);
+  font: 14px/1.45 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.grid {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.grid.cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.grid.cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.card {
+  border: 1.5px solid var(--line);
+  background: #fff;
+  padding: 14px;
+  min-height: 120px;
+}
+
+.card h3 {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+
+.card p,
+.card li {
+  color: var(--muted);
+  font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.card p {
+  margin: 0;
+}
+
+.card ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.callout {
+  margin: 0 18px 18px;
+  border: 2px solid var(--plugin-line);
+  background: #f4f8fd;
+  padding: 16px;
+}
+
+.callout h3 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.callout p {
+  margin: 0;
+  color: var(--muted);
+  font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.callout strong {
+  color: var(--ink);
+}
+
+.human { background: var(--human-bg); border-color: var(--human-line); }
+.plugin { background: var(--plugin-bg); border-color: var(--plugin-line); }
+.engine { background: var(--engine-bg); border-color: var(--engine-line); }
+.vault { background: var(--vault-bg); border-color: var(--vault-line); }
+.risk { background: var(--risk-bg); border-color: var(--risk-line); }
+.ok { background: var(--ok-bg); border-color: var(--ok-line); }
+
+.tag {
+  display: inline-block;
+  margin-bottom: 10px;
+  border: 1px solid currentColor;
+  padding: 3px 7px;
+  font: 700 12px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.diagram {
+  padding: 18px;
+  overflow-x: auto;
+}
+
+svg {
+  display: block;
+  width: 100%;
+  min-width: 920px;
+  height: auto;
+}
+
+.lane-title {
+  font: 700 16px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  fill: var(--ink);
+}
+
+.lane-sub {
+  font: 13px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  fill: var(--muted);
+}
+
+.node-title {
+  font: 700 14px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  fill: var(--ink);
+}
+
+.node-copy {
+  font: 12px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  fill: var(--muted);
+}
+
+.arrow {
+  stroke: var(--ink);
+  stroke-width: 2.2;
+  fill: none;
+  marker-end: url(#arrow);
+}
+
+.dashed-arrow {
+  stroke: var(--muted);
+  stroke-width: 1.8;
+  stroke-dasharray: 7 6;
+  fill: none;
+  marker-end: url(#arrow-muted);
+}
+
+.phase-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border-top: 2px solid var(--ink);
+}
+
+.phase {
+  padding: 16px;
+  border-right: 2px solid var(--ink);
+  background: #fff;
+}
+
+.phase:last-child {
+  border-right: 0;
+}
+
+.phase strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 17px;
+}
+
+.phase span {
+  color: var(--muted);
+  font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.command-table {
+  width: 100%;
+  border-collapse: collapse;
+  font: 14px/1.45 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.command-table th,
+.command-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 12px 14px;
+  border-top: 1.5px solid var(--line);
+}
+
+.command-table th {
+  background: #f0ebe2;
+  color: var(--ink);
+}
+
+.command-table code {
+  font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: #f4f1eb;
+  padding: 2px 5px;
+}
+
+.footer-note {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font: 13px/1.5 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+@media (max-width: 900px) {
+  main {
+    padding: 16px;
+  }
+
+  .topbar,
+  .section-header {
+    display: block;
+  }
+
+  h1 {
+    font-size: 34px;
+  }
+
+  .stamp {
+    margin-top: 18px;
+  }
+
+  .grid.cols-3,
+  .grid.cols-4,
+  .phase-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .phase {
+    border-right: 0;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .phase:last-child {
+    border-bottom: 0;
+  }
+}
+</style>
+</head>
+<body>
+<main>
+  <header class="topbar">
+    <div>
+      <p class="kicker">Phase 3 accepted / Obsidian-native UX layer</p>
+      <h1>kanban-task-engine의 주 UX를 CLI에서 Obsidian으로 옮긴다</h1>
+      <p class="subtitle">
+        사람은 Obsidian에서 카드와 노트를 다루고, ID 채번, frontmatter 보정, board projection,
+        reconcile, 상태 전이는 repo-local Obsidian companion plugin과 core engine이 처리한다.
+        CLI는 운영 보조, CI, 복구용 surface로 남긴다.
+      </p>
+    </div>
+    <aside class="stamp">
+      <strong>Decision Shape</strong>
+      Status: Accepted<br />
+      Accepted: 2026-05-14<br />
+      Primary UX: Obsidian<br />
+      New package: obsidian plugin<br />
+      Engine truth: Markdown issues<br />
+      Adapter: Obsidian Vault API<br />
+      CLI role: fallback/debug
+    </aside>
+  </header>
+
+  <section class="section">
+    <div class="section-header">
+      <h2>1. 목표 UX</h2>
+      <p>사람이 매일 쓰는 흐름에서 터미널을 제거한다.</p>
+    </div>
+    <div class="diagram" aria-label="Obsidian-first user journey diagram">
+      <svg viewBox="0 0 1180 360" role="img">
+        <title>Obsidian-first user journey</title>
+        <desc>New task, board movement, reconcile, and regenerated board flow inside Obsidian.</desc>
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#18212f"></path>
+          </marker>
+          <marker id="arrow-muted" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#5b6472"></path>
+          </marker>
+        </defs>
+
+        <rect x="20" y="40" width="180" height="260" rx="8" fill="#fff0d7" stroke="#ba6b00" stroke-width="2"></rect>
+        <text x="42" y="78" class="lane-title">사람</text>
+        <text x="42" y="103" class="lane-sub">title/status만 다룸</text>
+        <rect x="42" y="135" width="136" height="46" rx="6" fill="#fffdfa" stroke="#ba6b00"></rect>
+        <text x="58" y="163" class="node-title">New Task</text>
+        <rect x="42" y="205" width="136" height="46" rx="6" fill="#fffdfa" stroke="#ba6b00"></rect>
+        <text x="58" y="233" class="node-title">Move Card</text>
+
+        <rect x="250" y="40" width="220" height="260" rx="8" fill="#e5eef8" stroke="#286eaa" stroke-width="2"></rect>
+        <text x="272" y="78" class="lane-title">Obsidian Plugin</text>
+        <text x="272" y="103" class="lane-sub">commands + modals</text>
+        <rect x="275" y="128" width="170" height="48" rx="6" fill="#fffdfa" stroke="#286eaa"></rect>
+        <text x="294" y="154" class="node-title">New Task Modal</text>
+        <text x="294" y="169" class="node-copy">title only is enough</text>
+        <rect x="275" y="205" width="170" height="48" rx="6" fill="#fffdfa" stroke="#286eaa"></rect>
+        <text x="294" y="231" class="node-title">Diff Preview</text>
+        <text x="294" y="246" class="node-copy">apply only after review</text>
+
+        <rect x="520" y="40" width="220" height="260" rx="8" fill="#e4f3e7" stroke="#2d8b57" stroke-width="2"></rect>
+        <text x="542" y="78" class="lane-title">Core Engine</text>
+        <text x="542" y="103" class="lane-sub">deterministic contract</text>
+        <rect x="545" y="122" width="170" height="44" rx="6" fill="#fffdfa" stroke="#2d8b57"></rect>
+        <text x="563" y="149" class="node-title">ID + Issue Create</text>
+        <rect x="545" y="184" width="170" height="44" rx="6" fill="#fffdfa" stroke="#2d8b57"></rect>
+        <text x="563" y="211" class="node-title">Reconcile Moves</text>
+        <rect x="545" y="246" width="170" height="44" rx="6" fill="#fffdfa" stroke="#2d8b57"></rect>
+        <text x="563" y="273" class="node-title">Render Board</text>
+
+        <rect x="790" y="40" width="210" height="260" rx="8" fill="#f1e7f5" stroke="#8e3aa7" stroke-width="2"></rect>
+        <text x="812" y="78" class="lane-title">Vault</text>
+        <text x="812" y="103" class="lane-sub">source of truth</text>
+        <rect x="815" y="125" width="160" height="42" rx="6" fill="#fffdfa" stroke="#8e3aa7"></rect>
+        <text x="833" y="151" class="node-title">issues/*.md</text>
+        <rect x="815" y="190" width="160" height="42" rx="6" fill="#fffdfa" stroke="#8e3aa7"></rect>
+        <text x="833" y="216" class="node-title">boards/*.md</text>
+
+        <rect x="1030" y="40" width="130" height="260" rx="8" fill="#ffffff" stroke="#18212f" stroke-width="2"></rect>
+        <text x="1050" y="78" class="lane-title">Views</text>
+        <text x="1050" y="103" class="lane-sub">read-only-ish</text>
+        <rect x="1048" y="135" width="94" height="42" rx="6" fill="#e5eef8" stroke="#286eaa"></rect>
+        <text x="1061" y="161" class="node-title">Kanban</text>
+        <rect x="1048" y="205" width="94" height="42" rx="6" fill="#e5eef8" stroke="#286eaa"></rect>
+        <text x="1061" y="231" class="node-title">Dataview</text>
+
+        <path class="arrow" d="M178 158 C210 158 224 152 275 152"></path>
+        <path class="arrow" d="M445 152 C480 152 500 144 545 144"></path>
+        <path class="arrow" d="M715 144 C755 144 770 146 815 146"></path>
+        <path class="arrow" d="M975 211 C1000 211 1012 156 1048 156"></path>
+        <path class="arrow" d="M178 228 C210 228 224 229 275 229"></path>
+        <path class="arrow" d="M445 229 C482 229 501 206 545 206"></path>
+        <path class="arrow" d="M715 206 C754 206 773 146 815 146"></path>
+        <path class="arrow" d="M715 268 C760 268 768 211 815 211"></path>
+        <path class="dashed-arrow" d="M975 146 C1010 146 1012 226 1048 226"></path>
+      </svg>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <h2>2. Component Boundary</h2>
+      <p>Plugin은 얇게, core use-case는 재사용 가능하게.</p>
+    </div>
+    <div class="grid cols-4">
+      <article class="card human">
+        <span class="tag">Human Layer</span>
+        <h3>Obsidian 안에서 조작</h3>
+        <p>카드 생성, 현재 note normalize, board sync, move preview, apply를 Command Palette와 ribbon에서 실행한다.</p>
+      </article>
+      <article class="card plugin">
+        <span class="tag">Plugin Layer</span>
+        <h3>Vault-aware adapter</h3>
+        <p>Obsidian Vault API로 파일을 읽고 쓰며, dry-run diff와 apply confirmation을 UI로 노출한다.</p>
+      </article>
+      <article class="card engine">
+        <span class="tag">Core Layer</span>
+        <h3>Deterministic use-cases</h3>
+        <p>ID 채번, issue 생성, normalize, move, reconcile, board render는 CLI와 plugin이 같은 함수를 쓴다.</p>
+      </article>
+      <article class="card vault">
+        <span class="tag">Data Layer</span>
+        <h3>Markdown source of truth</h3>
+        <p>실제 상태는 issue frontmatter에 남고, board/index는 생성 projection으로 유지한다.</p>
+      </article>
+    </div>
+    <div class="callout">
+      <h3>별도 플러그인인가?</h3>
+      <p>
+        <strong>Accepted: 외부 앱이나 별도 SaaS가 아니라 이 repo 안의 Obsidian companion plugin을 만든다.</strong>
+        기존 Kanban/Dataview plugin은 board 표시와 조회를 맡고, kanban-task-engine plugin은 ID 채번,
+        issue 생성, rough note 승격, board move preview/apply 같은 engine-specific UX를 맡는다.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <h2>3. Command Surface</h2>
+      <p>CLI 명령을 사람이 쓰는 UX로 그대로 노출하지 않고, Obsidian 작업 단위로 재구성한다.</p>
+    </div>
+    <table class="command-table">
+      <thead>
+        <tr>
+          <th>Obsidian Command</th>
+          <th>사용자 경험</th>
+          <th>Engine Mapping</th>
+          <th>완료 조건</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>Kanban: New Task</code></td>
+          <td>title만 입력해도 ID와 기본 frontmatter가 채워진 issue 생성</td>
+          <td><code>new</code> use-case</td>
+          <td>issue 생성 후 board에 카드가 보임</td>
+        </tr>
+        <tr>
+          <td><code>Kanban: Normalize Current Note</code></td>
+          <td>rough note를 canonical issue로 승격</td>
+          <td><code>normalize --write</code> use-case</td>
+          <td>frontmatter/schema validation 통과</td>
+        </tr>
+        <tr>
+          <td><code>Kanban: Sync Current Board</code></td>
+          <td>현재 space의 board/index 재생성</td>
+          <td><code>board --write --space</code> use-case</td>
+          <td>Kanban plugin이 board view로 렌더</td>
+        </tr>
+        <tr>
+          <td><code>Kanban: Preview Board Moves</code></td>
+          <td>Obsidian에서 이동한 카드의 status diff를 modal로 확인</td>
+          <td><code>reconcile-board --dry-run</code> use-case</td>
+          <td>예상 move만 표시하고 apply는 아직 안 함</td>
+        </tr>
+        <tr>
+          <td><code>Kanban: Apply Board Moves</code></td>
+          <td>diff 확인 후 issue frontmatter에 반영</td>
+          <td><code>reconcile-board --apply</code> use-case</td>
+          <td>issue status와 regenerated board metadata가 일치</td>
+        </tr>
+        <tr>
+          <td><code>Kanban: Move Current Issue</code></td>
+          <td>현재 note에서 안전한 status transition 수행</td>
+          <td><code>move</code> use-case</td>
+          <td>invalid transition은 UI에서 차단</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <h2>4. Raw Card 처리</h2>
+      <p>사람이 board에 막 만든 카드를 canonical issue로 승격하는 흐름.</p>
+    </div>
+    <div class="diagram" aria-label="Raw card promotion state machine">
+      <svg viewBox="0 0 1180 330" role="img">
+        <title>Raw card promotion flow</title>
+        <desc>Cards with metadata become move candidates. Cards without metadata become promotion candidates.</desc>
+        <defs>
+          <marker id="arrow2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#18212f"></path>
+          </marker>
+        </defs>
+        <path d="M155 165 L300 165" stroke="#18212f" stroke-width="2.2" marker-end="url(#arrow2)"></path>
+        <path d="M520 120 L670 84" stroke="#18212f" stroke-width="2.2" marker-end="url(#arrow2)"></path>
+        <path d="M520 210 L670 248" stroke="#18212f" stroke-width="2.2" marker-end="url(#arrow2)"></path>
+        <path d="M880 84 L1025 84" stroke="#18212f" stroke-width="2.2" marker-end="url(#arrow2)"></path>
+        <path d="M880 248 L1025 248" stroke="#18212f" stroke-width="2.2" marker-end="url(#arrow2)"></path>
+
+        <rect x="30" y="112" width="125" height="106" rx="8" fill="#fffdfa" stroke="#18212f" stroke-width="2"></rect>
+        <text x="54" y="153" class="node-title">Board Card</text>
+        <text x="54" y="175" class="node-copy">human-created</text>
+
+        <polygon points="410,72 520,165 410,258 300,165" fill="#e5eef8" stroke="#286eaa" stroke-width="2"></polygon>
+        <text x="347" y="158" class="node-title">metadata</text>
+        <text x="354" y="178" class="node-title">exists?</text>
+
+        <rect x="670" y="44" width="210" height="80" rx="8" fill="#e6f6ef" stroke="#20815c" stroke-width="2"></rect>
+        <text x="695" y="78" class="node-title">Existing Issue Move</text>
+        <text x="695" y="99" class="node-copy">status reconcile candidate</text>
+
+        <rect x="670" y="208" width="210" height="80" rx="8" fill="#fff0d7" stroke="#ba6b00" stroke-width="2"></rect>
+        <text x="695" y="242" class="node-title">Raw Card Candidate</text>
+        <text x="695" y="263" class="node-copy">needs canonical promotion</text>
+
+        <rect x="1025" y="44" width="125" height="80" rx="8" fill="#f1e7f5" stroke="#8e3aa7" stroke-width="2"></rect>
+        <text x="1052" y="78" class="node-title">Apply</text>
+        <text x="1044" y="99" class="node-copy">frontmatter</text>
+
+        <rect x="1025" y="208" width="125" height="80" rx="8" fill="#f1e7f5" stroke="#8e3aa7" stroke-width="2"></rect>
+        <text x="1052" y="242" class="node-title">Promote</text>
+        <text x="1042" y="263" class="node-copy">ID + issue</text>
+
+        <text x="565" y="94" class="node-title">yes</text>
+        <text x="565" y="240" class="node-title">no</text>
+      </svg>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <h2>5. Delivery Plan</h2>
+      <p>MVP는 작게, 하지만 “Obsidian만 써도 된다”는 기준을 반드시 통과한다.</p>
+    </div>
+    <div class="phase-strip">
+      <div class="phase">
+        <strong>3A. Plugin Scaffold</strong>
+        <span>manifest, settings, dev reload, vault detection, command registration.</span>
+      </div>
+      <div class="phase">
+        <strong>3B. Core Extraction</strong>
+        <span>CLI handler에서 use-case 함수를 분리해 plugin이 직접 호출.</span>
+      </div>
+      <div class="phase">
+        <strong>3C. New + Sync</strong>
+        <span>New Task modal, board/index regenerate, Obsidian render smoke.</span>
+      </div>
+      <div class="phase">
+        <strong>3D. Preview + Apply</strong>
+        <span>board move diff modal, apply, status/writeback conflict guard.</span>
+      </div>
+      <div class="phase">
+        <strong>3E. Raw Promotion</strong>
+        <span>metadata 없는 card/note를 issue로 승격하는 guided flow.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <h2>6. Risk Gates</h2>
+      <p>Phase 3에서 반드시 막아야 하는 실패 모드.</p>
+    </div>
+    <div class="grid cols-3">
+      <article class="card risk">
+        <span class="tag">Blocker</span>
+        <h3>board가 source of truth가 되는 문제</h3>
+        <p>board는 projection이다. apply 전 이동은 proposal이고, 최종 상태는 issue frontmatter에만 확정된다.</p>
+      </article>
+      <article class="card risk">
+        <span class="tag">Blocker</span>
+        <h3>Obsidian cache와 외부 write 충돌</h3>
+        <p>plugin write는 Vault API/process 기반으로 처리하고, 외부 CLI write와 충돌하면 preview에서 멈춘다.</p>
+      </article>
+      <article class="card risk">
+        <span class="tag">Blocker</span>
+        <h3>사람이 metadata를 직접 편집하는 문제</h3>
+        <p>metadata comment는 generated 영역으로 유지하고, 수정 감지 시 apply를 막고 regenerate를 제안한다.</p>
+      </article>
+    </div>
+    <div class="grid cols-3">
+      <article class="card ok">
+        <span class="tag">Acceptance</span>
+        <h3>터미널 없이 task 생성</h3>
+        <p>Obsidian에서 제목만 입력하고 만들기를 누르면 새 카드가 board에 바로 보여야 한다.</p>
+      </article>
+      <article class="card ok">
+        <span class="tag">Acceptance</span>
+        <h3>GUI move reconcile</h3>
+        <p>Obsidian에서 이동한 카드가 preview diff와 apply를 거쳐 issue status로 반영되어야 한다.</p>
+      </article>
+      <article class="card ok">
+        <span class="tag">Acceptance</span>
+        <h3>regenerate 후 일관성</h3>
+        <p>board lane, metadata status, issue frontmatter가 같은 status를 보여야 한다.</p>
+      </article>
+    </div>
+  </section>
+
+  <p class="footer-note">
+    이 문서는 Phase 3 accepted direction HTML 렌더입니다. 구현 산출물은 plugin package, core use-case extraction,
+    Obsidian GUI smoke test, docs/runbook 업데이트로 나뉘어야 합니다.
+    Spec: <a href="../superpowers/specs/2026-05-14-obsidian-native-ux-plugin-spec.md">2026-05-14-obsidian-native-ux-plugin-spec.md</a>.
+    Review: <a href="../superpowers/specs/2026-05-14-obsidian-native-ux-plugin-spec-review.html">2026-05-14-obsidian-native-ux-plugin-spec-review.html</a>.
+    Plan: <a href="../superpowers/plans/2026-05-15-obsidian-native-ux-plugin-plan.md">2026-05-15-obsidian-native-ux-plugin-plan.md</a>.
+    Plan review: <a href="../superpowers/plans/2026-05-15-obsidian-native-ux-plugin-plan-review.html">2026-05-15-obsidian-native-ux-plugin-plan-review.html</a>.
+  </p>
+</main>
+</body>
+</html>

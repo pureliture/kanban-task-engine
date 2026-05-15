@@ -13,6 +13,7 @@
 | `kanban-use-case.svg` | AI CLI 실행 연동 use-case README embed 및 full-size/raw view용 SVG 렌더링 |
 | `kanban-use-case.html` | AI CLI 실행 연동 use-case 로컬 브라우저 확인용 HTML 렌더링 |
 | `kanban-task-engine-architecture-overview.svg` | 보조 compact overview SVG 렌더링 (수동 작성, 외부 asset 없음) |
+| `phase-3-obsidian-native-ux.html` | Phase 3 Obsidian-native UX layer 제안 및 브라우저 확인용 HTML 시각화 |
 
 ## 수정 방법
 
