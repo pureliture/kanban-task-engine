@@ -18,6 +18,10 @@
       "types": "./dist/executor/index.d.ts",
       "default": "./dist/executor/index.js"
     },
+    "./authoring": {
+      "types": "./dist/authoring/index.d.ts",
+      "default": "./dist/authoring/index.js"
+    },
     "./ports/vault-port": {
       "types": "./dist/ports/vault-port.d.ts",
       "default": "./dist/ports/vault-port.js"
@@ -37,6 +41,10 @@
     "./use-cases/obsidian-raw-card-promotion": {
       "types": "./dist/use-cases/obsidian-raw-card-promotion.d.ts",
       "default": "./dist/use-cases/obsidian-raw-card-promotion.js"
+    },
+    "./use-cases/obsidian-issue-move": {
+      "types": "./dist/use-cases/obsidian-issue-move.d.ts",
+      "default": "./dist/use-cases/obsidian-issue-move.js"
     }
   },
   "scripts": {

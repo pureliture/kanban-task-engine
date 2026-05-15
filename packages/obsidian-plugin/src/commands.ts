@@ -1,7 +1,9 @@
-import { Notice } from 'obsidian';
+import { Notice, TFile } from 'obsidian';
+import { normalizeIssue } from '@kanban-task-engine/core/authoring';
 import { previewObsidianBoardMoves } from '@kanban-task-engine/core/use-cases/obsidian-board-reconcile';
 import { writeObsidianBoardForSpace } from '@kanban-task-engine/core/use-cases/obsidian-board-sync';
 import type KanbanTaskEnginePlugin from './main';
+import { MoveCurrentIssueModal } from './modals/move-current-issue-modal';
 import { NewTaskModal } from './modals/new-task-modal';
 import { PromoteRawCardModal } from './modals/promote-raw-card-modal';
 import { ReconcilePreviewModal } from './modals/reconcile-preview-modal';
@@ -39,12 +41,12 @@ export function registerKanbanTaskEngineCommands(plugin: KanbanTaskEnginePlugin)
   plugin.addCommand({
     id: 'normalize-current-note',
     name: 'Normalize Current Note',
-    callback: () => new Notice('Normalize Current Note requires a future VaultPort normalize extraction'),
+    callback: () => void normalizeCurrentNote(plugin),
   });
   plugin.addCommand({
     id: 'move-current-issue',
     name: 'Move Current Issue',
-    callback: () => new Notice('Move Current Issue requires a future VaultPort issue move extraction'),
+    callback: () => openMoveCurrentIssue(plugin),
   });
 }
 
@@ -60,6 +62,43 @@ async function syncCurrentBoard(plugin: KanbanTaskEnginePlugin): Promise<void> {
   } catch (error) {
     new Notice(formatError(error));
   }
+}
+
+async function normalizeCurrentNote(plugin: KanbanTaskEnginePlugin): Promise<void> {
+  const activeFile = plugin.app.workspace.getActiveFile();
+  if (!(activeFile instanceof TFile) || !activeFile.path.endsWith('.md')) {
+    new Notice('Open a Markdown note before normalizing');
+    return;
+  }
+  try {
+    const vault = new ObsidianVaultPort(plugin.app.vault);
+    const result = await normalizeIssue({
+      vaultRoot: vault.root,
+      sourcePath: activeFile.path,
+      space: plugin.settings.defaultSpace,
+      project: plugin.settings.defaultProject,
+      write: true,
+    });
+    const board = await writeObsidianBoardForSpace({
+      vault,
+      vaultRoot: vault.root,
+      space: plugin.settings.defaultSpace,
+    });
+    new Notice(`Normalized ${result.id} to ${board.boardPath}`);
+  } catch (error) {
+    new Notice(formatError(error));
+  }
+}
+
+function openMoveCurrentIssue(plugin: KanbanTaskEnginePlugin): void {
+  const activeFile = plugin.app.workspace.getActiveFile();
+  if (!(activeFile instanceof TFile) || !activeFile.path.endsWith('.md')) {
+    new Notice('Open a Markdown issue note before moving it');
+    return;
+  }
+  new MoveCurrentIssueModal(plugin, {
+    relativeIssuePath: activeFile.path,
+  }).open();
 }
 
 async function openBoardMovePreview(

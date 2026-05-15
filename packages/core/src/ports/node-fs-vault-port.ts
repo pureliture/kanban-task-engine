@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { assertVaultRelativePath, type VaultPort } from './vault-port';
+import { atomicWriteFile } from '../store/fs-utils';
 
 export class NodeFsVaultPort implements VaultPort {
   readonly root: string;
@@ -44,7 +45,7 @@ export class NodeFsVaultPort implements VaultPort {
     const absolutePath = await this.resolveExisting(relativePath);
     const current = await fs.readFile(absolutePath, 'utf8');
     const next = updater(current);
-    await fs.writeFile(absolutePath, next, 'utf8');
+    await atomicWriteFile(absolutePath, next);
     return next;
   }
 

@@ -1487,7 +1487,7 @@ rtk git commit -m "test(obsidian): add desktop plugin smoke evidence"
 - Modify: `docs/design/phase-3-obsidian-native-ux.html`
 - Create: `PR_SUMMARY.md` only if requested by the PR workflow.
 
-- [ ] **Step 1: Update evidence sections**
+- [x] **Step 1: Update evidence sections**
 
 Update docs to include:
 
@@ -1497,7 +1497,7 @@ Update docs to include:
 - raw promotion result.
 - final verification bundle.
 
-- [ ] **Step 2: Request multi-agent review**
+- [x] **Step 2: Request multi-agent review**
 
 Use `superpowers:requesting-code-review` and at least three review perspectives:
 
@@ -1513,7 +1513,7 @@ Review focus:
 - Copy install is required for official smoke.
 - Ribbon icon is safe entrypoint only.
 
-- [ ] **Step 3: Apply review fixes with TDD**
+- [x] **Step 3: Apply review fixes with TDD**
 
 For each accepted finding:
 
@@ -1529,6 +1529,12 @@ For each accepted finding:
 rtk git add docs packages scripts package.json pnpm-lock.yaml
 rtk git commit -m "docs(obsidian): record phase 3 plugin verification"
 ```
+
+Task 9 review result:
+
+- Reviewers were spawned with `gpt-5.3-codex-spark` for spec compliance, runtime/data-safety, and maintainability.
+- P1 fixes applied with tests: active-note normalize command, active-issue move modal/use-case, safe ribbon status modal, atomic `NodeFsVaultPort.process()`, `moveIssueStatus` default write semantics, and narrow core subpath imports for the plugin bundle.
+- Reclassified follow-ups: generated projection pair rollback and multi-proposal reconcile rollback remain hardening debt because generated board/index files are not source of truth and current apply errors preserve applied/conflict details.
 
 ## 12. Done Criteria
 

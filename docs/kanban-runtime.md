@@ -181,6 +181,10 @@ pnpm obsidian-plugin:smoke-e2e -- --no-gui
 
 This creates a disposable vault, enables the copy-installed `kanban-task-engine` community plugin in `.obsidian/community-plugins.json`, seeds `registry.yaml`, and prints the Obsidian Desktop open command plus vault-scoped Obsidian CLI commands to run when Desktop runtime automation is available.
 
+Current Phase 3 desktop evidence, captured on 2026-05-15, used Obsidian Desktop 1.12.7 with the plugin copy-installed into a disposable smoke vault. The gate covered plugin reload, command discovery, `Kanban Task Engine: New Task`, `Kanban Task Engine: Promote Raw Card`, board screenshot capture, issue file evidence, and `obsidian dev:errors` returning no captured errors. The smoke created canonical issues `VC-002 Runtime GUI E2E Task` and `VC-003 Raw GUI Promotion Card` under the disposable vault.
+
+Task 9 review hardening connected `Normalize Current Note` and `Move Current Issue` to runtime handlers instead of placeholder notices, moved the ribbon icon to a read-only status/menu modal, and kept plugin imports on narrow core subpaths so the Obsidian bundle does not pull the full core runtime dependency graph.
+
 ## Recipes And Policy
 
 Active recipe resolution order:
