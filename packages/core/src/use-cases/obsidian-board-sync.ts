@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { collectBoardProjection } from '../boards/board-projection';
 import type { VaultPort } from '../ports/vault-port';
+import { collectVaultBoardProjection } from './obsidian-vault-records';
 
 export interface WriteObsidianBoardForSpaceInput {
   vault: VaultPort;
@@ -26,8 +26,8 @@ export async function writeObsidianBoardForSpace(
 ): Promise<WriteObsidianBoardForSpaceResult> {
   await assertMatchingVaultRoot(input);
 
-  const projection = await collectBoardProjection({
-    vaultRoot: input.vaultRoot,
+  const projection = await collectVaultBoardProjection({
+    vault: input.vault,
     space: input.space,
     generatedAt: input.generatedAt,
   });
