@@ -1,4 +1,5 @@
 export interface VaultPort {
+  readonly root: string;
   read(relativePath: string): Promise<string>;
   cachedRead?(relativePath: string): Promise<string>;
   exists(relativePath: string): Promise<boolean>;
