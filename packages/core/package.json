@@ -10,9 +10,33 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./boards/reconcile-board": {
+      "types": "./dist/boards/reconcile-board.d.ts",
+      "default": "./dist/boards/reconcile-board.js"
+    },
     "./executor": {
       "types": "./dist/executor/index.d.ts",
       "default": "./dist/executor/index.js"
+    },
+    "./ports/vault-port": {
+      "types": "./dist/ports/vault-port.d.ts",
+      "default": "./dist/ports/vault-port.js"
+    },
+    "./use-cases/obsidian-authoring": {
+      "types": "./dist/use-cases/obsidian-authoring.d.ts",
+      "default": "./dist/use-cases/obsidian-authoring.js"
+    },
+    "./use-cases/obsidian-board-reconcile": {
+      "types": "./dist/use-cases/obsidian-board-reconcile.d.ts",
+      "default": "./dist/use-cases/obsidian-board-reconcile.js"
+    },
+    "./use-cases/obsidian-board-sync": {
+      "types": "./dist/use-cases/obsidian-board-sync.d.ts",
+      "default": "./dist/use-cases/obsidian-board-sync.js"
+    },
+    "./use-cases/obsidian-raw-card-promotion": {
+      "types": "./dist/use-cases/obsidian-raw-card-promotion.d.ts",
+      "default": "./dist/use-cases/obsidian-raw-card-promotion.js"
     }
   },
   "scripts": {

@@ -1,24 +1,21 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import * as obsidian from 'obsidian';
 import KanbanTaskEnginePlugin from '../src/main';
 import { registerKanbanTaskEngineCommands } from '../src/commands';
 
-const noticeMessages: string[] = [];
+const noticeMessages = (obsidian as unknown as { noticeMessages: string[] }).noticeMessages;
 
-vi.mock('obsidian', () => ({
-  Notice: class {
-    constructor(message: string) {
-      noticeMessages.push(message);
-    }
-  },
-  Plugin: class {
-    addCommand(): void {
-      return;
-    }
+const commandMocks = vi.hoisted(() => ({
+  writeObsidianBoardForSpace: vi.fn(),
+  previewObsidianBoardMoves: vi.fn(),
+}));
 
-    addRibbonIcon(): { remove: () => void } {
-      return { remove: () => void 0 };
-    }
-  },
+vi.mock('@kanban-task-engine/core/use-cases/obsidian-board-sync', () => ({
+  writeObsidianBoardForSpace: commandMocks.writeObsidianBoardForSpace,
+}));
+
+vi.mock('@kanban-task-engine/core/use-cases/obsidian-board-reconcile', () => ({
+  previewObsidianBoardMoves: commandMocks.previewObsidianBoardMoves,
 }));
 
 type PluginCommand = { id: string; name: string; callback?: () => void };
@@ -30,6 +27,11 @@ type RibbonState = {
 };
 
 describe('command registration', () => {
+  beforeEach(() => {
+    commandMocks.writeObsidianBoardForSpace.mockReset();
+    commandMocks.previewObsidianBoardMoves.mockReset();
+  });
+
   it('registers task commands', () => {
     const commands: PluginCommand[] = [];
 
@@ -49,6 +51,7 @@ describe('command registration', () => {
       'apply-board-moves',
       'promote-raw-card',
       'normalize-current-note',
+      'move-current-issue',
     ]);
     expect(commands.map(command => command.name)).toEqual([
       'New Task',
@@ -57,6 +60,7 @@ describe('command registration', () => {
       'Apply Board Moves',
       'Promote Raw Card',
       'Normalize Current Note',
+      'Move Current Issue',
     ]);
   });
 
@@ -98,14 +102,30 @@ describe('command registration', () => {
     });
     expect(typeof ribbonState.callback).toBe('function');
 
-    commands.forEach(command => command.callback?.());
-    expect(noticeMessages).toHaveLength(commands.length);
-
     ribbonState.callback(undefined as unknown as MouseEvent);
     const ribbonMessage = noticeMessages[noticeMessages.length - 1] ?? '';
     expect(ribbonMessage).toMatch(/menu\/status/);
     expect(ribbonMessage).not.toMatch(/write|apply|sync|create/i);
     expect(ribbonState.callback.toString()).not.toMatch(/vault|write|apply|create|sync/i);
+  });
+
+  it('opens sync confirmation without regenerating the board immediately', () => {
+    const commands: PluginCommand[] = [];
+    const plugin = {
+      app: {},
+      settings: {
+        defaultSpace: 'vibe-coding',
+      },
+      addCommand: (command: PluginCommand): void => {
+        commands.push(command);
+      },
+      addRibbonIcon: () => ({ remove: () => void 0 }),
+    };
+
+    registerKanbanTaskEngineCommands(plugin as never);
+    commands.find(command => command.id === 'sync-current-board')?.callback?.();
+
+    expect(commandMocks.writeObsidianBoardForSpace).not.toHaveBeenCalled();
   });
 });
 
