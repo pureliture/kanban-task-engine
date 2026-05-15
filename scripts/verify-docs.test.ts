@@ -182,6 +182,19 @@ describe('verify-docs SVG rendering contract', () => {
     await Promise.all(tempRoots.splice(0).map(root => rm(root, { recursive: true, force: true })));
   });
 
+  it('keeps Obsidian plugin smoke install scripts wired from the root package', async () => {
+    const packageJson = JSON.parse(await readFile(join(repoRoot, 'package.json'), 'utf8')) as {
+      scripts?: Record<string, string>;
+    };
+
+    expect(existsSync(join(repoRoot, 'scripts/obsidian-plugin-dev-link.mjs'))).toBe(true);
+    expect(existsSync(join(repoRoot, 'scripts/obsidian-plugin-smoke-install.mjs'))).toBe(true);
+    expect(packageJson.scripts).toMatchObject({
+      'obsidian-plugin:dev-link': 'node scripts/obsidian-plugin-dev-link.mjs',
+      'obsidian-plugin:smoke-install': 'node scripts/obsidian-plugin-smoke-install.mjs',
+    });
+  });
+
   it('keeps the Python verifier split behind a small CLI wrapper', async () => {
     const wrapper = await readFile(verifier, 'utf8');
     const wrapperLineCount = wrapper.split('\n').length;

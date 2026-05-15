@@ -14,7 +14,9 @@
     "eval:superpowers:full": "node --import tsx scripts/eval-superpowers.ts --with-tests",
     "lint": "pnpm -r lint",
     "clean": "pnpm -r clean",
-    "migrate": "tsx scripts/migrate-tickets.ts"
+    "migrate": "tsx scripts/migrate-tickets.ts",
+    "obsidian-plugin:dev-link": "node scripts/obsidian-plugin-dev-link.mjs",
+    "obsidian-plugin:smoke-install": "node scripts/obsidian-plugin-smoke-install.mjs"
   },
   "devDependencies": {
     "gray-matter": "^4.0.3",

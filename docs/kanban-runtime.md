@@ -153,6 +153,26 @@ pnpm --filter @kanban-task-engine/core exec vitest run tests/authoring-runtime-s
 
 The smoke must prove `kanban new`, `kanban new --dry-run --json`, `kanban normalize --check --json`, and `kanban normalize --write --json` against a temporary vault. Passing this gate is not Obsidian GUI readiness and is not live `workspace-kanban` readiness.
 
+## Obsidian Plugin Install Smoke
+
+The Obsidian plugin is developed in `packages/obsidian-plugin`, but official smoke/E2E evidence must come from a copy-installed plugin under a disposable vault. The development symlink helper is only for local iteration speed and is not acceptance evidence.
+
+```bash
+pnpm --filter @kanban-task-engine/obsidian-plugin build
+SMOKE_VAULT=$(mktemp -d)
+pnpm obsidian-plugin:smoke-install -- --vault "$SMOKE_VAULT"
+test -f "$SMOKE_VAULT/.obsidian/plugins/kanban-task-engine/manifest.json"
+test -f "$SMOKE_VAULT/.obsidian/plugins/kanban-task-engine/main.js"
+```
+
+For fast local iteration only, use:
+
+```bash
+pnpm obsidian-plugin:dev-link -- --vault "$SMOKE_VAULT"
+```
+
+Do not use the main operating vault as the smoke vault. Use a disposable vault or a purpose-built dev smoke vault so plugin copy/install checks cannot mutate long-lived task state.
+
 ## Recipes And Policy
 
 Active recipe resolution order:
