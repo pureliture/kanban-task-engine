@@ -5,6 +5,18 @@
 저장소: `~/Projects/kanban-task-engine`
 상위 결정: `docs/design/phase-3-obsidian-native-ux.html`
 
+## 0. 구현 및 검증 증거
+
+2026-05-15 Phase 3 implementation branch 기준 evidence:
+
+- `packages/obsidian-plugin` package가 추가되었고 `pnpm --filter @kanban-task-engine/obsidian-plugin build`가 `packages/obsidian-plugin/main.js`를 생성한다.
+- official smoke는 dev symlink가 아니라 copy-installed artifact 기준으로 수행한다. `pnpm obsidian-plugin:smoke-install -- --vault "$SMOKE_VAULT"`와 `pnpm obsidian-plugin:smoke-e2e -- --no-gui`가 disposable vault에 `manifest.json`, `main.js`, `registry.yaml`, `.obsidian/community-plugins.json`을 준비한다.
+- Obsidian Desktop 1.12.7에서 copy-installed plugin reload 후 command list, `New Task`, explicit raw card promotion, screenshot, `dev:errors` gate를 통과했다. GUI smoke issue evidence는 `VC-002 Runtime GUI E2E Task`, `VC-003 Raw GUI Promotion Card`다.
+- `New Task` GUI smoke에서 발견된 container space `defaultProject` 누락은 `defaultProject: 'kanban-task-engine'` 기본값과 settings test로 고정했다.
+- Task 9 three-perspective review는 `gpt-5.3-codex-spark` reviewer 3개로 수행했다. 반영된 P1 수정은 active-note normalize command 연결, active-issue move modal/use-case 추가, safe ribbon status modal, `NodeFsVaultPort.process()` atomic write, `moveIssueStatus` default mutation semantics, plugin bundle root-core import 제거다.
+- 재분류된 follow-up은 generated projection pair rollback과 multi-proposal reconcile rollback이다. issue frontmatter가 source of truth이고 현재 apply path는 stale/conflict guard 및 applied-details error를 제공하므로 Phase 3 merge blocker가 아니라 별도 hardening debt로 추적한다.
+- 최종 verification bundle은 `rtk pnpm -r build`, `rtk pnpm -r test`, `rtk pnpm test:docs`, `rtk pnpm eval:hardening`, `rtk git diff --check`로 검증한다.
+
 ## 1. 목적
 
 이 문서는 Phase 3 범위인 `kanban-task-engine` repo-local Obsidian companion plugin의 정본 spec이다. 목표는 사람이 매일 쓰는 UX를 CLI에서 Obsidian으로 옮기되, Markdown issue vault를 source of truth로 유지하고, 기존 CLI/Core runtime contract를 깨지 않는 것이다.

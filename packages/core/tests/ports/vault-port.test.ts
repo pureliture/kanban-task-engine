@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { mkdtemp, readFile, symlink, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir, symlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import { NodeFsVaultPort } from '../../src/ports/node-fs-vault-port';
@@ -19,6 +19,7 @@ describe('NodeFsVaultPort', () => {
 
     expect(updated).toBe('# Two\n');
     expect(await readFile(path.join(root, 'issues/vibe-coding/VC-001.md'), 'utf8')).toBe('# Two\n');
+    await expect(readdir(path.join(root, 'issues/vibe-coding'))).resolves.not.toContain('VC-001.md.tmp');
     expect(await vault.listMarkdownFiles('issues')).toEqual(['issues/vibe-coding/VC-001.md']);
   });
 

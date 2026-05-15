@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as obsidian from 'obsidian';
 import type { BoardStatusProposal } from '@kanban-task-engine/core/boards/reconcile-board';
 import { NewTaskModal } from '../src/modals/new-task-modal';
+import { MoveCurrentIssueModal } from '../src/modals/move-current-issue-modal';
 import { PromoteRawCardModal } from '../src/modals/promote-raw-card-modal';
 import { ReconcilePreviewModal } from '../src/modals/reconcile-preview-modal';
 import { SyncBoardModal } from '../src/modals/sync-board-modal';
@@ -13,6 +14,7 @@ const mocks = vi.hoisted(() => ({
   previewNextObsidianIssueId: vi.fn(),
   applyObsidianBoardMoves: vi.fn(),
   promoteRawBoardCard: vi.fn(),
+  moveObsidianIssueStatus: vi.fn(),
 }));
 
 vi.mock('@kanban-task-engine/core/use-cases/obsidian-authoring', () => ({
@@ -28,6 +30,10 @@ vi.mock('@kanban-task-engine/core/use-cases/obsidian-raw-card-promotion', () => 
   promoteRawBoardCard: mocks.promoteRawBoardCard,
 }));
 
+vi.mock('@kanban-task-engine/core/use-cases/obsidian-issue-move', () => ({
+  moveObsidianIssueStatus: mocks.moveObsidianIssueStatus,
+}));
+
 describe('command modals', () => {
   beforeEach(() => {
     noticeMessages.length = 0;
@@ -35,6 +41,7 @@ describe('command modals', () => {
     mocks.previewNextObsidianIssueId.mockReset();
     mocks.applyObsidianBoardMoves.mockReset();
     mocks.promoteRawBoardCard.mockReset();
+    mocks.moveObsidianIssueStatus.mockReset();
   });
 
   it('requires a title before creating a new task', async () => {
@@ -198,6 +205,34 @@ describe('command modals', () => {
       space: 'vibe-coding',
       expectedChanges: previewedChanges,
     }));
+  });
+
+  it('moves the active issue through the Obsidian move modal', async () => {
+    mocks.moveObsidianIssueStatus.mockResolvedValue({
+      issueId: 'VC-001',
+      oldStatus: 'TODO',
+      newStatus: 'READY',
+      changed: true,
+      relativePath: 'issues/vibe-coding/kanban-task-engine/VC-001.md',
+      boardPath: 'boards/vibe-coding.md',
+    });
+    const vaultPort = createVaultPortMock();
+    const modal = new MoveCurrentIssueModal(createPluginMock(), {
+      vaultPort,
+      relativeIssuePath: 'issues/vibe-coding/kanban-task-engine/VC-001.md',
+    });
+    modal.setTargetStatus('READY');
+
+    await modal.submit();
+
+    expect(mocks.moveObsidianIssueStatus).toHaveBeenCalledWith(expect.objectContaining({
+      vault: vaultPort,
+      vaultRoot: '/vault/root',
+      space: 'vibe-coding',
+      relativeIssuePath: 'issues/vibe-coding/kanban-task-engine/VC-001.md',
+      targetStatus: 'READY',
+    }));
+    expect(noticeMessages.at(-1)).toContain('Moved VC-001 TODO -> READY');
   });
 
   it('renders reconcile preview with title, source path, statuses, and conflict status', () => {

@@ -1,6 +1,7 @@
-import { Notice, Plugin } from 'obsidian';
+import { Plugin } from 'obsidian';
 import { DEFAULT_SETTINGS, type KanbanTaskEnginePluginSettings } from './settings';
 import { registerKanbanTaskEngineCommands } from './commands';
+import { KanbanTaskEngineStatusModal } from './modals/status-modal';
 
 export default class KanbanTaskEnginePlugin extends Plugin {
   settings: KanbanTaskEnginePluginSettings = DEFAULT_SETTINGS;
@@ -11,7 +12,7 @@ export default class KanbanTaskEnginePlugin extends Plugin {
 
     if (this.settings.showRibbonActions) {
       this.addRibbonIcon('list-checks', 'Kanban Task Engine', () => {
-        new Notice('Kanban Task Engine: menu/status open');
+        new KanbanTaskEngineStatusModal(this).open();
       });
     }
   }
