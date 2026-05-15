@@ -189,9 +189,11 @@ describe('verify-docs SVG rendering contract', () => {
 
     expect(existsSync(join(repoRoot, 'scripts/obsidian-plugin-dev-link.mjs'))).toBe(true);
     expect(existsSync(join(repoRoot, 'scripts/obsidian-plugin-smoke-install.mjs'))).toBe(true);
+    expect(existsSync(join(repoRoot, 'scripts/obsidian-plugin-smoke-e2e.mjs'))).toBe(true);
     expect(packageJson.scripts).toMatchObject({
       'obsidian-plugin:dev-link': 'node scripts/obsidian-plugin-dev-link.mjs',
       'obsidian-plugin:smoke-install': 'node scripts/obsidian-plugin-smoke-install.mjs',
+      'obsidian-plugin:smoke-e2e': 'node scripts/obsidian-plugin-smoke-e2e.mjs',
     });
   });
 

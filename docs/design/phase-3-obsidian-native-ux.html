@@ -646,6 +646,16 @@ svg {
         <h3>regenerate 후 일관성</h3>
         <p>board lane, metadata status, issue frontmatter가 같은 status를 보여야 한다.</p>
       </article>
+      <article class="card ok">
+        <span class="tag">Evidence</span>
+        <h3>copy-installed smoke</h3>
+        <p><code>obsidian-plugin:smoke-e2e -- --no-gui</code>가 disposable vault, plugin copy install, registry seed, vault-scoped Obsidian CLI next commands를 생성한다.</p>
+      </article>
+      <article class="card risk">
+        <span class="tag">Blocked</span>
+        <h3>Desktop GUI runtime</h3>
+        <p>현재 run에서는 Obsidian CLI <code>vaults verbose</code>와 Computer Use app state 조회가 timeout되어 GUI E2E를 통과로 주장하지 않는다.</p>
+      </article>
     </div>
   </section>
 
