@@ -1193,7 +1193,11 @@ import { TFile, type Vault } from 'obsidian';
 import type { VaultPort } from '@kanban-task-engine/core';
 
 export class ObsidianVaultPort implements VaultPort {
-  constructor(private readonly vault: Vault) {}
+  readonly root: string;
+
+  constructor(private readonly vault: Vault, root: string) {
+    this.root = root;
+  }
 
   async read(relativePath: string): Promise<string> {
     return this.vault.read(this.file(relativePath));
@@ -1556,4 +1560,3 @@ Spec coverage:
 - Docs/deploy readiness: Tasks 7 through 9.
 
 No plan task may add GitHub/Jira remote sync, agent execution, mobile support, or automatic raw card promotion.
-

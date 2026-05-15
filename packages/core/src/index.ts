@@ -72,3 +72,5 @@ export * from './authoring';
 export * from './executor';
 export * from './ports/vault-port';
 export * from './ports/node-fs-vault-port';
+export * from './use-cases/obsidian-authoring';
+export * from './use-cases/obsidian-board-sync';
