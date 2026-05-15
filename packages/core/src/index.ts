@@ -74,3 +74,5 @@ export * from './ports/vault-port';
 export * from './ports/node-fs-vault-port';
 export * from './use-cases/obsidian-authoring';
 export * from './use-cases/obsidian-board-sync';
+export * from './use-cases/obsidian-board-reconcile';
+export * from './use-cases/obsidian-raw-card-promotion';

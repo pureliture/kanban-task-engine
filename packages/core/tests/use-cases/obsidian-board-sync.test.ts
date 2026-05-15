@@ -145,8 +145,8 @@ class ErroringVaultPort implements VaultPort {
     this.root = root;
   }
 
-  async read(): Promise<string> {
-    return '';
+  async read(relativePath: string): Promise<string> {
+    return readFile(path.join(this.root, relativePath), 'utf8');
   }
 
   async exists(): Promise<boolean> {

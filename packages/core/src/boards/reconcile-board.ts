@@ -60,6 +60,13 @@ export interface ReconcileBoardResult {
   }>;
 }
 
+export interface ReconcileBoardFromRecordsOptions {
+  space: string;
+  boardRelativePath: string;
+  boardMarkdown: string;
+  records: RegistryIssueRecord[];
+}
+
 interface BoardCardMetadata {
   issueId: string;
   recordedStatus: IssueStatus;
@@ -98,29 +105,16 @@ export async function reconcileBoard(options: ReconcileBoardOptions): Promise<Re
   }
 
   const records = await listRegistryIssueRecords({ vaultRoot, space: options.space });
-  result.conflicts.push(...duplicateIssueConflicts(records));
-  if (result.conflicts.length > 0) return result;
-  const recordsById = new Map(records.map(record => [record.id, record]));
-  const cards = parseBoardCards(boardMarkdown, result.conflicts);
-  const seen = new Set<string>();
-
-  for (const card of cards) {
-    if (seen.has(card.issueId)) {
-      result.conflicts.push(conflict('duplicate-card', card, `Duplicate board card for issue ${card.issueId}`));
-      continue;
-    }
-    seen.add(card.issueId);
-
-    const record = recordsById.get(card.issueId);
-    if (!record) {
-      result.conflicts.push(conflict('unknown-issue', card, `Unknown issue id: ${card.issueId}`));
-      continue;
-    }
-
-    validateCardAgainstIssue(card, record, boardRelativePath, result);
-  }
-
+  const preview = reconcileBoardFromRecords({
+    space: options.space,
+    boardRelativePath,
+    boardMarkdown,
+    records,
+  });
+  result.proposals.push(...preview.proposals);
+  result.conflicts.push(...preview.conflicts);
   if (options.apply !== true || result.conflicts.length > 0) return result;
+  const recordsById = new Map(records.map(record => [record.id, record]));
 
   for (const proposal of result.proposals) {
     const move = await moveIssueStatus({
@@ -141,6 +135,40 @@ export async function reconcileBoard(options: ReconcileBoardOptions): Promise<Re
         relativePath: move.relativePath,
       });
     }
+  }
+
+  return result;
+}
+
+export function reconcileBoardFromRecords(options: ReconcileBoardFromRecordsOptions): ReconcileBoardResult {
+  const result: ReconcileBoardResult = {
+    space: options.space,
+    boardRelativePath: options.boardRelativePath,
+    proposals: [],
+    conflicts: [],
+    applied: [],
+  };
+  const records = options.records;
+  result.conflicts.push(...duplicateIssueConflicts(records));
+  if (result.conflicts.length > 0) return result;
+  const recordsById = new Map(records.map(record => [record.id, record]));
+  const cards = parseBoardCards(options.boardMarkdown, result.conflicts);
+  const seen = new Set<string>();
+
+  for (const card of cards) {
+    if (seen.has(card.issueId)) {
+      result.conflicts.push(conflict('duplicate-card', card, `Duplicate board card for issue ${card.issueId}`));
+      continue;
+    }
+    seen.add(card.issueId);
+
+    const record = recordsById.get(card.issueId);
+    if (!record) {
+      result.conflicts.push(conflict('unknown-issue', card, `Unknown issue id: ${card.issueId}`));
+      continue;
+    }
+
+    validateCardAgainstIssue(card, record, options.boardRelativePath, result);
   }
 
   return result;
