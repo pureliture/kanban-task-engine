@@ -11,7 +11,7 @@ export interface KanbanTaskEnginePluginSettings {
 
 export const DEFAULT_SETTINGS: KanbanTaskEnginePluginSettings = {
   defaultSpace: 'vibe-coding',
-  defaultProject: undefined,
+  defaultProject: 'kanban-task-engine',
   defaultPriority: 'P2',
   defaultExecutor: 'human',
   syncBoardAfterCreate: true,
