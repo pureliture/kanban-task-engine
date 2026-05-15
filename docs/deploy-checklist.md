@@ -7,6 +7,8 @@
 - [ ] `pnpm install --frozen-lockfile` succeeds with Node 22 and pnpm 10.32.1.
 - [ ] `pnpm -r build` passes.
 - [ ] `pnpm -r test` passes.
+- [ ] `pnpm --filter @kanban-task-engine/obsidian-plugin build` passes and emits `packages/obsidian-plugin/main.js`.
+- [ ] `pnpm obsidian-plugin:smoke-install -- --vault "$SMOKE_VAULT"` copy-installs `manifest.json` and `main.js` into a disposable vault.
 - [ ] `node packages/cli/dist/bin.js --help` passes after build.
 - [ ] `pnpm --filter @kanban-task-engine/core exec vitest run tests/authoring-runtime-smoke.test.ts` passes after build.
 - [ ] After `pnpm -r build`, run the full prepared disposable vault board write smoke from `docs/kanban-runtime.md`; it must create `registry.yaml`, a valid issue note, run `KANBAN_HOME=$DISPOSABLE_VAULT node packages/cli/dist/bin.js board --write --all`, and grep for board/checksum/Dataview markers.
@@ -25,6 +27,7 @@
 - [ ] Smoke test `kanban sync`, `kanban board`, `kanban next`, and inspect-only `kanban run <id>` against a disposable vault.
 - [ ] Confirm generated board files contain `kanban-plugin: board`, all six status lanes, no dummy cards, and `kanban-task-engine:id=... checksum=sha256:<64-hex>` metadata.
 - [ ] Confirm generated index files contain Dataview queries and remain generated projections, not source-of-truth files.
+- [ ] If local Obsidian Desktop runtime is available, open the disposable smoke vault and run the plugin GUI E2E with the copy-installed artifact.
 - [ ] Run disposable-vault `kanban move` smoke and confirm only issue frontmatter changed.
 - [ ] Run disposable-vault `reconcile-board --dry-run` after a board lane edit and confirm exact diff.
 - [ ] Run disposable-vault `reconcile-board --apply` and regenerate board with `board --write`.
@@ -46,6 +49,8 @@
 - `board --write` succeeds without explicit `KANBAN_HOME`.
 - `board --write` writes outside the disposable vault or follows a symlink escape.
 - Generated board/index files are edited or documented as source of truth.
+- Obsidian plugin acceptance evidence comes from a dev symlink instead of a copy-installed disposable smoke vault.
+- Obsidian Desktop GUI E2E fails when that runtime is part of the release gate.
 - Generated cards omit issue id, source path, status, or projection checksum metadata.
 - CI uses a Node or pnpm version other than Node 22 and pnpm 10.32.1.
 - Work mode can start Codex, Claude, Firebase, OpenClaw, or mobile sync side effects.
