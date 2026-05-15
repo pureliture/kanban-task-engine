@@ -70,3 +70,5 @@ export type {
 export * from './movement/issue-mover';
 export * from './authoring';
 export * from './executor';
+export * from './ports/vault-port';
+export * from './ports/node-fs-vault-port';
