@@ -230,7 +230,7 @@ async function assertVaultPathInsideRoot(vault: VaultPort, relativePath: string)
       realPath = absolutePath;
     }
   }
-  
+
   if (!isInsideOrSame(realPath, realRoot)) {
     throw new Error(`Vault path escapes root: ${relativePath}`);
   }

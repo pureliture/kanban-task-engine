@@ -102,4 +102,3 @@ export * from './use-cases/obsidian-board-reconcile';
 export * from './use-cases/obsidian-raw-card-promotion';
 export * from './use-cases/obsidian-issue-move';
 export * from './runtime/workflow-engine';
-

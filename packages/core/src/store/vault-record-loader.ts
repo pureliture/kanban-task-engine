@@ -69,7 +69,7 @@ export async function listVaultRegistryIssueRecords(
     const space = getRegistrySpace(registry, spaceName);
     const roots = [...issueRootRelatives(space), space.epics];
     const files = await listIssueFiles(input.vault, roots);
-    
+
     for (const relativePath of files) {
       const markdown = await input.vault.read(relativePath);
       records.push(parseVaultIssueRecord({
@@ -141,7 +141,7 @@ function issueRootRelatives(space: RegistrySpace): string[] {
 
 async function listIssueFiles(vault: VaultPort, relativeRoots: string[]): Promise<string[]> {
   const files = new Set<string>();
-  
+
   // Deduplicate relativeRoots lexically to avoid redundant scanning
   const sortedRoots = [...relativeRoots]
     .filter(Boolean)

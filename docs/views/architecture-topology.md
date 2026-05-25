@@ -174,7 +174,7 @@
 async function assertVaultRelativePath(vaultRoot: string, relativePath: string): Promise<void> {
   const resolvedRoot = await fs.realpath(path.resolve(vaultRoot));
   const resolvedTarget = await fs.realpath(path.resolve(vaultRoot, relativePath));
-  
+
   if (!resolvedTarget.startsWith(resolvedRoot)) {
     throw new Error("Directory traversal detected: access blocked.");
   }
