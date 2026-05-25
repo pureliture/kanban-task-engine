@@ -289,7 +289,7 @@ describe('WorkflowEngine', () => {
 
     // 3. Simulate body edits in-between and check preservation:
     await vault.process(relativePath, (content) => content.replace('Purpose.', 'Freshly Edited Purpose!'));
-    
+
     // Now perform successful transition
     const result = await engine.transition({
       vault,
