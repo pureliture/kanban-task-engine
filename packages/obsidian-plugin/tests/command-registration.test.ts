@@ -138,7 +138,9 @@ describe('command registration', () => {
     commandMocks.normalizeIssue.mockResolvedValue({
       id: 'VC-001',
       targetPath: '/vault/root/issues/vibe-coding/kanban-task-engine/VC-001-note.md',
-      wrote: true,
+      wrote: false,
+      inPlace: true,
+      markdown: '---\nid: VC-001\n---'
     });
     const commands: PluginCommand[] = [];
     const plugin = createCommandPlugin(commands);
@@ -151,7 +153,7 @@ describe('command registration', () => {
       sourcePath: 'inbox/rough.md',
       space: 'vibe-coding',
       project: 'kanban-task-engine',
-      write: true,
+      write: false,
     }));
   });
 });
@@ -169,6 +171,10 @@ function createCommandPlugin(commands: PluginCommand[]) {
           getBasePath: () => '/vault/root',
         },
         getAbstractFileByPath: () => null,
+        modify: vi.fn(),
+        create: vi.fn(),
+        delete: vi.fn(),
+        getMarkdownFiles: () => [],
       },
       workspace: {
         getActiveFile: () => Object.assign(new obsidian.TFile(), {

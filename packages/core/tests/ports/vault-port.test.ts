@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { mkdtemp, readFile, readdir, symlink, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir, symlink, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import { NodeFsVaultPort } from '../../src/ports/node-fs-vault-port';
@@ -47,5 +47,20 @@ describe('NodeFsVaultPort', () => {
       /Unsafe vault-relative path|Vault path escapes root/,
     );
     expect(await readFile(path.join(outside, 'secret.md'), 'utf8')).toBe('# Secret\n');
+  });
+
+  it('skips dot entries like .git, .obsidian, or .DS_Store during walk', async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), 'kte-vault-port-dots-'));
+    const vault = new NodeFsVaultPort(root);
+
+    await vault.create('issues/VC-001.md', '# One\n');
+    await mkdir(path.join(root, '.git'), { recursive: true });
+    await writeFile(path.join(root, '.git/secret.md'), '# Secret\n', 'utf8');
+    await mkdir(path.join(root, '.obsidian'), { recursive: true });
+    await writeFile(path.join(root, '.obsidian/settings.md'), '# Settings\n', 'utf8');
+    await writeFile(path.join(root, '.DS_Store'), 'binary', 'utf8');
+
+    const files = await vault.listMarkdownFiles();
+    expect(files).toEqual(['issues/VC-001.md']);
   });
 });

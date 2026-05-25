@@ -79,14 +79,25 @@ import {
 } from './store/vault-record-loader';
 import { NodeFsVaultPort } from './ports/node-fs-vault-port';
 
+export interface FindRegistryIssueByIdOptions {
+  vaultRoot: string;
+  issueId: string;
+  space?: string;
+}
+
+export interface ListRegistryIssueRecordsOptions {
+  vaultRoot: string;
+  space?: string;
+}
+
 /** @deprecated Use findVaultRegistryIssueById instead */
-export async function findRegistryIssueById(options: { vaultRoot: string; issueId: string; space?: string }) {
+export async function findRegistryIssueById(options: FindRegistryIssueByIdOptions) {
   const vault = new NodeFsVaultPort(options.vaultRoot);
   return findVaultRegistryIssueByIdLegacy({ vault, issueId: options.issueId, space: options.space });
 }
 
 /** @deprecated Use listVaultRegistryIssueRecords instead */
-export async function listRegistryIssueRecords(options: { vaultRoot: string; space?: string }) {
+export async function listRegistryIssueRecords(options: ListRegistryIssueRecordsOptions) {
   const vault = new NodeFsVaultPort(options.vaultRoot);
   return listVaultRegistryIssueRecordsLegacy({ vault, space: options.space });
 }
