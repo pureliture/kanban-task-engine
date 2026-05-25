@@ -3,10 +3,8 @@ import YAML from 'yaml';
 import {
   validateIssueFrontmatterForRegistry,
   type IssueFrontmatter,
+  type IssueStatus,
 } from '@kanban-task-engine/schema';
-import { renderDataviewIndexMarkdown } from '../boards/dataview-index-renderer';
-import type { BoardProjection } from '../boards/board-projection';
-import { renderObsidianBoardMarkdown } from '../boards/obsidian-board-renderer';
 import type { VaultPort } from '../ports/vault-port';
 import {
   getRegistrySpace,
@@ -14,25 +12,50 @@ import {
   parseRegistryYaml,
   type RegistrySpace,
   type VaultRegistry,
-} from '../store/registry';
-import type { RegistryIssueRecord } from '../store/registry-issue-source';
+} from './registry';
+import { renderDataviewIndexMarkdown } from '../boards/dataview-index-renderer';
+import { renderObsidianBoardMarkdown } from '../boards/obsidian-board-renderer';
+import type { BoardProjection } from '../boards/board-projection';
+
+export interface RegistryIssueRecord {
+  id: string;
+  status: IssueStatus;
+  space: string;
+  absolutePath: string;
+  relativePath: string;
+  markdown: string;
+  body: string;
+  frontmatter: IssueFrontmatter;
+  projection: {
+    id: string;
+    title: string;
+    type: IssueFrontmatter['type'];
+    status: IssueStatus;
+    priority?: IssueFrontmatter['priority'];
+    project: string;
+    epic?: string;
+    updated: string;
+    relativePath: string;
+  };
+}
 
 export interface ListVaultRegistryIssueRecordsInput {
   vault: VaultPort;
   space?: string;
 }
 
-export interface CollectVaultBoardProjectionInput {
+export interface FindVaultRegistryIssueByIdInput {
   vault: VaultPort;
-  space: string;
-  generatedAt?: string;
+  issueId: string;
+  space?: string;
 }
 
-const TASK_SECTIONS = ['목적', '컨텍스트', 'Acceptance Criteria', '실행 힌트', '로그'];
-const EPIC_SECTIONS = ['목표', '범위', '성공 지표', '하위 티켓', '로그'];
+const TASK_SECTIONS = ['목적', '컨텍스트', 'Acceptance Criteria', '실행 힌트', '로그'] as const;
+const EPIC_SECTIONS = ['목표', '범위', '성공 지표', '하위 티켓', '로그'] as const;
 
 export async function loadVaultRegistry(vault: VaultPort): Promise<VaultRegistry> {
-  return parseRegistryYaml(await vault.read('registry.yaml'));
+  const content = await vault.read('registry.yaml');
+  return parseRegistryYaml(content);
 }
 
 export async function listVaultRegistryIssueRecords(
@@ -44,7 +67,10 @@ export async function listVaultRegistryIssueRecords(
 
   for (const spaceName of spaceNames) {
     const space = getRegistrySpace(registry, spaceName);
-    for (const relativePath of await listIssueFiles(input.vault, [...issueRootRelatives(space), space.epics])) {
+    const roots = [...issueRootRelatives(space), space.epics];
+    const files = await listIssueFiles(input.vault, roots);
+    
+    for (const relativePath of files) {
       const markdown = await input.vault.read(relativePath);
       records.push(parseVaultIssueRecord({
         markdown,
@@ -59,41 +85,19 @@ export async function listVaultRegistryIssueRecords(
   return records.sort((a, b) => a.id.localeCompare(b.id) || a.relativePath.localeCompare(b.relativePath));
 }
 
-export async function collectVaultBoardProjection(
-  input: CollectVaultBoardProjectionInput,
-): Promise<BoardProjection> {
-  const registry = await loadVaultRegistry(input.vault);
-  const space = getRegistrySpace(registry, input.space);
-  const generatedAt = input.generatedAt ?? new Date().toISOString();
-  const issueRecords = await listVaultRegistryIssueRecords({
-    vault: input.vault,
-    space: input.space,
-  });
-  const issues = issueRecords.map(record => record.projection);
-  const boardMarkdown = renderObsidianBoardMarkdown({
-    space: input.space,
-    generatedAt,
-    issues,
-  });
-  const indexMarkdown = renderDataviewIndexMarkdown({
-    space: input.space,
-    generatedAt,
-    issueRoot: space.issues,
-    epicRoot: space.epics,
-  });
+export async function findVaultRegistryIssueById(
+  input: FindVaultRegistryIssueByIdInput,
+): Promise<RegistryIssueRecord> {
+  const records = (await listVaultRegistryIssueRecords({ vault: input.vault, space: input.space }))
+    .filter(record => record.id === input.issueId);
 
-  validateRenderedProjection(boardMarkdown, indexMarkdown);
-
-  return {
-    space: input.space,
-    boardPath: path.resolve(input.vault.root, space.board),
-    indexPath: path.resolve(input.vault.root, space.epicBoard),
-    boardRelativePath: space.board,
-    indexRelativePath: space.epicBoard,
-    issueCount: issues.filter(issue => issue.type !== 'epic').length,
-    boardMarkdown,
-    indexMarkdown,
-  };
+  if (records.length === 0) {
+    throw new Error(`Unknown issue id: ${input.issueId}`);
+  }
+  if (records.length > 1) {
+    throw new Error(`Duplicate issue id: ${input.issueId}`);
+  }
+  return records[0];
 }
 
 export function parseVaultIssueRecord(input: {
@@ -135,21 +139,36 @@ function issueRootRelatives(space: RegistrySpace): string[] {
   return [space.issues];
 }
 
-async function listIssueFiles(vault: VaultPort, roots: string[]): Promise<string[]> {
+async function listIssueFiles(vault: VaultPort, relativeRoots: string[]): Promise<string[]> {
   const files = new Set<string>();
-  for (const root of roots) {
-    let markdownFiles: string[];
+  
+  // Deduplicate relativeRoots lexically to avoid redundant scanning
+  const sortedRoots = [...relativeRoots]
+    .filter(Boolean)
+    .sort((a, b) => a.length - b.length);
+  const dedupedRoots: string[] = [];
+  for (const root of sortedRoots) {
+    if (dedupedRoots.some(parent => isInsideOrSameRelative(root, parent))) continue;
+    dedupedRoots.push(root);
+  }
+
+  for (const root of dedupedRoots) {
     try {
-      markdownFiles = await vault.listMarkdownFiles(root);
+      const markdownFiles = await vault.listMarkdownFiles(root);
+      for (const file of markdownFiles) {
+        files.add(file);
+      }
     } catch (error) {
       if (isNodeError(error) && error.code === 'ENOENT') continue;
       throw error;
     }
-    for (const file of markdownFiles) {
-      files.add(file);
-    }
   }
   return [...files].sort((a, b) => a.localeCompare(b));
+}
+
+function isInsideOrSameRelative(candidate: string, parent: string): boolean {
+  const relative = path.relative(parent, candidate);
+  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
 function parseIssueForRegistry(
@@ -159,7 +178,9 @@ function parseIssueForRegistry(
 ): { frontmatter: IssueFrontmatter; body: string } {
   const normalized = markdown.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   const frontmatterMatch = normalized.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
-  if (!frontmatterMatch) throw new Error('Invalid issue markdown: Missing YAML frontmatter');
+  if (!frontmatterMatch) {
+    throw new Error('Invalid issue markdown: Missing YAML frontmatter');
+  }
 
   let frontmatter: unknown;
   try {
@@ -173,7 +194,9 @@ function parseIssueForRegistry(
     spaceType: space.type,
   });
   const errors: string[] = [];
-  if (!result.ok) errors.push(...result.errors);
+  if (!result.ok) {
+    errors.push(...result.errors);
+  }
 
   const validatedFrontmatter = result.ok ? result.value : undefined;
   const body = normalized.slice(frontmatterMatch[0].length);
@@ -187,8 +210,12 @@ function parseIssueForRegistry(
     }
   }
 
-  if (errors.length > 0) throw new Error(`Invalid issue markdown in ${relativePath}: ${errors.join('; ')}`);
-  if (!validatedFrontmatter) throw new Error(`Invalid issue markdown in ${relativePath}: Missing validated frontmatter`);
+  if (errors.length > 0) {
+    throw new Error(`Invalid issue markdown in ${relativePath}: ${errors.join('; ')}`);
+  }
+  if (!validatedFrontmatter) {
+    throw new Error(`Invalid issue markdown in ${relativePath}: Missing validated frontmatter`);
+  }
   return { frontmatter: validatedFrontmatter, body };
 }
 
@@ -201,15 +228,70 @@ function extractSections(body: string): Record<string, string> {
   for (const line of lines) {
     const match = line.match(/^##\s+(.+)$/);
     if (match) {
-      if (current) sections[current] = buffer.join('\n').trim();
+      if (current) {
+        sections[current] = buffer.join('\n').trim();
+      }
       current = match[1].trim();
       buffer = [];
     } else if (current) {
       buffer.push(line);
     }
   }
-  if (current) sections[current] = buffer.join('\n').trim();
+  if (current) {
+    sections[current] = buffer.join('\n').trim();
+  }
   return sections;
+}
+
+function isRecord(input: unknown): input is Record<string, unknown> {
+  return typeof input === 'object' && input !== null && !Array.isArray(input);
+}
+
+function isNodeError(error: unknown): error is NodeJS.ErrnoException {
+  return typeof error === 'object' && error !== null && 'code' in error;
+}
+
+export interface CollectVaultBoardProjectionInput {
+  vault: VaultPort;
+  space: string;
+  generatedAt?: string;
+}
+
+export async function collectVaultBoardProjection(
+  input: CollectVaultBoardProjectionInput,
+): Promise<BoardProjection> {
+  const registry = await loadVaultRegistry(input.vault);
+  const space = getRegistrySpace(registry, input.space);
+  const generatedAt = input.generatedAt ?? new Date().toISOString();
+  const issueRecords = await listVaultRegistryIssueRecords({
+    vault: input.vault,
+    space: input.space,
+  });
+  const issues = issueRecords.map(record => record.projection);
+  const boardMarkdown = renderObsidianBoardMarkdown({
+    space: input.space,
+    generatedAt,
+    issues,
+  });
+  const indexMarkdown = renderDataviewIndexMarkdown({
+    space: input.space,
+    generatedAt,
+    issueRoot: space.issues,
+    epicRoot: space.epics,
+  });
+
+  validateRenderedProjection(boardMarkdown, indexMarkdown);
+
+  return {
+    space: input.space,
+    boardPath: path.resolve(input.vault.root, space.board),
+    indexPath: path.resolve(input.vault.root, space.epicBoard),
+    boardRelativePath: space.board,
+    indexRelativePath: space.epicBoard,
+    issueCount: issues.filter(issue => issue.type !== 'epic').length,
+    boardMarkdown,
+    indexMarkdown,
+  };
 }
 
 function validateRenderedProjection(boardMarkdown: string, indexMarkdown: string): void {
@@ -219,12 +301,4 @@ function validateRenderedProjection(boardMarkdown: string, indexMarkdown: string
   if (indexMarkdown.includes('kanban-plugin: board') || indexMarkdown.includes('%% kanban:settings')) {
     throw new Error('Rendered Dataview index must be plain Markdown');
   }
-}
-
-function isRecord(input: unknown): input is Record<string, unknown> {
-  return typeof input === 'object' && input !== null && !Array.isArray(input);
-}
-
-function isNodeError(error: unknown): error is NodeJS.ErrnoException {
-  return typeof error === 'object' && error !== null && 'code' in error;
 }

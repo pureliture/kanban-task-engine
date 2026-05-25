@@ -9,7 +9,7 @@ import {
   listVaultRegistryIssueRecords,
   loadVaultRegistry,
   parseVaultIssueRecord,
-} from './obsidian-vault-records';
+} from '../store/vault-record-loader';
 import { getRegistrySpace, type RegistrySpace } from '../store/registry';
 import { StateMachine } from '../state-machine';
 

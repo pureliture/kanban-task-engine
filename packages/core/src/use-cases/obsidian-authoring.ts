@@ -5,7 +5,7 @@ import type { VaultPort } from '../ports/vault-port';
 import { getRegistrySpace, type RegistrySpace } from '../store/registry';
 import { allocateNextIssueId } from '../store/sequence';
 import { assertMatchingVaultRoot, writeObsidianBoardForSpace } from './obsidian-board-sync';
-import { listVaultRegistryIssueRecords, loadVaultRegistry } from './obsidian-vault-records';
+import { listVaultRegistryIssueRecords, loadVaultRegistry } from '../store/vault-record-loader';
 
 const PRIORITIES = new Set<string>(['P0', 'P1', 'P2', 'P3']);
 const EXECUTORS = new Set<string>(['human', 'codex', 'claude-code']);

@@ -1,11 +1,13 @@
-import fs from 'fs/promises';
-import path from 'path';
 import { isIssueStatus, type IssueStatus } from '@kanban-task-engine/schema';
 import { StateMachine } from '../state-machine';
-import { getRegistrySpace, loadRegistry } from '../store/registry';
-import { listRegistryIssueRecords, type RegistryIssueRecord } from '../store/registry-issue-source';
-import { resolveRegistryPath } from '../store/registry-path';
-import { resolveVaultPath } from '../store/vault-path';
+import { getRegistrySpace } from '../store/registry';
+import { type VaultPort } from '../ports/vault-port';
+import { NodeFsVaultPort } from '../ports/node-fs-vault-port';
+import {
+  listVaultRegistryIssueRecords,
+  loadVaultRegistry,
+  type RegistryIssueRecord,
+} from '../store/vault-record-loader';
 import { moveIssueStatus } from '../movement/issue-mover';
 import { computeBoardProjectionChecksum } from './obsidian-board-renderer';
 
@@ -41,6 +43,7 @@ export interface BoardReconcileConflict {
 }
 
 export interface ReconcileBoardOptions {
+  vault?: VaultPort;
   vaultRoot: string;
   space: string;
   apply?: boolean;
@@ -76,11 +79,10 @@ interface BoardCardMetadata {
 }
 
 export async function reconcileBoard(options: ReconcileBoardOptions): Promise<ReconcileBoardResult> {
-  const vaultRoot = path.resolve(options.vaultRoot);
-  const registry = await loadRegistry(await resolveVaultPath(vaultRoot, 'registry.yaml'));
+  const vault = options.vault ?? new NodeFsVaultPort(options.vaultRoot);
+  const registry = await loadVaultRegistry(vault);
   const space = getRegistrySpace(registry, options.space);
   const boardRelativePath = space.board;
-  const boardPath = await resolveRegistryPath(vaultRoot, boardRelativePath, { field: `${options.space}.board` });
   const result: ReconcileBoardResult = {
     space: options.space,
     boardRelativePath,
@@ -91,7 +93,7 @@ export async function reconcileBoard(options: ReconcileBoardOptions): Promise<Re
 
   let boardMarkdown: string;
   try {
-    boardMarkdown = await fs.readFile(boardPath, 'utf8');
+    boardMarkdown = await vault.read(boardRelativePath);
   } catch (error) {
     if (isNodeError(error) && error.code === 'ENOENT') {
       result.conflicts.push({
@@ -104,7 +106,7 @@ export async function reconcileBoard(options: ReconcileBoardOptions): Promise<Re
     throw error;
   }
 
-  const records = await listRegistryIssueRecords({ vaultRoot, space: options.space });
+  const records = await listVaultRegistryIssueRecords({ vault, space: options.space });
   const preview = reconcileBoardFromRecords({
     space: options.space,
     boardRelativePath,
@@ -118,7 +120,8 @@ export async function reconcileBoard(options: ReconcileBoardOptions): Promise<Re
 
   for (const proposal of result.proposals) {
     const move = await moveIssueStatus({
-      vaultRoot,
+      vault,
+      vaultRoot: options.vaultRoot,
       issueId: proposal.issueId,
       targetStatus: proposal.proposedStatus,
       dryRun: false,
