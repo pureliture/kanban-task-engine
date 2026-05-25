@@ -201,7 +201,15 @@ export class MarkdownStore implements TaskStore {
   }
 
   private slugify(text: string): string {
-    return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const slug = text
+      .normalize('NFKD')
+      .replace(/[^\p{L}\p{N}\s-]/gu, '')
+      .trim()
+      .toLowerCase()
+      .replace(/[_\s]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+    return slug.normalize('NFC') || 'issue';
   }
 
   private matchesFilter(task: CanonicalTaskModel, filter?: TaskFilter): boolean {

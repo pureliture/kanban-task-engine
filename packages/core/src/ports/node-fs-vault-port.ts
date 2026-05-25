@@ -65,6 +65,9 @@ export class NodeFsVaultPort implements VaultPort {
   private async walk(directory: string, results: string[]): Promise<void> {
     await assertExistingPathInsideRoot(this.root, directory, path.relative(this.root, directory));
     for (const entry of await fs.readdir(directory, { withFileTypes: true })) {
+      if (entry.name.startsWith('.')) {
+        continue;
+      }
       const absolutePath = path.join(directory, entry.name);
       const relativePath = path.relative(this.root, absolutePath).split(path.sep).join('/');
       if (entry.isSymbolicLink()) {

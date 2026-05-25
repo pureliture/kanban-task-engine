@@ -7,6 +7,7 @@ import type { VaultPort } from '../ports/vault-port';
 import type { RegistryIssueRecord } from '../store/vault-record-loader';
 import { POLICY_EVENTS } from '../events';
 import { markdownIssueToCanonical } from '../store/mapper';
+import { parseFrontmatter, extractBody } from '../store/frontmatter-utils';
 
 export interface WorkflowTransitionInput {
   vault: VaultPort;
@@ -73,9 +74,59 @@ export class WorkflowEngine {
 
     const now = input.now ?? new Date().toISOString();
 
-    // 2. Policy Engine evaluation
+    const moveLogEntry = this.formatMoveLog({
+      now,
+      oldStatus,
+      newStatus,
+      reason: input.reason,
+    });
+
+    const writtenContent = await vault.process(record.relativePath, (currentContent) => {
+      const currentFrontmatter = parseFrontmatter(currentContent);
+      const currentBody = extractBody(currentContent);
+
+      if (!currentFrontmatter) {
+        throw new Error(`Invalid frontmatter in current note at ${record.relativePath}`);
+      }
+
+      // Guard ID freshness
+      if (currentFrontmatter.id !== record.id) {
+        throw new Error(`Stale ID mismatch: expected ${record.id}, found ${currentFrontmatter.id}`);
+      }
+
+      // Guard status freshness
+      if (currentFrontmatter.status !== record.status) {
+        throw new Error(`Stale status mismatch: expected ${record.status}, found ${currentFrontmatter.status}`);
+      }
+
+      // Guard type freshness
+      if (currentFrontmatter.type !== record.frontmatter.type) {
+        throw new Error(`Stale type mismatch: expected ${record.frontmatter.type}, found ${currentFrontmatter.type}`);
+      }
+
+      // Preserve current body edits and append log into current ## 로그
+      const bodyWithLog = this.appendLog(currentBody, moveLogEntry);
+
+      const newFrontmatter: Record<string, unknown> = {
+        ...currentFrontmatter,
+        status: newStatus,
+        updated: now,
+      };
+      if (newStatus === 'DONE') {
+        newFrontmatter.completed = now;
+      } else {
+        delete newFrontmatter.completed;
+      }
+
+      const content = `---\n${YAML.stringify(newFrontmatter).trimEnd()}\n---\n\n${bodyWithLog.trimStart()}`;
+      return content.endsWith('\n') ? content : `${content}\n`;
+    });
+
+    // 2. Policy Engine / Event Bus evaluation only after successful write
     if (this.policyEngine) {
-      const task = markdownIssueToCanonical(record.markdown, record.relativePath);
+      const task = markdownIssueToCanonical(writtenContent, record.relativePath);
+      task.workflow.normalized_status = oldStatus;
+      task.workflow.raw_status = oldStatus;
       await this.policyEngine.onTransition(task, newStatus);
     } else if (this.eventBus) {
       // 3. Direct Event Bus publishing if PolicyEngine is not used but EventBus is present
@@ -84,30 +135,6 @@ export class WorkflowEngine {
         transition: { from: oldStatus, to: newStatus },
       });
     }
-
-    // 4. Markdown metadata write-back and log appending
-    const frontmatter: Record<string, unknown> = {
-      ...record.frontmatter,
-      status: newStatus,
-      updated: now,
-    };
-    if (newStatus === 'DONE') {
-      frontmatter.completed = now;
-    } else {
-      delete frontmatter.completed;
-    }
-
-    const moveLogEntry = this.formatMoveLog({
-      now,
-      oldStatus,
-      newStatus,
-      reason: input.reason,
-    });
-
-    const bodyWithLog = this.appendLog(record.body, moveLogEntry);
-    const content = `---\n${YAML.stringify(frontmatter).trimEnd()}\n---\n\n${bodyWithLog.trimStart()}`;
-
-    await vault.process(record.relativePath, () => content.endsWith('\n') ? content : `${content}\n`);
 
     return result;
   }

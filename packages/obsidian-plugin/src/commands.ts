@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { Notice, TFile } from 'obsidian';
 import { normalizeIssue } from '@kanban-task-engine/core/authoring';
 import { previewObsidianBoardMoves } from '@kanban-task-engine/core/use-cases/obsidian-board-reconcile';
@@ -77,8 +78,18 @@ async function normalizeCurrentNote(plugin: KanbanTaskEnginePlugin): Promise<voi
       sourcePath: activeFile.path,
       space: plugin.settings.defaultSpace,
       project: plugin.settings.defaultProject,
-      write: true,
+      write: false,
     });
+
+    const relativeTargetPath = path.relative(vault.root, result.targetPath).split(path.sep).join('/');
+
+    if (result.inPlace) {
+      await plugin.app.vault.modify(activeFile, result.markdown);
+    } else {
+      await vault.create(relativeTargetPath, result.markdown);
+      await plugin.app.vault.delete(activeFile);
+    }
+
     const board = await writeObsidianBoardForSpace({
       vault,
       vaultRoot: vault.root,

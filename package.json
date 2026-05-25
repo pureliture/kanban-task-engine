@@ -17,7 +17,7 @@
     "migrate": "tsx scripts/migrate-tickets.ts",
     "obsidian-plugin:dev-link": "node scripts/obsidian-plugin-dev-link.mjs",
     "obsidian-plugin:smoke-install": "node scripts/obsidian-plugin-smoke-install.mjs",
-    "obsidian-plugin:smoke-e2e": "node scripts/obsidian-plugin-smoke-e2e.mjs"
+    "obsidian-plugin:smoke-setup": "node scripts/obsidian-plugin-smoke-setup.mjs"
   },
   "devDependencies": {
     "gray-matter": "^4.0.3",

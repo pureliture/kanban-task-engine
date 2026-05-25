@@ -246,4 +246,62 @@ describe('WorkflowEngine', () => {
     expect(exitHandler).toHaveBeenCalledTimes(1);
     expect(enterHandler).toHaveBeenCalledTimes(1);
   });
+
+  it('guards ID and status freshness and preserves body edits in vault.process', async () => {
+    const root = await createTempVault();
+    const vault = new NodeFsVaultPort(root);
+
+    const relativePath = 'issues/space/project/VC-001.md';
+    await vault.create(relativePath, VALID_TASK_MARKDOWN);
+    const record = parseVaultIssueRecord({
+      markdown: VALID_TASK_MARKDOWN,
+      relativePath,
+      space: SPACE_MOCK,
+      spaceName: 'space',
+      vaultRoot: root,
+    });
+
+    const engine = new WorkflowEngine();
+
+    // 1. Simulate ID mismatch on disk:
+    await vault.process(relativePath, (content) => content.replace('id: VC-001', 'id: VC-999'));
+    await expect(engine.transition({
+      vault,
+      record,
+      targetStatus: 'READY',
+      now: '2026-05-25T12:00:00.000Z',
+    })).rejects.toThrow(/Stale ID mismatch/);
+
+    // Reset back
+    await vault.process(relativePath, (content) => content.replace('id: VC-999', 'id: VC-001'));
+
+    // 2. Simulate status mismatch on disk:
+    await vault.process(relativePath, (content) => content.replace('status: TODO', 'status: READY'));
+    await expect(engine.transition({
+      vault,
+      record,
+      targetStatus: 'READY',
+      now: '2026-05-25T12:00:00.000Z',
+    })).rejects.toThrow(/Stale status mismatch/);
+
+    // Reset back
+    await vault.process(relativePath, (content) => content.replace('status: READY', 'status: TODO'));
+
+    // 3. Simulate body edits in-between and check preservation:
+    await vault.process(relativePath, (content) => content.replace('Purpose.', 'Freshly Edited Purpose!'));
+    
+    // Now perform successful transition
+    const result = await engine.transition({
+      vault,
+      record,
+      targetStatus: 'READY',
+      now: '2026-05-25T12:00:00.000Z',
+    });
+
+    expect(result.changed).toBe(true);
+    const updatedContent = await vault.read(relativePath);
+    expect(updatedContent).toContain('Freshly Edited Purpose!');
+    expect(updatedContent).not.toContain('Purpose.');
+    expect(updatedContent).toContain('- 2026-05-25T12:00:00.000Z move: TODO -> READY');
+  });
 });
