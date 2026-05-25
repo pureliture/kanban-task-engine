@@ -91,9 +91,9 @@ describe('WorkflowEngine', () => {
   it('performs valid transitions and updates frontmatter and logs', async () => {
     const root = await createTempVault();
     const vault = new NodeFsVaultPort(root);
-    
+
     const relativePath = 'issues/space/project/VC-001.md';
-    
+
     await vault.create(relativePath, VALID_TASK_MARKDOWN);
     const record = parseVaultIssueRecord({
       markdown: VALID_TASK_MARKDOWN,
@@ -130,7 +130,7 @@ describe('WorkflowEngine', () => {
   it('rejects invalid transitions', async () => {
     const root = await createTempVault();
     const vault = new NodeFsVaultPort(root);
-    
+
     const relativePath = 'issues/space/project/VC-001.md';
     await vault.create(relativePath, VALID_TASK_MARKDOWN);
     const record = parseVaultIssueRecord({
@@ -152,7 +152,7 @@ describe('WorkflowEngine', () => {
   it('enforces epic transition constraints', async () => {
     const root = await createTempVault();
     const vault = new NodeFsVaultPort(root);
-    
+
     const relativePath = 'issues/space/project/VC-epic.md';
     await vault.create(relativePath, VALID_EPIC_MARKDOWN);
     const record = parseVaultIssueRecord({
@@ -164,7 +164,7 @@ describe('WorkflowEngine', () => {
     });
 
     const engine = new WorkflowEngine();
-    
+
     // Epic TODO -> DONE is allowed
     const validResult = await engine.transition({
       vault,
@@ -184,7 +184,7 @@ describe('WorkflowEngine', () => {
   it('emits events to EventBus on transition', async () => {
     const root = await createTempVault();
     const vault = new NodeFsVaultPort(root);
-    
+
     const relativePath = 'issues/space/project/VC-001.md';
     await vault.create(relativePath, VALID_TASK_MARKDOWN);
     const record = parseVaultIssueRecord({
@@ -216,7 +216,7 @@ describe('WorkflowEngine', () => {
   it('evaluates enter/exit rules using PolicyEngine', async () => {
     const root = await createTempVault();
     const vault = new NodeFsVaultPort(root);
-    
+
     const relativePath = 'issues/space/project/VC-001.md';
     await vault.create(relativePath, VALID_TASK_MARKDOWN);
     const record = parseVaultIssueRecord({

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
+
   <style>
     /* Premium CSS Variables & Harmonious HSL Palette */
     :root {
@@ -19,7 +19,7 @@
       --border-glow: rgba(99, 102, 241, 0.4);
       --text-main: #E2E8F0;
       --text-muted: #94A3B8;
-      
+
       /* Glowing Gradients */
       --gradient-primary: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
       --gradient-accent: linear-gradient(135deg, #3B82F6 0%, #10B981 100%);
@@ -41,7 +41,7 @@
       font-family: 'Inter', sans-serif;
       line-height: 1.6;
       overflow-x: hidden;
-      background-image: 
+      background-image:
         radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
         radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 40%);
     }
@@ -496,11 +496,11 @@
 </head>
 <body>
   <div class="container">
-    
+
     <header>
       <h1>Kanban Task Engine - Architectural Topology</h1>
       <p>코드베이스 리팩토링 및 3대 개선 후보군 적용 완료에 따른 시스템 정합성 및 의존성 시각화 대시보드</p>
-      
+
       <div class="badge-bar">
         <div class="badge">
           <span class="dot green"></span>
@@ -524,7 +524,7 @@
           <span>인터랙티브 레이어 토폴로지 맵</span>
           <span style="font-size: 0.8rem; color: var(--text-muted);">컴포넌트를 선택하여 경계 흐름을 추적해 보세요.</span>
         </div>
-        
+
         <div class="topology-container">
           <svg viewBox="0 0 700 440">
             <!-- Defs for markers -->
@@ -577,7 +577,7 @@
 
             <!-- Loader -> VaultPort -->
             <path id="link-loader-port" d="M 330 270 L 330 360" class="link" />
-            
+
             <!-- VaultPort -> NodeFsPort -->
             <path id="link-port-impl" d="M 330 380 L 540 380" class="link" />
 
@@ -650,7 +650,7 @@
           <span>컴포넌트 명세 & 관계 분석</span>
           <div class="info-tag" id="panel-tag">NEW (Refactored)</div>
         </div>
-        
+
         <div class="detail-panel">
           <div>
             <div class="info-header">
@@ -689,7 +689,7 @@
       <div class="card-title">
         <span>의존성 경계 개선 및 중복 로직 제거 (Before & After 비교)</span>
       </div>
-      
+
       <div class="code-comparison-tabs">
         <button class="comparison-tab active" onclick="switchDiff('mover')">1. CLI Mover (issue-mover.ts)</button>
         <button class="comparison-tab" onclick="switchDiff('obsidian')">2. Obsidian Sync (obsidian-issue-move.ts)</button>
@@ -916,7 +916,7 @@
           prevNode.classList.remove('active-loader');
         }
       }
-      
+
       const currentNode = document.getElementById(`node-${nodeId}`);
       if (currentNode) {
         if (nodeId === 'record-loader' || nodeId === 'vault-port' || nodeId === 'node-fs-port') {
@@ -925,7 +925,7 @@
           currentNode.classList.add('active');
         }
       }
-      
+
       activeNodeId = nodeId;
       const data = nodeInfo[nodeId];
 
@@ -968,8 +968,8 @@
     }
 
     function resetLinks() {
-      const links = ['link-cli-move', 'link-usecase-move', 'link-usecase-reconcile', 
-                     'link-engine-sm', 'link-engine-policy', 'link-engine-loader', 
+      const links = ['link-cli-move', 'link-usecase-move', 'link-usecase-reconcile',
+                     'link-engine-sm', 'link-engine-policy', 'link-engine-loader',
                      'link-reconcile-loader', 'link-loader-port', 'link-port-impl'];
       links.forEach(id => {
         const link = document.getElementById(id);
