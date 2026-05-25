@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { getRegistrySpace, listRegistrySpaces } from '../store/registry';
 import { assertVaultRelativePath, type VaultPort } from '../ports/vault-port';
+import { assertVaultPathInsideRoot } from '../ports/vault-path-security';
 import { NodeFsVaultPort } from '../ports/node-fs-vault-port';
 import {
   listVaultRegistryIssueRecords,
@@ -87,8 +88,8 @@ export async function collectBoardProjection(options: CollectBoardProjectionOpti
   }
 
   // Symlink containment checks
-  await assertVaultPathInsideRoot(vault, boardRelativePath);
-  await assertVaultPathInsideRoot(vault, indexRelativePath);
+  await assertVaultPathInsideRoot(vault.root, boardRelativePath);
+  await assertVaultPathInsideRoot(vault.root, indexRelativePath);
 
   const boardPath = path.resolve(vault.root, boardRelativePath);
   const indexPath = path.resolve(vault.root, indexRelativePath);
@@ -208,58 +209,4 @@ function validateRenderedProjection(boardMarkdown: string, indexMarkdown: string
   if (indexMarkdown.includes('kanban-plugin: board') || indexMarkdown.includes('%% kanban:settings')) {
     throw new Error('Rendered Dataview index must be plain Markdown');
   }
-}
-
-async function assertVaultPathInsideRoot(vault: VaultPort, relativePath: string): Promise<void> {
-  assertVaultRelativePath(relativePath);
-  const absolutePath = path.resolve(vault.root, relativePath);
-  let realRoot: string;
-  let realPath: string;
-  try {
-    realRoot = await fs.realpath(vault.root);
-  } catch {
-    realRoot = vault.root;
-  }
-  try {
-    realPath = await fs.realpath(absolutePath);
-  } catch {
-    const nearest = await nearestExistingPath(absolutePath);
-    try {
-      realPath = await fs.realpath(nearest);
-    } catch {
-      realPath = absolutePath;
-    }
-  }
-
-  if (!isInsideOrSame(realPath, realRoot)) {
-    throw new Error(`Vault path escapes root: ${relativePath}`);
-  }
-}
-
-async function nearestExistingPath(absolutePath: string): Promise<string> {
-  let current = absolutePath;
-  for (;;) {
-    try {
-      await fs.lstat(current);
-      return current;
-    } catch (error) {
-      if (!isNodeError(error) || error.code !== 'ENOENT') {
-        throw error;
-      }
-      const parent = path.dirname(current);
-      if (parent === current) {
-        throw error;
-      }
-      current = parent;
-    }
-  }
-}
-
-function isInsideOrSame(candidate: string, root: string): boolean {
-  const relative = path.relative(root, candidate);
-  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
-}
-
-function isNodeError(error: unknown): error is NodeJS.ErrnoException {
-  return typeof error === 'object' && error !== null && 'code' in error;
 }

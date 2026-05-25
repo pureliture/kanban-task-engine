@@ -48,7 +48,7 @@ export async function moveIssueStatus(options: MoveIssueStatusOptions): Promise<
   validateProvidedRecord(options, record);
   const oldStatus = record.frontmatter.status;
   const newStatus = options.targetStatus;
-  const dryRun = options.dryRun ?? false;
+  const dryRun = options.dryRun ?? true;
 
   if (record.frontmatter.type === 'epic') {
     validateEpicTransition(options.issueId, oldStatus, newStatus);

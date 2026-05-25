@@ -49,8 +49,10 @@ describe('issue mover', () => {
     expect(content).toContain('- 2026-05-13T10:00:00.000Z move: TODO -> READY (operator selected item)');
   });
 
-  it('applies by default when dryRun is omitted', async () => {
+  it('dry-runs by default when dryRun is omitted', async () => {
     const vaultRoot = await makePhase3Vault({ status: 'TODO' });
+    const issuePath = path.join(vaultRoot, 'issues/vibe-coding/kanban-task-engine/VC-001-ready.md');
+    const before = await fs.readFile(issuePath, 'utf8');
 
     const result = await moveIssueStatus({
       vaultRoot,
@@ -59,9 +61,8 @@ describe('issue mover', () => {
       now: '2026-05-13T10:00:00.000Z',
     });
 
-    expect(result.dryRun).toBe(false);
-    const content = await fs.readFile(path.join(vaultRoot, result.relativePath), 'utf8');
-    expect(content).toContain('status: READY');
+    expect(result.dryRun).toBe(true);
+    await expect(fs.readFile(issuePath, 'utf8')).resolves.toBe(before);
   });
 
   it('inserts a move log inside the log section before later sections', async () => {
