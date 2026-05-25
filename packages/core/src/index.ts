@@ -59,14 +59,38 @@ export { resolveVaultPath } from './store/vault-path';
 export { allocateNextIssueId, parseIssueSequence } from './store/sequence';
 export type { AllocateIssueIdOptions } from './store/sequence';
 export {
-  findRegistryIssueById,
-  listRegistryIssueRecords,
-} from './store/registry-issue-source';
+  findVaultRegistryIssueById,
+  listVaultRegistryIssueRecords,
+  loadVaultRegistry,
+  parseVaultIssueRecord,
+  collectVaultBoardProjection,
+} from './store/vault-record-loader';
 export type {
-  FindRegistryIssueByIdOptions,
-  ListRegistryIssueRecordsOptions,
   RegistryIssueRecord,
-} from './store/registry-issue-source';
+  ListVaultRegistryIssueRecordsInput,
+  FindVaultRegistryIssueByIdInput,
+  CollectVaultBoardProjectionInput,
+} from './store/vault-record-loader';
+
+// Legacy compatible wrappers
+import {
+  findVaultRegistryIssueById as findVaultRegistryIssueByIdLegacy,
+  listVaultRegistryIssueRecords as listVaultRegistryIssueRecordsLegacy,
+} from './store/vault-record-loader';
+import { NodeFsVaultPort } from './ports/node-fs-vault-port';
+
+/** @deprecated Use findVaultRegistryIssueById instead */
+export async function findRegistryIssueById(options: { vaultRoot: string; issueId: string; space?: string }) {
+  const vault = new NodeFsVaultPort(options.vaultRoot);
+  return findVaultRegistryIssueByIdLegacy({ vault, issueId: options.issueId, space: options.space });
+}
+
+/** @deprecated Use listVaultRegistryIssueRecords instead */
+export async function listRegistryIssueRecords(options: { vaultRoot: string; space?: string }) {
+  const vault = new NodeFsVaultPort(options.vaultRoot);
+  return listVaultRegistryIssueRecordsLegacy({ vault, space: options.space });
+}
+
 export * from './movement/issue-mover';
 export * from './authoring';
 export * from './executor';

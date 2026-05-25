@@ -4,7 +4,7 @@ import type { VaultPort } from '../ports/vault-port';
 import { StateMachine } from '../state-machine';
 import { assertMatchingVaultRoot, writeObsidianBoardForSpace } from './obsidian-board-sync';
 import { getRegistrySpace } from '../store/registry';
-import { loadVaultRegistry, parseVaultIssueRecord } from './obsidian-vault-records';
+import { loadVaultRegistry, parseVaultIssueRecord } from '../store/vault-record-loader';
 
 export interface MoveObsidianIssueStatusInput {
   vault: VaultPort;

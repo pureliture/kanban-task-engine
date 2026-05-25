@@ -1,13 +1,15 @@
 import YAML from 'yaml';
 import { isIssueStatus, type IssueStatus } from '@kanban-task-engine/schema';
 import { StateMachine } from '../state-machine';
-import { atomicWriteFile } from '../store/fs-utils';
+import { type VaultPort } from '../ports/vault-port';
+import { NodeFsVaultPort } from '../ports/node-fs-vault-port';
 import {
-  findRegistryIssueById,
+  findVaultRegistryIssueById,
   type RegistryIssueRecord,
-} from '../store/registry-issue-source';
+} from '../store/vault-record-loader';
 
 export interface MoveIssueStatusOptions {
+  vault?: VaultPort;
   vaultRoot: string;
   issueId: string;
   targetStatus: IssueStatus;
@@ -35,8 +37,10 @@ export async function moveIssueStatus(options: MoveIssueStatusOptions): Promise<
     throw new Error(`Invalid target status: ${String(options.targetStatus)}`);
   }
 
-  const record = options.record ?? await findRegistryIssueById({
-    vaultRoot: options.vaultRoot,
+  const vault = options.vault ?? new NodeFsVaultPort(options.vaultRoot);
+
+  const record = options.record ?? await findVaultRegistryIssueById({
+    vault,
     issueId: options.issueId,
     space: options.space,
   });
@@ -81,7 +85,7 @@ export async function moveIssueStatus(options: MoveIssueStatusOptions): Promise<
     newStatus,
     reason: options.reason,
   })).trimStart()}`;
-  await atomicWriteFile(record.absolutePath, content.endsWith('\n') ? content : `${content}\n`);
+  await vault.process(record.relativePath, () => content.endsWith('\n') ? content : `${content}\n`);
   return result;
 }
 
