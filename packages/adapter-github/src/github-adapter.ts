@@ -5,8 +5,28 @@ import {
   TaskRef,
 } from '@kanban-task-engine/core';
 import { graphql } from '@octokit/graphql';
-import { githubIssueToCanonical, GitHubIssueData } from './github-mapper';
-import { normalizedToGithubStatus } from './status-mapping';
+import {
+  githubIssueToCanonical,
+  GitHubIssueData,
+  canonicalToGithubDraft,
+  GitHubDraftPayload,
+  parseKanbanIdFromBody,
+} from './github-mapper';
+import { normalizedToGithubStatus, resolveStatusOptionId } from './status-mapping';
+
+export interface ProjectDraftItem {
+  itemId: string;
+  title: string;
+  kanbanId?: string;
+  status?: string;
+}
+
+export interface CreateDraftResult {
+  payload: GitHubDraftPayload;
+  dryRun: boolean;
+  itemId?: string;
+  appliedStatusOptionId?: string;
+}
 
 export interface GitHubAdapterConfig {
   token: string;
@@ -183,5 +203,100 @@ export class GitHubAdapter implements WorkStateProvider {
   async resolveRef(taskRef: TaskRef): Promise<string> {
     const repoFullName = `${this.config.owner}/${this.config.repo}`;
     return `https://github.com/${repoFullName}/issues/${taskRef.external_id.replace('#', '')}`;
+  }
+
+  // ===================================================================
+  // 정방향 발행 (canonical → GitHub Projects draft 카드). a: Jira 대체.
+  // ===================================================================
+
+  /** Project Status 단일선택 필드의 {옵션이름: optionId} 맵을 조회한다. */
+  async fetchStatusOptions(): Promise<Record<string, string>> {
+    const query = `
+      query($projectId: ID!) {
+        node(id: $projectId) {
+          ... on ProjectV2 {
+            field(name: "Status") {
+              ... on ProjectV2SingleSelectField { options { id name } }
+            }
+          }
+        }
+      }
+    `;
+    const result: any = await this.graphqlWithAuth(query, { projectId: this.config.projectId });
+    const options: Record<string, string> = {};
+    for (const o of result.node?.field?.options ?? []) options[o.name] = o.id;
+    return options;
+  }
+
+  /** canonical task 를 Project draft 카드로 발행하고 status 를 설정한다. dryRun 시 payload 만 반환. */
+  async createDraftInProject(
+    task: CanonicalTaskModel,
+    opts: { dryRun?: boolean } = {},
+  ): Promise<CreateDraftResult> {
+    const payload = canonicalToGithubDraft(task);
+    if (opts.dryRun) return { payload, dryRun: true };
+
+    const createMutation = `
+      mutation($projectId: ID!, $title: String!, $body: String!) {
+        addProjectV2DraftIssue(input: { projectId: $projectId, title: $title, body: $body }) {
+          projectItem { id }
+        }
+      }
+    `;
+    const created: any = await this.graphqlWithAuth(createMutation, {
+      projectId: this.config.projectId,
+      title: payload.title,
+      body: payload.body,
+    });
+    const itemId = created.addProjectV2DraftIssue.projectItem.id;
+
+    const options = await this.fetchStatusOptions();
+    const optionId = resolveStatusOptionId(payload.statusOption, options);
+    if (optionId) {
+      const setStatus = `
+        mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+          updateProjectV2ItemFieldValue(
+            input: { projectId: $projectId, itemId: $itemId, fieldId: $fieldId, value: { singleSelectOptionId: $optionId } }
+          ) { projectV2Item { id } }
+        }
+      `;
+      await this.graphqlWithAuth(setStatus, {
+        projectId: this.config.projectId,
+        itemId,
+        fieldId: this.config.statusFieldId,
+        optionId,
+      });
+    }
+    return { payload, dryRun: false, itemId, appliedStatusOptionId: optionId };
+  }
+
+  /** Project 의 draft 카드들을 조회한다 (역방향 sync 입력: kanbanId ↔ status). */
+  async fetchProjectDrafts(): Promise<ProjectDraftItem[]> {
+    const query = `
+      query($projectId: ID!) {
+        node(id: $projectId) {
+          ... on ProjectV2 {
+            items(last: 100) {
+              nodes {
+                id
+                content { ... on DraftIssue { title body } }
+                fieldValueByName(name: "Status") {
+                  ... on ProjectV2ItemFieldSingleSelectValue { name }
+                }
+              }
+            }
+          }
+        }
+      }
+    `;
+    const result: any = await this.graphqlWithAuth(query, { projectId: this.config.projectId });
+    return (result.node?.items?.nodes ?? [])
+      .filter((n: any) => n.content?.title)
+      .map((n: any) => ({
+        itemId: n.id,
+        title: n.content.title,
+        kanbanId: parseKanbanIdFromBody(n.content.body),
+        status: n.fieldValueByName?.name,
+      }));
   }
 }

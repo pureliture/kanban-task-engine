@@ -22,5 +22,6 @@ describe('canonicalToJiraPayload', () => {
     expect(payload.fields.issuetype.name).toBe('Story');
     expect(payload.fields.priority.name).toBe('High');
     expect(payload.fields.labels).toEqual(['auth']);
+    expect(payload.statusHint).toBe('Ready'); // READY → Jira hint (ADR-0003 bridge)
   });
 });
