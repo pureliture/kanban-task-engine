@@ -33,3 +33,15 @@ export function githubStatusToNormalized(githubStatus: string): NormalizedStatus
 export function normalizedToGithubStatus(normalized: NormalizedStatus): string {
   return CANONICAL_TO_GITHUB[normalized] ?? 'Backlog';
 }
+
+/**
+ * GitHub Projects Status 옵션 이름 → optionId resolve.
+ * 대상 project 에 옵션이 없으면(예: Blocked 부재) In Review → Backlog 순으로 폴백한다.
+ * options 는 {optionName: optionId} 맵 (런타임 조회).
+ */
+export function resolveStatusOptionId(
+  githubStatusName: string,
+  options: Record<string, string>,
+): string | undefined {
+  return options[githubStatusName] ?? options['In Review'] ?? options['Backlog'];
+}

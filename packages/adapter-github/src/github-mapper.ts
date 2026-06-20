@@ -4,7 +4,7 @@ import {
   RawStatusCategory,
   TaskRef,
 } from '@kanban-task-engine/core';
-import { githubStatusToNormalized } from './status-mapping';
+import { githubStatusToNormalized, normalizedToGithubStatus } from './status-mapping';
 
 export interface GitHubIssueData {
   number: number;
@@ -119,4 +119,37 @@ function mapPriority(raw: string): CanonicalTaskModel['classification']['priorit
     'Trivial': 'Trivial',
   };
   return map[raw] ?? 'Medium';
+}
+
+// =====================================================================
+// 역방향(canonical → GitHub Projects draft). a: Jira 대체 발행.
+// =====================================================================
+
+export interface GitHubDraftPayload {
+  title: string;
+  body: string;
+  /** GitHub Projects Status 옵션 이름 (optionId 는 resolveStatusOptionId 로 해석) */
+  statusOption: string;
+  /** 역방향 매칭용 kanban id (body 에 기록) */
+  kanbanId: string;
+}
+
+/** CanonicalTaskModel → GitHub Projects v2 draft 카드 payload. */
+export function canonicalToGithubDraft(task: CanonicalTaskModel): GitHubDraftPayload {
+  const kanbanId = task.task_ref.external_id;
+  const statusOption = normalizedToGithubStatus(task.workflow.normalized_status);
+  const lines = [
+    `kanban-id: ${kanbanId}`,
+    `type: ${task.classification.issue_type}`,
+    `priority: ${task.classification.priority}`,
+  ];
+  if (task.classification.labels.length) lines.push(`labels: ${task.classification.labels.join(', ')}`);
+  if (task.description_ref) lines.push(`source: ${task.description_ref}`);
+  return { title: task.summary, body: lines.join('\n'), statusOption, kanbanId };
+}
+
+/** draft 카드 body 에서 kanban-id 를 역추출 (fetchProjectDrafts 매칭용). */
+export function parseKanbanIdFromBody(body: string | null | undefined): string | undefined {
+  const m = (body ?? '').match(/kanban-id:\s*(\S+)/);
+  return m?.[1];
 }

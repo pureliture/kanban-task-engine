@@ -21,6 +21,10 @@
     "personal": {
       "type": "single",
       "path": "KANBAN_HOME/issues/personal"
+    },
+    "career": {
+      "type": "single",
+      "path": "KANBAN_HOME/issues/career"
     }
   }
 }
