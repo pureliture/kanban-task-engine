@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@kanban-task-engine/core": "workspace:*",
+    "@kanban-task-engine/neurons-enrichment": "workspace:*",
     "yaml": "^2.8.3"
   }
 }
