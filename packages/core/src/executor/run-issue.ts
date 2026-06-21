@@ -15,6 +15,11 @@ import {
   writeRunMetadata as defaultWriteRunMetadata,
 } from './run-artifacts.js';
 import { createKanbanWorktree, getKanbanBranchName } from './worktree.js';
+import { NodeFsVaultPort } from '../ports/node-fs-vault-port.js';
+import { findVaultRegistryIssueById, type RegistryIssueRecord } from '../store/vault-record-loader.js';
+import { WorkflowEngine } from '../runtime/workflow-engine.js';
+import { type IssueStatus } from '@kanban-task-engine/schema';
+import { parseFrontmatter } from '../store/frontmatter-utils.js';
 
 export interface RunIssueArtifactWriters {
   writeRunLog: typeof defaultWriteRunLog;
@@ -82,12 +87,18 @@ export async function runIssueWithAgent(input: RunIssueWithAgentInput): Promise<
     let outcome: RunOutcome = 'FAILED';
     let failureReason: string | undefined;
 
-    await writeIssueDocument(input.issuePath, {
-      ...original.frontmatter,
-      status: 'RUNNING',
-      run_count: runCount,
-      updated: startedAt,
-    }, original.body);
+    const vault = new NodeFsVaultPort(input.vaultRoot);
+    const record = buildRegistryIssueRecord(input.issuePath, input.vaultRoot, original);
+    const engine = new WorkflowEngine();
+    await engine.transition({
+      vault,
+      record,
+      targetStatus: 'RUNNING',
+      now: startedAt,
+      frontmatterPatch: {
+        run_count: runCount,
+      },
+    });
 
     try {
       const worktree = await createKanbanWorktree({
@@ -189,26 +200,49 @@ export async function runIssueWithAgent(input: RunIssueWithAgentInput): Promise<
       }
     }
 
-    const issueBeforeFinalState = await readIssueDocument(input.issuePath);
-    const writeFinalIssueState = async (issue?: Awaited<ReturnType<typeof readIssueDocument>>) => {
-      const latest = issue ?? await readIssueDocument(input.issuePath);
-      await writeIssueDocument(input.issuePath, {
-        ...latest.frontmatter,
-        status: outcome,
-        run_count: runCount,
-        updated: completedAt,
-      }, appendLog(latest.body, formatIssueLogEntry({
+    const writeFinalIssueState = async (targetStatus: RunOutcome) => {
+      const latestDoc = await readIssueDocument(input.issuePath);
+      let latestRecord = buildRegistryIssueRecord(input.issuePath, input.vaultRoot, latestDoc);
+      const logEntry = formatIssueLogEntry({
         at: completedAt,
         issueId: input.issueId,
-        outcome,
+        outcome: targetStatus,
         result: finalAgentResult,
         logPath,
         worktreePath,
         failureReason,
-      })));
+      });
+
+      const finalEngine = new WorkflowEngine();
+      if (latestRecord.status === 'REVIEW' && targetStatus === 'FAILED') {
+        await vault.process(latestRecord.relativePath, (currentContent) => {
+          const currentFrontmatter = parseFrontmatter(currentContent);
+          if (!currentFrontmatter) {
+            throw new Error(`Invalid frontmatter in current note at ${latestRecord.relativePath}`);
+          }
+          const newFM = {
+            ...currentFrontmatter,
+            status: 'RUNNING' as IssueStatus,
+          };
+          return `---\n${YAML.stringify(newFM).trimEnd()}\n---\n\n${original.body.trimStart()}`;
+        });
+        const currentDoc = await readIssueDocument(input.issuePath);
+        latestRecord = buildRegistryIssueRecord(input.issuePath, input.vaultRoot, currentDoc);
+      }
+
+      await finalEngine.transition({
+        vault,
+        record: latestRecord,
+        targetStatus,
+        now: completedAt,
+        frontmatterPatch: {
+          run_count: runCount,
+        },
+        customLogEntry: logEntry,
+      });
     };
 
-    await writeFinalIssueState();
+    await writeFinalIssueState(outcome);
 
     try {
       metadataPath = await artifacts.writeRunMetadata(input.vaultRoot, date, metadata);
@@ -225,9 +259,9 @@ export async function runIssueWithAgent(input: RunIssueWithAgentInput): Promise<
         );
         metadata = { ...metadata, logPath };
       } catch {
-        // The final issue log below records the metadata failure when log rewrite is unavailable.
+        // Keep final issue convergence independent of artifact durability.
       }
-      await writeFinalIssueState(issueBeforeFinalState);
+      await writeFinalIssueState(outcome);
     }
 
     try {
@@ -254,14 +288,14 @@ export async function runIssueWithAgent(input: RunIssueWithAgentInput): Promise<
         );
         metadata = { ...metadata, logPath };
       } catch {
-        // The final issue log below records the event failure when log rewrite is unavailable.
+        // Keep final issue convergence independent of artifact durability.
       }
       try {
         metadataPath = await artifacts.writeRunMetadata(input.vaultRoot, date, metadata);
       } catch {
-        // The final issue log below records the event failure when metadata cannot be rewritten.
+        // Keep final issue convergence independent of artifact durability.
       }
-      await writeFinalIssueState();
+      await writeFinalIssueState(outcome);
       try {
         await artifacts.appendRunEvent(input.vaultRoot, date, {
           type: 'issue.run',
@@ -404,4 +438,32 @@ function errorMessage(error: unknown): string {
 
 function isRecord(input: unknown): input is Record<string, unknown> {
   return typeof input === 'object' && input !== null && !Array.isArray(input);
+}
+
+function buildRegistryIssueRecord(
+  issuePath: string,
+  vaultRoot: string,
+  doc: { raw: string; frontmatter: Frontmatter; body: string },
+): RegistryIssueRecord {
+  const relativePath = path.relative(vaultRoot, issuePath).split(path.sep).join('/');
+  return {
+    id: String(doc.frontmatter.id),
+    status: doc.frontmatter.status as IssueStatus,
+    space: String(doc.frontmatter.project ?? 'local'),
+    absolutePath: path.resolve(issuePath),
+    relativePath,
+    markdown: doc.raw,
+    body: doc.body,
+    frontmatter: doc.frontmatter as any,
+    projection: {
+      id: String(doc.frontmatter.id),
+      title: String(doc.frontmatter.title ?? ''),
+      type: doc.frontmatter.type as any,
+      status: doc.frontmatter.status as IssueStatus,
+      priority: doc.frontmatter.priority as any,
+      project: String(doc.frontmatter.project ?? 'local'),
+      updated: String(doc.frontmatter.updated ?? ''),
+      relativePath,
+    },
+  };
 }
