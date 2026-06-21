@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { getRegistrySpace, listRegistrySpaces } from '../store/registry';
+import { getRegistrySpace, listRegistrySpaces, type RegistrySpace } from '../store/registry';
 import { assertVaultRelativePath, type VaultPort } from '../ports/vault-port';
 import { assertVaultPathInsideRoot } from '../ports/vault-path-security';
 import { NodeFsVaultPort } from '../ports/node-fs-vault-port';
@@ -9,13 +9,16 @@ import {
   loadVaultRegistry,
 } from '../store/vault-record-loader';
 import { renderDataviewIndexMarkdown } from './dataview-index-renderer';
-import { renderObsidianBoardMarkdown } from './obsidian-board-renderer';
+import { renderObsidianBoardMarkdown, type ObsidianBoardIssue } from './obsidian-board-renderer';
+import type { BoardEnrichmentProvider } from './board-enrichment';
 
 export interface CollectBoardProjectionOptions {
   vault?: VaultPort;
   vaultRoot: string;
   space: string;
   generatedAt?: string;
+  /** 선택: neurons enrichment provider (read-only, fail-soft). 미주입 시 enrichment 없는 board */
+  enrichmentProvider?: BoardEnrichmentProvider;
 }
 
 export interface WriteBoardProjectionOptions extends CollectBoardProjectionOptions {}
@@ -25,6 +28,7 @@ export interface WriteBoardProjectionsOptions {
   vaultRoot: string;
   all: true;
   generatedAt?: string;
+  enrichmentProvider?: BoardEnrichmentProvider;
 }
 
 export interface BoardProjection {
@@ -96,6 +100,7 @@ export async function collectBoardProjection(options: CollectBoardProjectionOpti
 
   const issueRecords = await listVaultRegistryIssueRecords({ vault, space: options.space });
   const issues = issueRecords.map(record => record.projection);
+  await applyBoardEnrichment(issues, space, options.enrichmentProvider);
   const boardMarkdown = renderObsidianBoardMarkdown({
     space: options.space,
     generatedAt,
@@ -141,6 +146,7 @@ export async function writeBoardProjections(options: WriteBoardProjectionsOption
       vaultRoot: options.vaultRoot,
       space,
       generatedAt: options.generatedAt,
+      enrichmentProvider: options.enrichmentProvider,
     }));
   }
 
@@ -200,6 +206,30 @@ function toPublicTarget(
 function toWriteResult(projection: BoardProjection): BoardProjectionWriteResult {
   const { boardMarkdown: _boardMarkdown, indexMarkdown: _indexMarkdown, ...result } = projection;
   return result;
+}
+
+/**
+ * board issue 들에 neurons enrichment 를 batch 주입한다 (read-only, fail-soft).
+ * provider 미주입 또는 space.external.brain_id 미설정이면 no-op.
+ * neurons 미가용/오류 시 throw 를 삼키고 enrichment 없는 board 로 진행 (D3 fail-soft).
+ */
+async function applyBoardEnrichment(
+  issues: ObsidianBoardIssue[],
+  space: RegistrySpace,
+  provider?: BoardEnrichmentProvider,
+): Promise<void> {
+  const brainId = space.external?.brain_id;
+  if (!provider || !brainId) return;
+  const brainSlug = brainId.replace(/^\/project\//, '');
+  try {
+    const map = await provider.fetchForBoard({ brainSlug, issueIds: issues.map(issue => issue.id) });
+    for (const issue of issues) {
+      const enrichment = map.get(issue.id);
+      if (enrichment) issue.enrichment = enrichment;
+    }
+  } catch {
+    // fail-soft: enrichment 는 부가기능. neurons 미가용 시 board lifecycle 영향 0.
+  }
 }
 
 function validateRenderedProjection(boardMarkdown: string, indexMarkdown: string): void {

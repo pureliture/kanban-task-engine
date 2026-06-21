@@ -1,5 +1,6 @@
 import { createHash } from 'crypto';
 import { ISSUE_STATUSES, type IssueStatus } from '@kanban-task-engine/schema';
+import type { BoardEnrichment } from './board-enrichment';
 
 export interface ObsidianBoardIssue {
   id: string;
@@ -11,6 +12,8 @@ export interface ObsidianBoardIssue {
   relativePath: string;
   epic?: string;
   priority?: string;
+  /** read-only neurons enrichment overlay (휘발성, checksum/SoT 미포함) */
+  enrichment?: BoardEnrichment;
 }
 
 export interface RenderObsidianBoardOptions {
@@ -81,8 +84,23 @@ function renderCard(issue: ObsidianBoardIssue, generatedAt: string): string {
   const alias = formatCardAlias(issue);
   const priority = normalizePriority(issue.priority);
   const checksum = computeBoardProjectionChecksum(issue);
+  const badge = formatEnrichmentBadge(issue.enrichment);
 
-  return `- [ ] [[${linkTarget}|${alias}]] \`${priority}\` <!-- kanban-task-engine:id=${issue.id} status=${issue.status} checksum=${checksum} source=${encodeURIComponent(issue.relativePath)} generatedAt=${generatedAt} -->`;
+  return `- [ ] [[${linkTarget}|${alias}]] \`${priority}\`${badge} <!-- kanban-task-engine:id=${issue.id} status=${issue.status} checksum=${checksum} source=${encodeURIComponent(issue.relativePath)} generatedAt=${generatedAt} -->`;
+}
+
+/**
+ * read-only enrichment 뱃지 (neurons mirror). checksum 에 포함되지 않으므로 drift 를
+ * 유발하지 않고, .md SoT 와 무관한 휘발 표시다. 카운트가 없으면 빈 문자열.
+ */
+function formatEnrichmentBadge(enrichment: BoardEnrichment | undefined): string {
+  if (!enrichment) return '';
+  const parts: string[] = [];
+  if (enrichment.decisionCount) parts.push(`d${enrichment.decisionCount}`);
+  if (enrichment.driftCount) parts.push(`drift${enrichment.driftCount}`);
+  if (enrichment.incidentCount) parts.push(`inc${enrichment.incidentCount}`);
+  if (enrichment.neighborCount) parts.push(`~${enrichment.neighborCount}`);
+  return parts.length ? ` \`🧠 ${parts.join(' ')}\`` : '';
 }
 
 function formatCardAlias(issue: ObsidianBoardIssue): string {
