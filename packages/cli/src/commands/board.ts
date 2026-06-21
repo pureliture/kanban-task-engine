@@ -22,17 +22,28 @@ import { loadVaultIssueIndex, renderIssueBoard } from '../vault.js';
  *  2) KANBAN_NEURONS_LEDGER — 로컬 stdio(`neuron-knowledge mcp-stdio`). neuron-knowledge 설치 필요.
  *  3) 미설정 — 미주입(enrichment 없는 board).
  * KANBAN_NEURONS_GRAPH=1 이면 stdio 모드에서 graphiti graph 결과 활성화(--enable-graph).
+ * KANBAN_NEURONS_CACHE_TTL_MS / KANBAN_NEURONS_CONCURRENCY 로 enrichment 레이턴시 튜닝(c).
  */
+function enrichmentOptions(): { cacheTtlMs?: number; concurrency?: number } {
+  const ttl = process.env.KANBAN_NEURONS_CACHE_TTL_MS;
+  const concurrency = process.env.KANBAN_NEURONS_CONCURRENCY;
+  return {
+    cacheTtlMs: ttl ? Number(ttl) : undefined,
+    concurrency: concurrency ? Number(concurrency) : undefined,
+  };
+}
+
 function createEnrichmentProvider(): { provider?: BoardEnrichmentProvider; client?: McpClient } {
+  const opts = enrichmentOptions();
   const url = process.env.KANBAN_NEURONS_MCP_URL;
   if (url) {
     const client = new HttpMcpClient({ url });
-    return { provider: new NeuronsBoardEnrichmentProvider(client), client };
+    return { provider: new NeuronsBoardEnrichmentProvider(client, opts), client };
   }
   const ledgerPath = process.env.KANBAN_NEURONS_LEDGER;
   if (ledgerPath) {
     const client = new StdioMcpClient({ ledgerPath, enableGraph: process.env.KANBAN_NEURONS_GRAPH === '1' });
-    return { provider: new NeuronsBoardEnrichmentProvider(client), client };
+    return { provider: new NeuronsBoardEnrichmentProvider(client, opts), client };
   }
   return {};
 }

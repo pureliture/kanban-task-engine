@@ -66,3 +66,66 @@ describe('parseToolResult', () => {
     expect(parseToolResult({ content: [{ type: 'text', text: 'hello' }] })).toEqual({ text: 'hello' });
   });
 });
+
+describe('caching + concurrency (c: latency)', () => {
+  function countingClient(): McpClient & { calls: number } {
+    const client = {
+      calls: 0,
+      async callTool() {
+        client.calls += 1;
+        return { results: [] };
+      },
+      async close() {},
+    };
+    return client;
+  }
+
+  it('serves from TTL cache without re-calling neurons', async () => {
+    const client = countingClient();
+    const provider = new NeuronsBoardEnrichmentProvider(client, { now: () => 1000 });
+    await provider.fetchForBoard({ brainSlug: 'x', issueIds: ['A'] });
+    const afterFirst = client.calls;
+    expect(afterFirst).toBeGreaterThan(0);
+    await provider.fetchForBoard({ brainSlug: 'x', issueIds: ['A'] }); // 캐시 히트
+    expect(client.calls).toBe(afterFirst); // 추가 호출 0
+  });
+
+  it('re-fetches after TTL expiry', async () => {
+    let t = 1000;
+    const client = countingClient();
+    const provider = new NeuronsBoardEnrichmentProvider(client, { cacheTtlMs: 100, now: () => t });
+    await provider.fetchForBoard({ brainSlug: 'x', issueIds: ['A'] });
+    const afterFirst = client.calls;
+    t = 1200; // expiry 초과
+    await provider.fetchForBoard({ brainSlug: 'x', issueIds: ['A'] });
+    expect(client.calls).toBeGreaterThan(afterFirst);
+  });
+
+  it('cacheTtlMs=0 disables caching', async () => {
+    const client = countingClient();
+    const provider = new NeuronsBoardEnrichmentProvider(client, { cacheTtlMs: 0 });
+    await provider.fetchForBoard({ brainSlug: 'x', issueIds: ['A'] });
+    const afterFirst = client.calls;
+    await provider.fetchForBoard({ brainSlug: 'x', issueIds: ['A'] });
+    expect(client.calls).toBeGreaterThan(afterFirst); // 매번 재조회
+  });
+
+  it('runs issues in parallel under the concurrency cap', async () => {
+    let active = 0;
+    let peak = 0;
+    const client: McpClient = {
+      async callTool() {
+        active += 1;
+        peak = Math.max(peak, active);
+        await new Promise((resolve) => setTimeout(resolve, 5));
+        active -= 1;
+        return { results: [] };
+      },
+      async close() {},
+    };
+    const provider = new NeuronsBoardEnrichmentProvider(client, { concurrency: 2, cacheTtlMs: 0 });
+    await provider.fetchForBoard({ brainSlug: 'x', issueIds: ['A', 'B', 'C', 'D', 'E'] });
+    expect(peak).toBeGreaterThan(3); // 2 issue 병렬 발생(직렬이면 issue당 3 tool=3)
+    expect(peak).toBeLessThanOrEqual(6); // cap 2 issue × 3 tool = 6
+  });
+});

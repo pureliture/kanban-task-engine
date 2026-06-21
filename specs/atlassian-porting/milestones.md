@@ -157,7 +157,7 @@ canonical frontmatter = 현행 issue-schema(`type` 계열, `issueType` 아님)�
 - ☑ `HttpMcpClient`(Streamable HTTP, mcp 2025-06-18, session stateless, JSON/SSE 파싱) + CLI 우선순위 배선(`KANBAN_NEURONS_MCP_URL` → `KANBAN_NEURONS_LEDGER` stdio → none)
 - ☑ 단위테스트: core 뱃지 4(+checksum 불침범), provider 6, HTTP 3. 전체 green(core 344, neurons-enrichment 9, cli 74)
 - ☑ **실 mcp-http end-to-end 검증** — `HttpMcpClient`→provider→실 neurons(ssh 터널) 통과. `structuredContent` 파싱·graph_status `available` 확인. (probe 카운트 0 = brain 매칭 데이터 없음, 파이프라인은 동작)
-- ☐ 레이턴시 최적화: `brain_context_resolve` batch + 캐시 TTL (현재 issue당 3 tool 호출 PoC)
+- ☑ **레이턴시 최적화(c, 2026-06-21)**: TTL 캐시(`brainSlug:issueId` 중복 호출 제거) + issue 동시성 cap 병렬화(직렬 루프 제거), CLI env 튜닝(`KANBAN_NEURONS_CACHE_TTL_MS`/`KANBAN_NEURONS_CONCURRENCY`). 테스트 +4(캐시 히트/TTL 만료/비활성/동시성 cap). neurons 무수정. **batch(`brain_context_resolve`)는 보류** — issue별 매칭 불확실 + graph 300s 블로킹 우려(openQuestion 유지). 실 mcp-http 실측(ssh 터널): 1회차 9 tool 호출 1842ms → 2회차 캐시 히트 **0 호출 0ms**.
 - ☐ Tailscale 우분투 online 복구 시 ssh 터널 없이 tailnet IP 직접 연결
 
 **exit-gate**: ☑ 단위(🧠 뱃지 렌더 + checksum/`.md` SoT 불침범) + 실 mcp-http end-to-end 연결·파싱 동작.
