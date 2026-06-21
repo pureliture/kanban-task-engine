@@ -1,19 +1,19 @@
-import fs from 'fs/promises';
-import path from 'path';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { getRegistrySpace, listRegistrySpaces, type RegistrySpace } from '../store/registry';
+import { assertVaultRelativePath, type VaultPort } from '../ports/vault-port';
+import { assertVaultPathInsideRoot } from '../ports/vault-path-security';
+import { NodeFsVaultPort } from '../ports/node-fs-vault-port';
 import {
-  getRegistrySpace,
-  listRegistrySpaces,
-  loadRegistry,
-} from '../store/registry';
-import { atomicWriteFile } from '../store/fs-utils';
-import { resolveVaultPath } from '../store/vault-path';
-import { listRegistryIssueRecords } from '../store/registry-issue-source';
+  listVaultRegistryIssueRecords,
+  loadVaultRegistry,
+} from '../store/vault-record-loader';
 import { renderDataviewIndexMarkdown } from './dataview-index-renderer';
 import { renderObsidianBoardMarkdown, type ObsidianBoardIssue } from './obsidian-board-renderer';
 import type { BoardEnrichmentProvider } from './board-enrichment';
-import type { RegistrySpace } from '../store/registry';
 
 export interface CollectBoardProjectionOptions {
+  vault?: VaultPort;
   vaultRoot: string;
   space: string;
   generatedAt?: string;
@@ -24,6 +24,7 @@ export interface CollectBoardProjectionOptions {
 export interface WriteBoardProjectionOptions extends CollectBoardProjectionOptions {}
 
 export interface WriteBoardProjectionsOptions {
+  vault?: VaultPort;
   vaultRoot: string;
   all: true;
   generatedAt?: string;
@@ -69,22 +70,35 @@ export class BoardProjectionWriteError extends Error {
 }
 
 export async function collectBoardProjection(options: CollectBoardProjectionOptions): Promise<BoardProjection> {
-  const vaultRoot = path.resolve(options.vaultRoot);
-  const registry = await loadRegistry(await resolveVaultPath(vaultRoot, 'registry.yaml'));
+  const vault = options.vault ?? new NodeFsVaultPort(options.vaultRoot);
+  const registry = await loadVaultRegistry(vault);
   const space = getRegistrySpace(registry, options.space);
   const generatedAt = options.generatedAt ?? new Date().toISOString();
 
   const boardRelativePath = space.board;
   const indexRelativePath = space.epicBoard;
-  const boardPath = await resolveRegistryVaultPath(vaultRoot, boardRelativePath, `${options.space}.board`);
-  const indexPath = await resolveRegistryVaultPath(vaultRoot, indexRelativePath, `${options.space}.epicBoard`);
   const issueRoot = space.issues;
   const epicRoot = space.epics;
 
-  await resolveRegistryVaultPath(vaultRoot, issueRoot, `${options.space}.issues`);
-  await resolveRegistryVaultPath(vaultRoot, epicRoot, `${options.space}.epics`);
+  // Lexical safety checks
+  assertVaultRelativePath(boardRelativePath);
+  assertVaultRelativePath(indexRelativePath);
+  assertVaultRelativePath(issueRoot);
+  assertVaultRelativePath(epicRoot);
+  if (space.type === 'container') {
+    for (const project of Object.values(space.projects ?? {})) {
+      assertVaultRelativePath(project.path);
+    }
+  }
 
-  const issueRecords = await listRegistryIssueRecords({ vaultRoot, space: options.space });
+  // Symlink containment checks
+  await assertVaultPathInsideRoot(vault.root, boardRelativePath);
+  await assertVaultPathInsideRoot(vault.root, indexRelativePath);
+
+  const boardPath = path.resolve(vault.root, boardRelativePath);
+  const indexPath = path.resolve(vault.root, indexRelativePath);
+
+  const issueRecords = await listVaultRegistryIssueRecords({ vault, space: options.space });
   const issues = issueRecords.map(record => record.projection);
   await applyBoardEnrichment(issues, space, options.enrichmentProvider);
   const boardMarkdown = renderObsidianBoardMarkdown({
@@ -114,38 +128,43 @@ export async function collectBoardProjection(options: CollectBoardProjectionOpti
 }
 
 export async function writeBoardProjection(options: WriteBoardProjectionOptions): Promise<BoardProjectionWriteResult> {
-  const projection = await collectBoardProjection(options);
-  await writeProjectionTargets([projection]);
+  const vault = options.vault ?? new NodeFsVaultPort(options.vaultRoot);
+  const projection = await collectBoardProjection({ ...options, vault });
+  await writeProjectionTargets(vault, [projection]);
   return toWriteResult(projection);
 }
 
 export async function writeBoardProjections(options: WriteBoardProjectionsOptions): Promise<BoardProjectionWriteResult[]> {
-  const vaultRoot = path.resolve(options.vaultRoot);
-  const registry = await loadRegistry(await resolveVaultPath(vaultRoot, 'registry.yaml'));
+  const vault = options.vault ?? new NodeFsVaultPort(options.vaultRoot);
+  const registry = await loadVaultRegistry(vault);
   const spaces = listRegistrySpaces(registry);
   const projections: BoardProjection[] = [];
 
   for (const space of spaces) {
     projections.push(await collectBoardProjection({
-      vaultRoot,
+      vault,
+      vaultRoot: options.vaultRoot,
       space,
       generatedAt: options.generatedAt,
       enrichmentProvider: options.enrichmentProvider,
     }));
   }
 
-  await writeProjectionTargets(projections);
+  await writeProjectionTargets(vault, projections);
 
   return projections.map(toWriteResult);
 }
 
-async function writeProjectionTargets(projections: BoardProjection[]): Promise<void> {
+async function writeProjectionTargets(vault: VaultPort, projections: BoardProjection[]): Promise<void> {
   const succeeded: BoardProjectionWriteTarget[] = [];
   for (const projection of projections) {
     for (const target of projectionWriteTargets(projection)) {
       try {
-        await fs.mkdir(path.dirname(target.path), { recursive: true });
-        await atomicWriteFile(target.path, target.content);
+        if (await vault.exists(target.relativePath)) {
+          await vault.process(target.relativePath, () => target.content);
+        } else {
+          await vault.create(target.relativePath, target.content);
+        }
         succeeded.push(toPublicTarget(target));
       } catch (error) {
         throw new BoardProjectionWriteError(
@@ -210,24 +229,6 @@ async function applyBoardEnrichment(
     }
   } catch {
     // fail-soft: enrichment 는 부가기능. neurons 미가용 시 board lifecycle 영향 0.
-  }
-}
-
-async function resolveRegistryVaultPath(vaultRoot: string, relativePath: string, field: string): Promise<string> {
-  assertSafeRegistryPath(relativePath, field);
-  return resolveVaultPath(vaultRoot, ...relativePath.split('/'));
-}
-
-function assertSafeRegistryPath(value: string, field: string): void {
-  if (
-    value.trim() === '' ||
-    value.includes('\0') ||
-    value.includes('\\') ||
-    value.includes('//') ||
-    path.isAbsolute(value) ||
-    value.split('/').includes('..')
-  ) {
-    throw new Error(`Unsafe registry ${field} path: ${value}`);
   }
 }
 

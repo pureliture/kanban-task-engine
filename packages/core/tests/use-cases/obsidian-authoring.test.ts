@@ -210,6 +210,27 @@ describe('createObsidianTask', () => {
       'utf8',
     )).rejects.toMatchObject({ code: 'ENOENT' });
   });
+
+  it('preserves Unicode letters and numbers in slugified title including Korean', async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), 'kte-authoring-unicode-'));
+    await seedRegistry(root);
+    const vault = new NodeFsVaultPort(root);
+
+    const result = await createObsidianTask({
+      vault,
+      vaultRoot: root,
+      space: 'vibe-coding',
+      project: 'kanban-task-engine',
+      title: '한글 테스트 티켓 123!',
+      priority: 'P2',
+      executor: 'human',
+      now: new Date('2026-05-15T00:00:00.000Z'),
+      syncBoard: false,
+    });
+
+    expect(result.issueId).toBe('VC-001');
+    expect(result.issuePath).toBe('issues/vibe-coding/kanban-task-engine/VC-001-한글-테스트-티켓-123.md');
+  });
 });
 
 class RecordingVaultPort implements VaultPort {

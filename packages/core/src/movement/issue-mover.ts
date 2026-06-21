@@ -1,13 +1,16 @@
 import YAML from 'yaml';
 import { isIssueStatus, type IssueStatus } from '@kanban-task-engine/schema';
 import { StateMachine } from '../state-machine';
-import { atomicWriteFile } from '../store/fs-utils';
+import { type VaultPort } from '../ports/vault-port';
+import { NodeFsVaultPort } from '../ports/node-fs-vault-port';
 import {
-  findRegistryIssueById,
+  findVaultRegistryIssueById,
   type RegistryIssueRecord,
-} from '../store/registry-issue-source';
+} from '../store/vault-record-loader';
+import { WorkflowEngine } from '../runtime/workflow-engine';
 
 export interface MoveIssueStatusOptions {
+  vault?: VaultPort;
   vaultRoot: string;
   issueId: string;
   targetStatus: IssueStatus;
@@ -35,15 +38,17 @@ export async function moveIssueStatus(options: MoveIssueStatusOptions): Promise<
     throw new Error(`Invalid target status: ${String(options.targetStatus)}`);
   }
 
-  const record = options.record ?? await findRegistryIssueById({
-    vaultRoot: options.vaultRoot,
+  const vault = options.vault ?? new NodeFsVaultPort(options.vaultRoot);
+
+  const record = options.record ?? await findVaultRegistryIssueById({
+    vault,
     issueId: options.issueId,
     space: options.space,
   });
   validateProvidedRecord(options, record);
   const oldStatus = record.frontmatter.status;
   const newStatus = options.targetStatus;
-  const dryRun = options.dryRun ?? false;
+  const dryRun = options.dryRun ?? true;
 
   if (record.frontmatter.type === 'epic') {
     validateEpicTransition(options.issueId, oldStatus, newStatus);
@@ -63,25 +68,15 @@ export async function moveIssueStatus(options: MoveIssueStatusOptions): Promise<
 
   if (!result.changed || dryRun) return result;
 
-  const now = options.now ?? new Date().toISOString();
-  const frontmatter: Record<string, unknown> = {
-    ...record.frontmatter,
-    status: newStatus,
-    updated: now,
-  };
-  if (newStatus === 'DONE') {
-    frontmatter.completed = now;
-  } else {
-    delete frontmatter.completed;
-  }
-
-  const content = `---\n${YAML.stringify(frontmatter).trimEnd()}\n---\n\n${appendLog(record.body, formatMoveLog({
-    now,
-    oldStatus,
-    newStatus,
+  const engine = new WorkflowEngine();
+  await engine.transition({
+    vault,
+    record,
+    targetStatus: newStatus,
     reason: options.reason,
-  })).trimStart()}`;
-  await atomicWriteFile(record.absolutePath, content.endsWith('\n') ? content : `${content}\n`);
+    now: options.now,
+  });
+
   return result;
 }
 
@@ -101,31 +96,4 @@ function validateEpicTransition(issueId: string, oldStatus: IssueStatus, newStat
   if (oldStatus === newStatus) return;
   if (oldStatus === 'TODO' && newStatus === 'DONE') return;
   throw new Error(`Invalid transition: ${oldStatus} -> ${newStatus} for issue ${issueId}`);
-}
-
-function formatMoveLog(input: {
-  now: string;
-  oldStatus: IssueStatus;
-  newStatus: IssueStatus;
-  reason?: string;
-}): string {
-  const suffix = input.reason ? ` (${input.reason})` : '';
-  return `- ${input.now} move: ${input.oldStatus} -> ${input.newStatus}${suffix}`;
-}
-
-function appendLog(body: string, entry: string): string {
-  const normalized = body.trimEnd();
-  const logHeading = normalized.match(/^## 로그\s*$/m);
-  if (logHeading?.index !== undefined) {
-    const logBodyStart = logHeading.index + logHeading[0].length;
-    const rest = normalized.slice(logBodyStart);
-    const nextHeadingOffset = rest.search(/\n##\s+/);
-    if (nextHeadingOffset < 0) return `${normalized}\n\n${entry}\n`;
-
-    const insertAt = logBodyStart + nextHeadingOffset;
-    const before = normalized.slice(0, insertAt).trimEnd();
-    const after = normalized.slice(insertAt).trimStart();
-    return `${before}\n\n${entry}\n\n${after}\n`;
-  }
-  return `${normalized}\n\n## 로그\n\n${entry}\n`;
 }

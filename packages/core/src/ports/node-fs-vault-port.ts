@@ -1,6 +1,10 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { assertVaultRelativePath, type VaultPort } from './vault-port';
+import {
+  assertExistingPathInsideRoot,
+  assertNearestExistingPathInsideRoot,
+} from './vault-path-security';
 import { atomicWriteFile } from '../store/fs-utils';
 
 export class NodeFsVaultPort implements VaultPort {
@@ -30,9 +34,9 @@ export class NodeFsVaultPort implements VaultPort {
   async create(relativePath: string, content: string): Promise<void> {
     const absolutePath = this.resolveLexical(relativePath);
     await fs.mkdir(this.root, { recursive: true });
-    await this.assertNearestExistingPathInsideRoot(path.dirname(absolutePath), relativePath);
+    await assertNearestExistingPathInsideRoot(this.root, path.dirname(absolutePath), relativePath);
     await fs.mkdir(path.dirname(absolutePath), { recursive: true });
-    await this.assertExistingPathInsideRoot(path.dirname(absolutePath), relativePath);
+    await assertExistingPathInsideRoot(this.root, path.dirname(absolutePath), relativePath);
     const handle = await fs.open(absolutePath, 'wx');
     try {
       await handle.writeFile(content, 'utf8');
@@ -52,25 +56,28 @@ export class NodeFsVaultPort implements VaultPort {
   async listMarkdownFiles(root = ''): Promise<string[]> {
     if (root !== '') assertVaultRelativePath(root);
     const start = root === '' ? this.root : this.resolveLexical(root);
-    await this.assertExistingPathInsideRoot(start, root);
+    await assertExistingPathInsideRoot(this.root, start, root);
     const results: string[] = [];
     await this.walk(start, results);
     return results.sort();
   }
 
   private async walk(directory: string, results: string[]): Promise<void> {
-    await this.assertExistingPathInsideRoot(directory, path.relative(this.root, directory));
+    await assertExistingPathInsideRoot(this.root, directory, path.relative(this.root, directory));
     for (const entry of await fs.readdir(directory, { withFileTypes: true })) {
+      if (entry.name.startsWith('.')) {
+        continue;
+      }
       const absolutePath = path.join(directory, entry.name);
       const relativePath = path.relative(this.root, absolutePath).split(path.sep).join('/');
       if (entry.isSymbolicLink()) {
-        await this.assertExistingPathInsideRoot(absolutePath, relativePath);
+        await assertExistingPathInsideRoot(this.root, absolutePath, relativePath);
         continue;
       }
       if (entry.isDirectory()) {
         await this.walk(absolutePath, results);
       } else if (entry.isFile() && entry.name.endsWith('.md')) {
-        await this.assertExistingPathInsideRoot(absolutePath, relativePath);
+        await assertExistingPathInsideRoot(this.root, absolutePath, relativePath);
         results.push(relativePath);
       }
     }
@@ -78,7 +85,7 @@ export class NodeFsVaultPort implements VaultPort {
 
   private async resolveExisting(relativePath: string): Promise<string> {
     const absolutePath = this.resolveLexical(relativePath);
-    await this.assertExistingPathInsideRoot(absolutePath, relativePath);
+    await assertExistingPathInsideRoot(this.root, absolutePath, relativePath);
     return absolutePath;
   }
 
@@ -89,52 +96,5 @@ export class NodeFsVaultPort implements VaultPort {
       throw new Error(`Unsafe vault-relative path: ${relativePath}`);
     }
     return absolutePath;
-  }
-
-  private async assertNearestExistingPathInsideRoot(
-    absolutePath: string,
-    relativePath: string,
-  ): Promise<void> {
-    const nearestPath = await this.nearestExistingPath(absolutePath);
-    await this.assertExistingPathInsideRoot(nearestPath, relativePath);
-  }
-
-  private async assertExistingPathInsideRoot(
-    absolutePath: string,
-    relativePath: string,
-  ): Promise<void> {
-    const realRoot = await fs.realpath(this.root);
-    const realPath = await fs.realpath(absolutePath);
-    if (!this.isInsideOrSame(realPath, realRoot)) {
-      throw new Error(`Vault path escapes root: ${relativePath}`);
-    }
-  }
-
-  private async nearestExistingPath(absolutePath: string): Promise<string> {
-    let current = absolutePath;
-    for (;;) {
-      try {
-        await fs.lstat(current);
-        return current;
-      } catch (error) {
-        if (!this.isNodeError(error) || error.code !== 'ENOENT') {
-          throw error;
-        }
-        const parent = path.dirname(current);
-        if (parent === current) {
-          throw error;
-        }
-        current = parent;
-      }
-    }
-  }
-
-  private isInsideOrSame(candidate: string, root: string): boolean {
-    const relativePath = path.relative(root, candidate);
-    return relativePath === '' || (!relativePath.startsWith('..') && !path.isAbsolute(relativePath));
-  }
-
-  private isNodeError(error: unknown): error is NodeJS.ErrnoException {
-    return typeof error === 'object' && error !== null && 'code' in error;
   }
 }

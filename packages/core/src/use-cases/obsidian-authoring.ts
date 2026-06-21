@@ -5,7 +5,7 @@ import type { VaultPort } from '../ports/vault-port';
 import { getRegistrySpace, type RegistrySpace } from '../store/registry';
 import { allocateNextIssueId } from '../store/sequence';
 import { assertMatchingVaultRoot, writeObsidianBoardForSpace } from './obsidian-board-sync';
-import { listVaultRegistryIssueRecords, loadVaultRegistry } from './obsidian-vault-records';
+import { listVaultRegistryIssueRecords, loadVaultRegistry } from '../store/vault-record-loader';
 
 const PRIORITIES = new Set<string>(['P0', 'P1', 'P2', 'P3']);
 const EXECUTORS = new Set<string>(['human', 'codex', 'claude-code']);
@@ -210,13 +210,13 @@ function selectIssueRoot(space: RegistrySpace, input: CreateObsidianTaskInput): 
 function slugifyTitle(title: string): string {
   const slug = title
     .normalize('NFKD')
-    .replace(/[^\w\s-]/g, '')
+    .replace(/[^\p{L}\p{N}\s-]/gu, '')
     .trim()
     .toLowerCase()
     .replace(/[_\s]+/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
-  return slug || 'issue';
+  return slug.normalize('NFC') || 'issue';
 }
 
 function formatCause(cause: unknown): string {

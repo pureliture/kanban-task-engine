@@ -173,10 +173,10 @@ pnpm obsidian-plugin:dev-link -- --vault "$SMOKE_VAULT"
 
 Do not use the main operating vault as the smoke vault. Use a disposable vault or a purpose-built dev smoke vault so plugin copy/install checks cannot mutate long-lived task state.
 
-For the Phase 3 no-GUI E2E harness, run:
+For the Phase 3 no-GUI smoke setup, run:
 
 ```bash
-pnpm obsidian-plugin:smoke-e2e -- --no-gui
+pnpm obsidian-plugin:smoke-setup -- --no-gui
 ```
 
 This creates a disposable vault, enables the copy-installed `kanban-task-engine` community plugin in `.obsidian/community-plugins.json`, seeds `registry.yaml`, and prints the Obsidian Desktop open command plus vault-scoped Obsidian CLI commands to run when Desktop runtime automation is available.

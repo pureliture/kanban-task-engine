@@ -31,21 +31,21 @@ function deepMerge<T>(target: T, patch: Partial<T>): T {
 
 export interface MarkdownStoreOptions {
   basePath: string | string[];
-  policyEngine?: {
-    onTransition(task: CanonicalTaskModel, transition: StateTransition): Promise<void>;
-    onParseError?(error: Error, filePath: string): void;
-  };
+  onTransition?: (task: CanonicalTaskModel, transition: StateTransition) => Promise<void>;
+  onParseError?: (error: Error, filePath: string) => void;
 }
 
 export class MarkdownStore implements TaskStore {
   private workspacePaths: string[];
-  private policyEngine?: MarkdownStoreOptions['policyEngine'];
+  private onTransition?: (task: CanonicalTaskModel, transition: StateTransition) => Promise<void>;
+  private onParseError?: (error: Error, filePath: string) => void;
   private stateCache: Map<string, CanonicalTaskModel> = new Map();
   private checksumCache: Map<string, string> = new Map();
 
   constructor(basePath: string | string[], options?: MarkdownStoreOptions) {
     this.workspacePaths = Array.isArray(basePath) ? basePath : [basePath];
-    this.policyEngine = options?.policyEngine;
+    this.onTransition = options?.onTransition;
+    this.onParseError = options?.onParseError;
   }
 
   async findByExternalKey(provider: string, externalKey: string): Promise<CanonicalTaskModel | null> {
@@ -55,7 +55,7 @@ export class MarkdownStore implements TaskStore {
     try {
       return await this.readIssueFile(filePath);
     } catch (err) {
-      this.policyEngine?.onParseError?.(err as Error, filePath);
+      this.onParseError?.(err as Error, filePath);
       return null;
     }
   }
@@ -121,7 +121,7 @@ export class MarkdownStore implements TaskStore {
           tasks.push(task);
         }
       } catch (err) {
-        this.policyEngine?.onParseError?.(err as Error, filePath);
+        this.onParseError?.(err as Error, filePath);
       }
     }
 
@@ -201,7 +201,15 @@ export class MarkdownStore implements TaskStore {
   }
 
   private slugify(text: string): string {
-    return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const slug = text
+      .normalize('NFKD')
+      .replace(/[^\p{L}\p{N}\s-]/gu, '')
+      .trim()
+      .toLowerCase()
+      .replace(/[_\s]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+    return slug.normalize('NFC') || 'issue';
   }
 
   private matchesFilter(task: CanonicalTaskModel, filter?: TaskFilter): boolean {
@@ -229,7 +237,7 @@ export class MarkdownStore implements TaskStore {
 
       return task;
     } catch (err) {
-      this.policyEngine?.onParseError?.(err as Error, filePath);
+      this.onParseError?.(err as Error, filePath);
       return null;
     }
   }
@@ -260,7 +268,7 @@ export class MarkdownStore implements TaskStore {
         from: rawStatusToNormalized(oldTask.workflow.raw_status),
         to: rawStatusToNormalized(newTask.workflow.raw_status),
       };
-      await this.policyEngine?.onTransition(newTask, transition);
+      await this.onTransition?.(newTask, transition);
     }
 
     this.stateCache.set(filePath, newTask);

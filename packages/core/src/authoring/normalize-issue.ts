@@ -601,13 +601,13 @@ function appendWarnings(target: string[], warnings: string[]): void {
 function slugifyTitle(title: string): string {
   const slug = title
     .normalize('NFKD')
-    .replace(/[^\w\s-]/g, '')
+    .replace(/[^\p{L}\p{N}\s-]/gu, '')
     .trim()
     .toLowerCase()
     .replace(/[_\s]+/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
-  return slug || 'issue';
+  return slug.normalize('NFC') || 'issue';
 }
 
 function toVaultRelativePath(vaultRoot: string, absolutePath: string): string {

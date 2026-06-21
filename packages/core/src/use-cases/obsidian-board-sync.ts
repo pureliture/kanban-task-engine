@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import type { VaultPort } from '../ports/vault-port';
-import { collectVaultBoardProjection } from './obsidian-vault-records';
+import { collectVaultBoardProjection } from '../store/vault-record-loader';
 
 export interface WriteObsidianBoardForSpaceInput {
   vault: VaultPort;
