@@ -15,6 +15,8 @@ export interface WorkflowTransitionInput {
   targetStatus: IssueStatus;
   reason?: string;
   now?: string;
+  frontmatterPatch?: Record<string, unknown>;
+  customLogEntry?: string;
 }
 
 export interface WorkflowTransitionResult {
@@ -74,7 +76,7 @@ export class WorkflowEngine {
 
     const now = input.now ?? new Date().toISOString();
 
-    const moveLogEntry = this.formatMoveLog({
+    const moveLogEntry = input.customLogEntry ?? this.formatMoveLog({
       now,
       oldStatus,
       newStatus,
@@ -111,6 +113,7 @@ export class WorkflowEngine {
         ...currentFrontmatter,
         status: newStatus,
         updated: now,
+        ...(input.frontmatterPatch ?? {}),
       };
       if (newStatus === 'DONE') {
         newFrontmatter.completed = now;
