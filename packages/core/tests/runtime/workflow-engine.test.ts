@@ -357,4 +357,92 @@ describe('WorkflowEngine', () => {
       frontmatterPatch: { status: 'DONE' },
     })).rejects.toThrow('frontmatterPatch may not override engine-owned field "status"');
   });
+
+  it('uses customLogEntry in place of the synthesized move-log line', async () => {
+    const root = await createTempVault();
+    const vault = new NodeFsVaultPort(root);
+
+    const relativePath = 'issues/space/project/VC-001.md';
+    await vault.create(relativePath, VALID_TASK_MARKDOWN);
+    const record = parseVaultIssueRecord({
+      markdown: VALID_TASK_MARKDOWN,
+      relativePath,
+      space: SPACE_MOCK,
+      spaceName: 'space',
+      vaultRoot: root,
+    });
+
+    const engine = new WorkflowEngine();
+    await engine.transition({
+      vault,
+      record,
+      targetStatus: 'READY',
+      now: '2026-05-25T12:00:00.000Z',
+      customLogEntry: '- 2026-05-25T12:00:00.000Z custom run entry',
+    });
+
+    const updatedContent = await vault.read(relativePath);
+    expect(updatedContent).toContain('- 2026-05-25T12:00:00.000Z custom run entry');
+    expect(updatedContent).not.toContain('move: TODO -> READY');
+  });
+
+  it('rejects reason and customLogEntry supplied together', async () => {
+    const root = await createTempVault();
+    const vault = new NodeFsVaultPort(root);
+
+    const relativePath = 'issues/space/project/VC-001.md';
+    await vault.create(relativePath, VALID_TASK_MARKDOWN);
+    const record = parseVaultIssueRecord({
+      markdown: VALID_TASK_MARKDOWN,
+      relativePath,
+      space: SPACE_MOCK,
+      spaceName: 'space',
+      vaultRoot: root,
+    });
+
+    const engine = new WorkflowEngine();
+    await expect(engine.transition({
+      vault,
+      record,
+      targetStatus: 'READY',
+      reason: 'manual',
+      customLogEntry: '- custom',
+    })).rejects.toThrow('Provide either reason or customLogEntry, not both');
+  });
+
+  it('honours frontmatterPatch and customLogEntry on a no-op call without emitting an event', async () => {
+    const root = await createTempVault();
+    const vault = new NodeFsVaultPort(root);
+
+    const relativePath = 'issues/space/project/VC-001.md';
+    await vault.create(relativePath, VALID_TASK_MARKDOWN);
+    const record = parseVaultIssueRecord({
+      markdown: VALID_TASK_MARKDOWN,
+      relativePath,
+      space: SPACE_MOCK,
+      spaceName: 'space',
+      vaultRoot: root,
+    });
+
+    const bus = new EventBus();
+    const handler = vi.fn();
+    bus.on('policy:transition', handler);
+
+    const engine = new WorkflowEngine({ eventBus: bus });
+    const result = await engine.transition({
+      vault,
+      record,
+      targetStatus: 'TODO', // same as current status -> no-op
+      now: '2026-05-25T12:00:00.000Z',
+      frontmatterPatch: { run_count: 7 },
+      customLogEntry: '- no-op note',
+    });
+
+    expect(result.changed).toBe(false);
+    const updatedContent = await vault.read(relativePath);
+    expect(updatedContent).toContain('run_count: 7');
+    expect(updatedContent).toContain('- no-op note');
+    expect(updatedContent).toContain('status: TODO');
+    expect(handler).not.toHaveBeenCalled();
+  });
 });
