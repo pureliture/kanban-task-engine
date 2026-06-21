@@ -1,4 +1,3 @@
-import YAML from 'yaml';
 import { isIssueStatus } from '@kanban-task-engine/schema';
 import type { BoardReconcileConflict, BoardStatusProposal } from '../boards/reconcile-board';
 import { reconcileBoardFromRecords } from '../boards/reconcile-board';
@@ -9,9 +8,9 @@ import {
   listVaultRegistryIssueRecords,
   loadVaultRegistry,
   parseVaultIssueRecord,
-} from './obsidian-vault-records';
+} from '../store/vault-record-loader';
 import { getRegistrySpace, type RegistrySpace } from '../store/registry';
-import { StateMachine } from '../state-machine';
+import { WorkflowEngine } from '../runtime/workflow-engine';
 
 export interface PreviewObsidianBoardMovesInput {
   vault?: VaultPort;
@@ -161,84 +160,42 @@ async function applyProposalThroughVault(input: {
   change: BoardStatusProposal;
   now?: string;
 }): Promise<ObsidianBoardAppliedMove | undefined> {
-  let result: ObsidianBoardAppliedMove | undefined;
-  await input.vault.process(input.change.relativeIssuePath, content => {
-    const record = parseVaultIssueRecord({
-      markdown: content,
-      relativePath: input.change.relativeIssuePath,
-      space: input.space,
-      spaceName: input.spaceName,
-      vaultRoot: input.vault.root,
-    });
-    if (record.id !== input.change.issueId) {
-      throw new Error(`Record id mismatch: expected ${input.change.issueId}, got ${record.id}`);
-    }
-    if (record.status !== input.change.currentStatus) {
-      throw new Error('Board move preview changed before apply; preview again before applying');
-    }
-    if (!isIssueStatus(input.change.proposedStatus)) {
-      throw new Error(`Invalid target status: ${String(input.change.proposedStatus)}`);
-    }
-    if (record.frontmatter.type === 'epic') {
-      throw new Error(`Epic movement is not supported for issue ${input.change.issueId}`);
-    }
-    if (record.status !== input.change.proposedStatus && !new StateMachine().canTransition(record.status, input.change.proposedStatus)) {
-      throw new Error(`Invalid transition: ${record.status} -> ${input.change.proposedStatus} for issue ${input.change.issueId}`);
-    }
-    if (record.status === input.change.proposedStatus) return content;
-
-    const now = input.now ?? new Date().toISOString();
-    const frontmatter: Record<string, unknown> = {
-      ...record.frontmatter,
-      status: input.change.proposedStatus,
-      updated: now,
-    };
-    if (input.change.proposedStatus === 'DONE') {
-      frontmatter.completed = now;
-    } else {
-      delete frontmatter.completed;
-    }
-    result = {
-      issueId: input.change.issueId,
-      oldStatus: record.status,
-      newStatus: input.change.proposedStatus,
-      relativePath: input.change.relativeIssuePath,
-    };
-    const next = `---\n${YAML.stringify(frontmatter).trimEnd()}\n---\n\n${appendLog(record.body, formatMoveLog({
-      now,
-      oldStatus: record.status,
-      newStatus: input.change.proposedStatus,
-      reason: `reconcile-board:${input.spaceName}`,
-    })).trimStart()}`;
-    return next.endsWith('\n') ? next : `${next}\n`;
+  const content = await input.vault.read(input.change.relativeIssuePath);
+  const record = parseVaultIssueRecord({
+    markdown: content,
+    relativePath: input.change.relativeIssuePath,
+    space: input.space,
+    spaceName: input.spaceName,
+    vaultRoot: input.vault.root,
   });
-  return result;
-}
 
-function formatMoveLog(input: {
-  now: string;
-  oldStatus: BoardStatusProposal['currentStatus'];
-  newStatus: BoardStatusProposal['proposedStatus'];
-  reason: string;
-}): string {
-  return `- ${input.now} move: ${input.oldStatus} -> ${input.newStatus} (${input.reason})`;
-}
-
-function appendLog(body: string, entry: string): string {
-  const normalized = body.trimEnd();
-  const logHeading = normalized.match(/^## 로그\s*$/m);
-  if (logHeading?.index !== undefined) {
-    const logBodyStart = logHeading.index + logHeading[0].length;
-    const rest = normalized.slice(logBodyStart);
-    const nextHeadingOffset = rest.search(/\n##\s+/);
-    if (nextHeadingOffset < 0) return `${normalized}\n\n${entry}\n`;
-
-    const insertAt = logBodyStart + nextHeadingOffset;
-    const before = normalized.slice(0, insertAt).trimEnd();
-    const after = normalized.slice(insertAt).trimStart();
-    return `${before}\n\n${entry}\n\n${after}\n`;
+  if (record.id !== input.change.issueId) {
+    throw new Error(`Record id mismatch: expected ${input.change.issueId}, got ${record.id}`);
   }
-  return `${normalized}\n\n## 로그\n\n${entry}\n`;
+  if (record.status !== input.change.currentStatus) {
+    throw new Error('Board move preview changed before apply; preview again before applying');
+  }
+  if (record.frontmatter.type === 'epic') {
+    throw new Error(`Epic movement is not supported for issue ${input.change.issueId}`);
+  }
+
+  const engine = new WorkflowEngine();
+  const transitionResult = await engine.transition({
+    vault: input.vault,
+    record,
+    targetStatus: input.change.proposedStatus as any,
+    reason: `reconcile-board:${input.spaceName}`,
+    now: input.now,
+  });
+
+  if (!transitionResult.changed) return undefined;
+
+  return {
+    issueId: input.change.issueId,
+    oldStatus: record.status,
+    newStatus: input.change.proposedStatus,
+    relativePath: input.change.relativeIssuePath,
+  };
 }
 
 function formatCause(cause: unknown): string {

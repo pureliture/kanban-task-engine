@@ -31,8 +31,9 @@ describe('MarkdownStore', () => {
     });
 
     it('should track state cache after loadFromFile', async () => {
-      const mockPolicyEngine = { onTransition: vi.fn(), onParseError: vi.fn() };
-      const store = new MarkdownStore('/test', { policyEngine: mockPolicyEngine });
+      const onTransition = vi.fn();
+      const onParseError = vi.fn();
+      const store = new MarkdownStore('/test', { onTransition, onParseError });
 
       vi.mocked(fs.readFile)
         .mockResolvedValueOnce(VALID_ISSUE_MARKDOWN)
@@ -45,8 +46,9 @@ describe('MarkdownStore', () => {
     });
 
     it('rejects invalid constrained issues when listing tasks', async () => {
-      const mockPolicyEngine = { onTransition: vi.fn(), onParseError: vi.fn() };
-      const store = new MarkdownStore('/test', { policyEngine: mockPolicyEngine });
+      const onTransition = vi.fn();
+      const onParseError = vi.fn();
+      const store = new MarkdownStore('/test', { onTransition, onParseError });
 
       vi.mocked(fs.readdir).mockResolvedValueOnce(['invalid.md'] as any);
       vi.mocked(fs.readFile).mockResolvedValueOnce(INVALID_ISSUE_MISSING_목적);
@@ -54,7 +56,7 @@ describe('MarkdownStore', () => {
       const tasks = await store.listTasks();
 
       expect(tasks).toEqual([]);
-      expect(mockPolicyEngine.onParseError).toHaveBeenCalledWith(
+      expect(onParseError).toHaveBeenCalledWith(
         expect.objectContaining({ message: expect.stringContaining('Missing required section: 목적') }),
         '/test/issues/invalid.md'
       );

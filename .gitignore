@@ -10,3 +10,12 @@ issues/
 codex-eval-loop.md
 .superpowers/
 docs/design/brainstorm/
+
+# OS and IDE files
+.DS_Store
+**/.DS_Store
+.claude/
+
+# Python Cache
+__pycache__/
+**/*.pyc

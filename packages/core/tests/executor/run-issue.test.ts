@@ -312,7 +312,7 @@ describe('runIssueWithAgent', () => {
     const appendRunEvent = vi.fn(async () => path.join(vaultRoot, 'events', '2026-04-24.jsonl'));
     const originalWriteFile = fs.writeFile;
     vi.spyOn(fs, 'writeFile').mockImplementation(async (filePath, data, options) => {
-      if (filePath === issuePath && String(data).includes('status: REVIEW')) {
+      if (typeof filePath === 'string' && filePath.startsWith(issuePath) && String(data).includes('status: REVIEW')) {
         throw new Error('issue write failed');
       }
       return originalWriteFile(filePath, data, options);

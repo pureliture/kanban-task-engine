@@ -1,14 +1,16 @@
-import fs from 'fs/promises';
-import os from 'os';
-import path from 'path';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { NodeFsVaultPort } from '../../src/ports/node-fs-vault-port';
 import {
-  findRegistryIssueById,
-  listRegistryIssueRecords,
-} from '../src/store/registry-issue-source';
+  findVaultRegistryIssueById,
+  listVaultRegistryIssueRecords,
+  collectVaultBoardProjection,
+} from '../../src/store/vault-record-loader';
 
 async function makeVault(): Promise<string> {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kanban-phase3-source-'));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kanban-loader-test-'));
   await fs.mkdir(path.join(root, 'issues/vibe-coding/kanban-task-engine'), { recursive: true });
   await fs.mkdir(path.join(root, 'issues/vibe-coding/_epics'), { recursive: true });
   await fs.writeFile(path.join(root, 'registry.yaml'), `spaces:
@@ -55,11 +57,12 @@ Use tests.
   return root;
 }
 
-describe('registry issue source', () => {
+describe('VaultRecordLoader', () => {
   it('lists valid issue records with vault-relative paths', async () => {
     const vaultRoot = await makeVault();
+    const vault = new NodeFsVaultPort(vaultRoot);
 
-    const records = await listRegistryIssueRecords({ vaultRoot, space: 'vibe-coding' });
+    const records = await listVaultRegistryIssueRecords({ vault, space: 'vibe-coding' });
 
     expect(records).toHaveLength(1);
     expect(records[0]).toMatchObject({
@@ -76,8 +79,9 @@ describe('registry issue source', () => {
 
   it('finds exactly one issue by frontmatter id', async () => {
     const vaultRoot = await makeVault();
+    const vault = new NodeFsVaultPort(vaultRoot);
 
-    const record = await findRegistryIssueById({ vaultRoot, issueId: 'VC-001' });
+    const record = await findVaultRegistryIssueById({ vault, issueId: 'VC-001' });
 
     expect(record.space).toBe('vibe-coding');
     expect(record.frontmatter.title).toBe('Ready item');
@@ -89,8 +93,22 @@ describe('registry issue source', () => {
       path.join(vaultRoot, 'issues/vibe-coding/kanban-task-engine/VC-001-ready.md'),
       path.join(vaultRoot, 'issues/vibe-coding/kanban-task-engine/VC-001-duplicate.md'),
     );
+    const vault = new NodeFsVaultPort(vaultRoot);
 
-    await expect(findRegistryIssueById({ vaultRoot, issueId: 'VC-001' }))
+    await expect(findVaultRegistryIssueById({ vault, issueId: 'VC-001' }))
       .rejects.toThrow('Duplicate issue id: VC-001');
+  });
+
+  it('collects vault board projection successfully', async () => {
+    const vaultRoot = await makeVault();
+    const vault = new NodeFsVaultPort(vaultRoot);
+
+    const projection = await collectVaultBoardProjection({ vault, space: 'vibe-coding' });
+
+    expect(projection.space).toBe('vibe-coding');
+    expect(projection.boardRelativePath).toBe('boards/vibe-coding.md');
+    expect(projection.indexRelativePath).toBe('boards/vibe-coding-epics.md');
+    expect(projection.issueCount).toBe(1);
+    expect(projection.boardMarkdown).toContain('kanban-plugin: board');
   });
 });
