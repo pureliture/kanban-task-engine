@@ -16,10 +16,10 @@ import {
 } from './run-artifacts.js';
 import { createKanbanWorktree, getKanbanBranchName } from './worktree.js';
 import { NodeFsVaultPort } from '../ports/node-fs-vault-port.js';
-import { findVaultRegistryIssueById, type RegistryIssueRecord } from '../store/vault-record-loader.js';
+import { type RegistryIssueRecord } from '../store/vault-record-loader.js';
 import { WorkflowEngine } from '../runtime/workflow-engine.js';
-import { type IssueStatus } from '@kanban-task-engine/schema';
-import { parseFrontmatter } from '../store/frontmatter-utils.js';
+import { StateMachine } from '../state-machine.js';
+import { type IssueStatus, VALID_ISSUE_TRANSITIONS } from '@kanban-task-engine/schema';
 
 export interface RunIssueArtifactWriters {
   writeRunLog: typeof defaultWriteRunLog;
@@ -200,9 +200,33 @@ export async function runIssueWithAgent(input: RunIssueWithAgentInput): Promise<
       }
     }
 
+    // REVIEW->FAILED is not a base transition, but finalization must converge a
+    // REVIEWed run to FAILED in a SINGLE atomic write — no intermediate physical
+    // RUNNING write (which created a crash window, a phantom REVIEW->RUNNING file
+    // event, and dropped the live note body for the pre-run snapshot). The engine
+    // preserves the current note body and appends the log in that one write.
+    const finalEngine = new WorkflowEngine({
+      stateMachine: new StateMachine([...VALID_ISSUE_TRANSITIONS, { from: 'REVIEW', to: 'FAILED' }]),
+    });
+
+    // Last-resort convergence when the engine transition is blocked by freshness
+    // drift (e.g. id/type mutated on disk by a concurrent external editor). The run
+    // is logically terminal; never strand the issue in RUNNING once the lock drops.
+    const forceTerminalStatus = async (targetStatus: RunOutcome, logEntry: string): Promise<void> => {
+      const latestDoc = await readIssueDocument(input.issuePath);
+      const frontmatter: Frontmatter = {
+        ...latestDoc.frontmatter,
+        status: targetStatus,
+        updated: completedAt,
+        run_count: runCount,
+      };
+      delete frontmatter.completed;
+      await writeIssueDocument(input.issuePath, frontmatter, appendLog(latestDoc.body, logEntry));
+    };
+
     const writeFinalIssueState = async (targetStatus: RunOutcome) => {
       const latestDoc = await readIssueDocument(input.issuePath);
-      let latestRecord = buildRegistryIssueRecord(input.issuePath, input.vaultRoot, latestDoc);
+      const latestRecord = buildRegistryIssueRecord(input.issuePath, input.vaultRoot, latestDoc);
       const logEntry = formatIssueLogEntry({
         at: completedAt,
         issueId: input.issueId,
@@ -213,33 +237,20 @@ export async function runIssueWithAgent(input: RunIssueWithAgentInput): Promise<
         failureReason,
       });
 
-      const finalEngine = new WorkflowEngine();
-      if (latestRecord.status === 'REVIEW' && targetStatus === 'FAILED') {
-        await vault.process(latestRecord.relativePath, (currentContent) => {
-          const currentFrontmatter = parseFrontmatter(currentContent);
-          if (!currentFrontmatter) {
-            throw new Error(`Invalid frontmatter in current note at ${latestRecord.relativePath}`);
-          }
-          const newFM = {
-            ...currentFrontmatter,
-            status: 'RUNNING' as IssueStatus,
-          };
-          return `---\n${YAML.stringify(newFM).trimEnd()}\n---\n\n${original.body.trimStart()}`;
+      try {
+        await finalEngine.transition({
+          vault,
+          record: latestRecord,
+          targetStatus,
+          now: completedAt,
+          frontmatterPatch: {
+            run_count: runCount,
+          },
+          customLogEntry: logEntry,
         });
-        const currentDoc = await readIssueDocument(input.issuePath);
-        latestRecord = buildRegistryIssueRecord(input.issuePath, input.vaultRoot, currentDoc);
+      } catch {
+        await forceTerminalStatus(targetStatus, logEntry);
       }
-
-      await finalEngine.transition({
-        vault,
-        record: latestRecord,
-        targetStatus,
-        now: completedAt,
-        frontmatterPatch: {
-          run_count: runCount,
-        },
-        customLogEntry: logEntry,
-      });
     };
 
     await writeFinalIssueState(outcome);

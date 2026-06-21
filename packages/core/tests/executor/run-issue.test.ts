@@ -366,7 +366,10 @@ describe('runIssueWithAgent', () => {
     const updatedIssue = await fs.readFile(issuePath, 'utf8');
     expect(updatedIssue).toContain('status: FAILED');
     expect(updatedIssue).toContain('Artifact writing failed: metadata volume readonly');
-    expect(updatedIssue).not.toContain('run -> REVIEW');
+    // REVIEW->FAILED now finalizes in a single atomic write that preserves the live
+    // note body, so the earlier REVIEW log entry survives alongside the FAILED one.
+    expect(updatedIssue).toContain('run -> REVIEW');
+    expect(updatedIssue).toContain('run -> FAILED');
     await expect(fs.access(result.metadataPath)).rejects.toMatchObject({ code: 'ENOENT' });
   });
 

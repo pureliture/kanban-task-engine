@@ -29,6 +29,9 @@ export interface WorkflowTransitionResult {
 
 const EPIC_BLOCKED_STATUSES = new Set<IssueStatus>(['READY', 'RUNNING', 'REVIEW', 'FAILED']);
 
+/** Frontmatter fields the engine owns; callers may not set them via frontmatterPatch. */
+const ENGINE_OWNED_FRONTMATTER = ['status', 'updated', 'completed', 'id', 'type'] as const;
+
 export class WorkflowEngine {
   private stateMachine: StateMachine;
   private policyEngine?: PolicyEngine;
@@ -53,6 +56,12 @@ export class WorkflowEngine {
       throw new Error(`Invalid target status: ${String(newStatus)}`);
     }
 
+    // customLogEntry fully replaces the move-log line, so `reason` would be silently
+    // dropped if both were supplied. Make the conflict loud instead.
+    if (input.customLogEntry !== undefined && input.reason !== undefined) {
+      throw new Error('Provide either reason or customLogEntry, not both');
+    }
+
     // 1. Transition validation
     if (record.frontmatter.type === 'epic') {
       this.validateEpicTransition(record.id, oldStatus, newStatus);
@@ -70,18 +79,20 @@ export class WorkflowEngine {
       relativePath: record.relativePath,
     };
 
-    if (!result.changed) {
+    // A same-status call is still honoured when it carries a frontmatterPatch or a
+    // customLogEntry, so callers never silently lose a patch/log on a no-op.
+    const hasPayload = input.frontmatterPatch !== undefined || input.customLogEntry !== undefined;
+    if (!result.changed && !hasPayload) {
       return result;
     }
 
     const now = input.now ?? new Date().toISOString();
 
-    const moveLogEntry = input.customLogEntry ?? this.formatMoveLog({
-      now,
-      oldStatus,
-      newStatus,
-      reason: input.reason,
-    });
+    // On a no-op (status unchanged) emit a log line only if the caller supplied one;
+    // there is no synthetic move line to write.
+    const moveLogEntry = input.customLogEntry ?? (result.changed
+      ? this.formatMoveLog({ now, oldStatus, newStatus, reason: input.reason })
+      : undefined);
 
     const writtenContent = await vault.process(record.relativePath, (currentContent) => {
       const currentFrontmatter = parseFrontmatter(currentContent);
@@ -107,13 +118,22 @@ export class WorkflowEngine {
       }
 
       // Preserve current body edits and append log into current ## 로그
-      const bodyWithLog = this.appendLog(currentBody, moveLogEntry);
+      const bodyWithLog = moveLogEntry !== undefined ? this.appendLog(currentBody, moveLogEntry) : currentBody;
 
+      const patch = input.frontmatterPatch ?? {};
+      for (const key of ENGINE_OWNED_FRONTMATTER) {
+        if (key in patch) {
+          throw new Error(`frontmatterPatch may not override engine-owned field "${key}"`);
+        }
+      }
+
+      // Patch is spread BEFORE the engine-owned fields so the engine always wins
+      // ownership of status/updated/completed (and id/type freshness is guarded above).
       const newFrontmatter: Record<string, unknown> = {
         ...currentFrontmatter,
+        ...patch,
         status: newStatus,
         updated: now,
-        ...(input.frontmatterPatch ?? {}),
       };
       if (newStatus === 'DONE') {
         newFrontmatter.completed = now;
@@ -125,18 +145,21 @@ export class WorkflowEngine {
       return content.endsWith('\n') ? content : `${content}\n`;
     });
 
-    // 2. Policy Engine / Event Bus evaluation only after successful write
-    if (this.policyEngine) {
-      const task = markdownIssueToCanonical(writtenContent, record.relativePath);
-      task.workflow.normalized_status = oldStatus;
-      task.workflow.raw_status = oldStatus;
-      await this.policyEngine.onTransition(task, newStatus);
-    } else if (this.eventBus) {
-      // 3. Direct Event Bus publishing if PolicyEngine is not used but EventBus is present
-      this.eventBus.emit(POLICY_EVENTS.TRANSITION, {
-        taskRef: { provider: 'local', external_key: record.space, external_id: record.id },
-        transition: { from: oldStatus, to: newStatus },
-      });
+    // 2. Policy Engine / Event Bus evaluation only after a real status change.
+    // A payload-only no-op write must not emit a phantom transition.
+    if (result.changed) {
+      if (this.policyEngine) {
+        const task = markdownIssueToCanonical(writtenContent, record.relativePath);
+        task.workflow.normalized_status = oldStatus;
+        task.workflow.raw_status = oldStatus;
+        await this.policyEngine.onTransition(task, newStatus);
+      } else if (this.eventBus) {
+        // 3. Direct Event Bus publishing if PolicyEngine is not used but EventBus is present
+        this.eventBus.emit(POLICY_EVENTS.TRANSITION, {
+          taskRef: { provider: 'local', external_key: record.space, external_id: record.id },
+          transition: { from: oldStatus, to: newStatus },
+        });
+      }
     }
 
     return result;
