@@ -36,6 +36,7 @@ export type {
 } from './boards/obsidian-board-renderer';
 export { renderDataviewIndexMarkdown } from './boards/dataview-index-renderer';
 export type { RenderDataviewIndexOptions } from './boards/dataview-index-renderer';
+export type { BoardEnrichment, BoardEnrichmentProvider } from './boards/board-enrichment';
 export {
   collectBoardProjection,
   writeBoardProjection,

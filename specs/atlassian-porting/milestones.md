@@ -17,6 +17,7 @@
 | M5 | safe-tenant live 증명 (Atlassian) | ⏸ DEFERRED | Atlassian 현재 불가 — 보류 |
 | M-GH | GitHub Projects 칸반 발행 (Jira 대체) | ☑ DONE | draft 발행 + status 매핑 readback 검증 |
 | — | Confluence | ✖ SKIP | 사용자 결정으로 완전 스킵 |
+| M-N | neurons enrichment (Phase 1, read-only) | ☑ DONE | HTTP+stdio client, 실 mcp-http end-to-end 검증(ssh터널). 뱃지 데이터 표시는 brain 매칭 의존 |
 
 ---
 
@@ -132,6 +133,40 @@ canonical frontmatter = 현행 issue-schema(`type` 계열, `issueType` 아님)�
 **✋ human-gate**: 모든 실 write는 human 승인 직후에만.
 
 ---
+
+## M-N — neurons enrichment (Phase 1, read-only) ◐ READY-TO-START
+
+**목표 (D3 A노선)**: neurons knowledge(decision/drift/incident)를 board 카드에 read-only overlay로 표시. `.md` SoT 불침범, neurons = read-only mirror. 조회 실패는 fail-soft(enrichment 없는 board 정상).
+
+**실측 완료 (Explore, 2026-06-20):**
+- 호출: `neuron-knowledge mcp-stdio --ledger <path> [--enable-graph]` — JSON-RPC over stdio, 인증 없음(로컬 프로세스 신뢰). TS는 `child_process.spawn`. HTTP(`mcp-http` :8765)는 미머지 WIP.
+- tool: `brain.query`(brain_id,query) · `brain_memory_search`(project,card_types[]) · `brain_incident_search`(symptom,project) · `brain_drift_explain`(subject,project) · `brain_context_resolve`(repository,branch,current_request,project — **project당 1회 batch**) · `brain_evidence_get`(source_ref_id, on-demand).
+- brain_id 연결: `space.external.brain_id`(M2에서 설정, 예 `/project/openclaw`) 우선, slug=`brain_id.replace('/project/','')`. `toLowerCase` fallback은 REFUTED.
+- kanban 주입점: `packages/core/src/boards/board-projection.ts:83`(batch fetch 후 issues 병합) + `obsidian-board-renderer.ts:79 renderCard()`(`ObsidianBoardIssue`에 `enrichment?` 확장). overlay DTO 분리 → CanonicalTaskModel 불변.
+- EnrichmentOverlay 매핑: decisions←`brain_memory_search(card_types=[decision])`, driftCount←`brain_drift_explain.drift_events.length`, incidents←`brain_incident_search`, graphNeighbors←`graph_results[].relations`.
+
+**선결 (착수 전 검증):**
+1. neurons ledger 경로 확보 + `brain.resolve({query:""})`로 실 brain_id 목록 확인 → registry `external.brain_id` 실값 검증.
+2. graphiti `--enable-graph` 가동 여부(없으면 `NullGraphMemoryAdapter` → graph 결과 빈 배열).
+
+**작업 단계 (2026-06-20 코드 완료):**
+- ☑ `packages/neurons-enrichment` 신규 — `StdioMcpClient`(JSON-RPC over stdio) + `McpClient` 추상화 + `parseToolResult`
+- ☑ core 포트 `BoardEnrichment`/`BoardEnrichmentProvider`(`boards/board-enrichment.ts`) + `NeuronsBoardEnrichmentProvider` tool 매핑
+- ☑ `ObsidianBoardIssue.enrichment?` 확장 + `renderCard` 🧠 뱃지 (checksum 미포함 = SoT 불침범)
+- ☑ `board-projection.ts` `applyBoardEnrichment` fail-soft 주입 + CLI `board` env opt-in 배선(`KANBAN_NEURONS_LEDGER`, `KANBAN_NEURONS_GRAPH`)
+- ☑ `HttpMcpClient`(Streamable HTTP, mcp 2025-06-18, session stateless, JSON/SSE 파싱) + CLI 우선순위 배선(`KANBAN_NEURONS_MCP_URL` → `KANBAN_NEURONS_LEDGER` stdio → none)
+- ☑ 단위테스트: core 뱃지 4(+checksum 불침범), provider 6, HTTP 3. 전체 green(core 344, neurons-enrichment 9, cli 74)
+- ☑ **실 mcp-http end-to-end 검증** — `HttpMcpClient`→provider→실 neurons(ssh 터널) 통과. `structuredContent` 파싱·graph_status `available` 확인. (probe 카운트 0 = brain 매칭 데이터 없음, 파이프라인은 동작)
+- ☐ 레이턴시 최적화: `brain_context_resolve` batch + 캐시 TTL (현재 issue당 3 tool 호출 PoC)
+- ☐ Tailscale 우분투 online 복구 시 ssh 터널 없이 tailnet IP 직접 연결
+
+**exit-gate**: ☑ 단위(🧠 뱃지 렌더 + checksum/`.md` SoT 불침범) + 실 mcp-http end-to-end 연결·파싱 동작.
+
+**선결 해소(메모리 stale 정정)**: Mac에 `neuron-knowledge` 없는 건 정상 — neurons는 **우분투 서버 컨테이너** 가동(ledger=PG, `.db` 아님). mcp-http는 **이미 배포돼 healthy**(`neurons-mcp-neuron-knowledge-mcp-1`, `--host 127.0.0.1 --port 8765 --enable-graph --graph-required`, loopback). Mac은 tailnet offline → **ssh 터널**(`ssh -fN -L 8765:127.0.0.1:8765 ragflow-ubuntu`) + `KANBAN_NEURONS_MCP_URL=http://127.0.0.1:8765/mcp`로 연결.
+
+**잔여(뱃지 실데이터)**: neurons에 kanban project brain(예 `/project/vibe-coding`) 데이터가 없어 현재 enrichment 카운트 0. 실 뱃지가 뜨려면 neurons에 kanban knowledge 적재 필요(별도 작업).
+
+**openQuestion**: TS↔Python stdio 동기 렌더 블로킹→캐시/프리페치 · `brain_evidence_get` device_id_hash 획득(evidence content는 deferred, locator만).
 
 ## 누적 working state (agentic-execution 메모)
 
