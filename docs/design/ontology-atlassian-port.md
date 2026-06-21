@@ -23,19 +23,32 @@
 | `CanonicalTaskModel` | `packages/core/src/types.ts` | 런타임 sync / state machine | issue_type=`Epic/Story/Task/Bug/Sub-task`, priority=`Blocker/Critical/High/Medium/Low/Trivial` (Jira 친화적) |
 | `CanonicalIssueModel` | `packages/schema/src/issue-schema.ts` | schema 검증 | issue_type=`epic/task/bug/chore/docs`, priority=`P0/P1/P2/P3` |
 
-두 모델은 공통 엔티티 골격을 공유한다:
+두 모델은 공통 엔티티 골격을 공유하지만, **필드 구성과 타입이 완전히 동일하지는 않다**.
+아래 골격에 모델 간 차이를 함께 표기한다(통합 설계 시 반드시 고려해야 할 지점).
 
 ```
 task_ref { provider, external_key, external_id }
 summary
+description_ref?                  # CanonicalTaskModel 전용 (Jira description 매핑에 사용)
 workflow { normalized_status, raw_status, raw_status_category }
 classification { issue_type, priority, labels, component }
 ownership { assignee, reporter }
-planning { … }
+planning { … }                   # Task=구조화된 Planning(sprint/due_date/estimate), Issue=Record<string, unknown>
 automation { policy_id, on_enter, on_exit, execution_profile, … }
+                                 #   Task에만 trigger / allowedActions / extra 추가
 sync { last_synced_at, last_source, … }
+                                 #   Task에만 checksum / jira 메타데이터 존재
 created? / updated? / completed?
 ```
+
+#### 모델 간 필드 차이 (통합 시 정합화 필요)
+
+| 필드 | `CanonicalTaskModel` (core) | `CanonicalIssueModel` (schema) |
+|---|---|---|
+| `description_ref` | 있음 | 없음 |
+| `planning` | 구조화된 `Planning` (sprint, due_date, estimate) | `Record<string, unknown>` |
+| `automation` | + `trigger`, `allowedActions`, `extra` | 기본 필드만 |
+| `sync` | + `checksum`, `jira` | `last_synced_at`, `last_source`만 |
 
 ### 2.1 분류 체계 불일치 (핵심 이슈)
 
