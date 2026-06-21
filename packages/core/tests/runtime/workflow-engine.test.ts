@@ -304,4 +304,57 @@ describe('WorkflowEngine', () => {
     expect(updatedContent).not.toContain('Purpose.');
     expect(updatedContent).toContain('- 2026-05-25T12:00:00.000Z move: TODO -> READY');
   });
+
+  it('applies frontmatterPatch without letting it override engine-owned fields', async () => {
+    const root = await createTempVault();
+    const vault = new NodeFsVaultPort(root);
+
+    const relativePath = 'issues/space/project/VC-001.md';
+    await vault.create(relativePath, VALID_TASK_MARKDOWN);
+    const record = parseVaultIssueRecord({
+      markdown: VALID_TASK_MARKDOWN,
+      relativePath,
+      space: SPACE_MOCK,
+      spaceName: 'space',
+      vaultRoot: root,
+    });
+
+    const engine = new WorkflowEngine();
+    await engine.transition({
+      vault,
+      record,
+      targetStatus: 'READY',
+      now: '2026-05-25T12:00:00.000Z',
+      frontmatterPatch: { run_count: 3 },
+    });
+
+    const updatedContent = await vault.read(relativePath);
+    expect(updatedContent).toContain('run_count: 3');
+    expect(updatedContent).toContain('status: READY');
+    expect(updatedContent).toContain('updated: 2026-05-25T12:00:00.000Z');
+  });
+
+  it('rejects a frontmatterPatch that targets an engine-owned field', async () => {
+    const root = await createTempVault();
+    const vault = new NodeFsVaultPort(root);
+
+    const relativePath = 'issues/space/project/VC-001.md';
+    await vault.create(relativePath, VALID_TASK_MARKDOWN);
+    const record = parseVaultIssueRecord({
+      markdown: VALID_TASK_MARKDOWN,
+      relativePath,
+      space: SPACE_MOCK,
+      spaceName: 'space',
+      vaultRoot: root,
+    });
+
+    const engine = new WorkflowEngine();
+    await expect(engine.transition({
+      vault,
+      record,
+      targetStatus: 'READY',
+      now: '2026-05-25T12:00:00.000Z',
+      frontmatterPatch: { status: 'DONE' },
+    })).rejects.toThrow('frontmatterPatch may not override engine-owned field "status"');
+  });
 });

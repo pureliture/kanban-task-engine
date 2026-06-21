@@ -29,6 +29,9 @@ export interface WorkflowTransitionResult {
 
 const EPIC_BLOCKED_STATUSES = new Set<IssueStatus>(['READY', 'RUNNING', 'REVIEW', 'FAILED']);
 
+/** Frontmatter fields the engine owns; callers may not set them via frontmatterPatch. */
+const ENGINE_OWNED_FRONTMATTER = ['status', 'updated', 'completed', 'id', 'type'] as const;
+
 export class WorkflowEngine {
   private stateMachine: StateMachine;
   private policyEngine?: PolicyEngine;
@@ -109,11 +112,20 @@ export class WorkflowEngine {
       // Preserve current body edits and append log into current ## 로그
       const bodyWithLog = this.appendLog(currentBody, moveLogEntry);
 
+      const patch = input.frontmatterPatch ?? {};
+      for (const key of ENGINE_OWNED_FRONTMATTER) {
+        if (key in patch) {
+          throw new Error(`frontmatterPatch may not override engine-owned field "${key}"`);
+        }
+      }
+
+      // Patch is spread BEFORE the engine-owned fields so the engine always wins
+      // ownership of status/updated/completed (and id/type freshness is guarded above).
       const newFrontmatter: Record<string, unknown> = {
         ...currentFrontmatter,
+        ...patch,
         status: newStatus,
         updated: now,
-        ...(input.frontmatterPatch ?? {}),
       };
       if (newStatus === 'DONE') {
         newFrontmatter.completed = now;
