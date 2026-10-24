@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
+import os from 'os';
 import grayMatter from 'gray-matter';
 
 function expandHome(input: string): string {
@@ -9,7 +10,7 @@ function expandHome(input: string): string {
 }
 
 function kanbanHome(): string {
-  return path.resolve(expandHome(process.env.KANBAN_HOME || '<OPENCLAW_HOME>/workspace-kanban/kanban'));
+  return path.resolve(process.env.KANBAN_HOME || path.join(process.env.HOME || os.homedir(), '.openclaw', 'workspace-kanban', 'kanban'));
 }
 
 const PRIORITY_TO_P: Record<string, string> = {

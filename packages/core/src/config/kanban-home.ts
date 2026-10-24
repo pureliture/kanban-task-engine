@@ -10,7 +10,7 @@ export function expandHome(input: string): string {
 export function resolveKanbanHome(env: NodeJS.ProcessEnv = process.env): string {
   const configured = env.KANBAN_HOME && env.KANBAN_HOME.trim() !== ''
     ? env.KANBAN_HOME
-    : '<OPENCLAW_HOME>/workspace-kanban/kanban';
+    : path.join(os.homedir(), '.openclaw', 'workspace-kanban', 'kanban');
   return path.resolve(expandHome(configured));
 }
 
